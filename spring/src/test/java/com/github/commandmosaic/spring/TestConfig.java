@@ -15,14 +15,12 @@
  */
 
  
-package com.github.commandmosaic;
+package com.github.commandmosaic.spring;
 
 import com.github.commandmosaic.api.CommandDispatcher;
 import com.github.commandmosaic.api.conversion.TypeConversionService;
 import com.github.commandmosaic.core.conversion.DefaultTypeConversionService;
-import com.github.commandmosaic.spring.InjectingBeanPostProcessor;
 import com.github.commandmosaic.api.configuration.CommandDispatcherConfiguration;
-import com.github.commandmosaic.spring.SpringCommandDispatcherFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;

@@ -14,27 +14,10 @@
  * limitations under the License.
  */
 
- 
-package com.github.commandmosaic.sample;
 
-import com.github.commandmosaic.api.Command;
-import com.github.commandmosaic.api.Parameter;
-import com.github.commandmosaic.api.CommandContext;
+module com.github.commandmosaic.servlet.common {
+    requires transitive com.github.commandmosaic.api;
+    requires javax.servlet.api;
 
-import java.util.Date;
-
-public class GetDateCommand implements Command<String> {
-
-    @Parameter
-    private Date date;
-
-    GetDateCommand() {
-        System.out.println("New instance is created");
-    }
-
-
-    @Override
-    public String execute(CommandContext context) {
-        return "The current date is: " + date;
-    }
+    exports com.github.commandmosaic.http.servlet.common;
 }

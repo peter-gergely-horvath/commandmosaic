@@ -15,20 +15,23 @@
  */
 
  
-package com.github.commandmosaic.servlet;
+package com.github.commandmosaic.spring;
 
 import com.github.commandmosaic.api.Command;
-import com.github.commandmosaic.api.CommandContext;
 import com.github.commandmosaic.api.Parameter;
+import com.github.commandmosaic.api.CommandContext;
 
-public class GreetCommand implements Command<String> {
+public class GetNumberCommand implements Command<String> {
 
     @Parameter
-    private String name;
+    private Number number;
 
     @Override
     public String execute(CommandContext context) {
+        return "The number is: " + number;
+    }
 
-        return "Hello " + name;
+    public void setNumber(Number number) {
+        this.number = number;
     }
 }

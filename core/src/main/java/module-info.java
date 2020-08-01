@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
- 
-package com.github.commandmosaic.sample;
 
-import com.github.commandmosaic.api.Command;
-import com.github.commandmosaic.api.Parameter;
-import com.github.commandmosaic.api.CommandContext;
+module com.github.commandmosaic.core {
+    requires transitive com.github.commandmosaic.api;
 
-public class GetNumberCommand implements Command<String> {
+    requires com.google.gson;
+    requires transitive com.google.common;
+    requires transitive org.slf4j;
 
-    @Parameter
-    private Number number;
-
-    @Override
-    public String execute(CommandContext context) {
-        return "The number is: " + number;
-    }
-
-    public void setNumber(Number number) {
-        this.number = number;
-    }
+    exports com.github.commandmosaic.core;
+    exports com.github.commandmosaic.core.conversion;
+    exports com.github.commandmosaic.core.factory;
+    exports com.github.commandmosaic.core.interceptor;
+    exports com.github.commandmosaic.core.parameter.source;
+    exports com.github.commandmosaic.core.server;
+    exports com.github.commandmosaic.core.server.model;
+    exports com.github.commandmosaic.core.parameter;
 }

@@ -50,10 +50,15 @@
             <version>4.5.12</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <scope>test</scope>
+            <!--
+            only set to compile for modules support:
+            in reality this is used for testing only
+            -->
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>

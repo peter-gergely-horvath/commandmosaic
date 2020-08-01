@@ -15,7 +15,7 @@
  */
 
  
-package com.github.commandmosaic;
+package com.github.commandmosaic.spring;
 
 import com.github.commandmosaic.api.Command;
 import com.github.commandmosaic.api.CommandDispatcher;
@@ -62,12 +62,12 @@ public class SpringCommandDispatcherTest {
     public void testNumberDispatcher() {
 
         Object result;
-        result = commandDispatcher.dispatchCommand("sample/GetNumberCommand",
+        result = commandDispatcher.dispatchCommand("GetNumberCommand",
                 Collections.<String, Object>singletonMap("number", 42), null);
 
         Assert.assertEquals("The number is: 42", result);
 
-        result = commandDispatcher.dispatchCommand("sample/GetNumberCommand",
+        result = commandDispatcher.dispatchCommand("GetNumberCommand",
                 Collections.<String, Object>singletonMap("number", 123), null);
 
         Assert.assertEquals("The number is: 123", result);

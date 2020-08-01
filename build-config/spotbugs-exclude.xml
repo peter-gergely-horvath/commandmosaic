@@ -1,0 +1,5 @@
+<FindBugsFilter>
+    <!--
+        This file lists issues FindBug should not report as bugs.
+    -->
+</FindBugsFilter>

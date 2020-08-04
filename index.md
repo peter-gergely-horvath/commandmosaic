@@ -189,7 +189,7 @@ authentication/authorization information from the request via the
 The user-provided security `CommandInterceptor` must be configured within
 `CommandDispatcherConfiguration`, otherwise security will not be enabled. 
 
-    CommandDispatcherConfiguration commandDispatcherConfiguration = CommandDispatcherConfiguration.builder()
+    CommandDispatcherConfiguration configuration = CommandDispatcherConfiguration.builder()
         .rootPackage("com.acme.foobar")
         .interceptor(MyCustomSecurityCommandInterceptor.class)
         .build();

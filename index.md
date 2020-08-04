@@ -340,7 +340,7 @@ At the same time, one application can host an arbitrary number of `CommandDispat
     }
     
     
-See [sample application](sample-apps/commandmosaic-helloworld-sample-app)
+See [sample application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-helloworld-sample-app)
     
 ## Command Pattern within a Spring Boot application
 
@@ -394,7 +394,7 @@ the Spring-aware `CommandDispatcher` instance.
 		
 	}
  
-See [sample application](sample-apps/commandmosaic-springboot2-sample-app)
+See [sample application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-springboot2-sample-app)
 
 ## Exposing Commands through a Servlet (without Spring)
 
@@ -484,8 +484,7 @@ and has a no-argument constructor, which invokes the `super` constructor with th
 desired `CommandDispatcherConfiguration` configuration object. 
 
 Once this is done, you can start implementing your `Command` classes and then 
-package your application. Your `Command` classes are Spring beans, so you
-can easily use Spring `@Autowired` depdency injection and other Spring features.
+package your application.
 
 The framework-provided `RequestHandler` base 
 dispatches incoming requests to the corresponding commands. All you have to
@@ -549,7 +548,7 @@ You are encouraged to create an AWS Java lambda application skeleton using
 AWS Maven archetype and then add the corresponding library dependency. 
 
 Please check the sample application for a fully working project setup:
-[commandmosaic-aws-lambda-springboot2-sample-app](sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
+[commandmosaic-aws-lambda-springboot2-sample-app](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
 
 ## Monolithic Lambda application?
 
@@ -590,9 +589,9 @@ Please always use Spring Boot 2.x+ versions with this library.
 You are encouraged to check the sample applications: please download the projects
 and remove the `<parent>...</parent>` section from their `pom.xml` file.
 
- * [Hello World application](sample-apps/commandmosaic-helloworld-sample-app)
- * [Minimalistic console Spring Boot2 application](sample-apps/commandmosaic-springboot2-sample-app)
- * [Exposing commands via an AWS Lambda function (request handler)](sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
+ * [Hello World application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-helloworld-sample-app)
+ * [Minimalistic console Spring Boot2 application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-springboot2-sample-app)
+ * [Exposing commands via an AWS Lambda function (request handler)](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
 
  
  

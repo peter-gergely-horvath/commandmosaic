@@ -15,10 +15,9 @@
  */
 
 
-module com.github.commandmosaic.security {
-    requires com.google.common;
+module com.github.commandmosaic.plain.sample {
+    requires com.github.commandmosaic.plain;
 
-    requires transitive com.github.commandmosaic.core;
-    exports com.github.commandmosaic.security;
-    opens com.github.commandmosaic.security.interceptor to com.github.commandmosaic.core;
+    opens com.github.commandmosaic.plain.sample
+            to com.github.commandmosaic.plain, com.github.commandmosaic.core;
 }

@@ -15,10 +15,14 @@
  */
 
 
-module com.github.commandmosaic.security {
-    requires com.google.common;
+module com.github.commandmosaic.spring.container.sample {
+    requires com.github.commandmosaic.springboot.autoconfigure;
 
-    requires transitive com.github.commandmosaic.core;
-    exports com.github.commandmosaic.security;
-    opens com.github.commandmosaic.security.interceptor to com.github.commandmosaic.core;
+    requires spring.boot.autoconfigure;
+    requires spring.context;
+    requires spring.boot;
+    requires spring.beans;
+
+    opens com.github.commandmosaic.spring.container.sample to
+            spring.beans, spring.context, spring.boot, spring.core;
 }

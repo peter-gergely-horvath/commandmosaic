@@ -15,10 +15,14 @@
  */
 
 
-module com.github.commandmosaic.security {
-    requires com.google.common;
+module com.github.commandmosaic.aws.lambda.springboot {
+    requires transitive com.github.commandmosaic.aws.lambda;
+    requires transitive com.github.commandmosaic.spring.container;
+    requires transitive com.github.commandmosaic.springboot.autoconfigure;
 
-    requires transitive com.github.commandmosaic.core;
-    exports com.github.commandmosaic.security;
-    opens com.github.commandmosaic.security.interceptor to com.github.commandmosaic.core;
+    requires aws.lambda.java.core;
+    requires spring.boot;
+    requires spring.context;
+
+    exports com.github.commandmosaic.aws.lambda.springboot;
 }

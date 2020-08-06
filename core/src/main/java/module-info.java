@@ -19,8 +19,8 @@ module com.github.commandmosaic.core {
     requires transitive com.github.commandmosaic.api;
 
     requires com.google.gson;
-    requires transitive com.google.common;
-    requires transitive org.slf4j;
+    requires com.google.common;
+    requires org.slf4j;
 
     exports com.github.commandmosaic.core;
     exports com.github.commandmosaic.core.conversion;

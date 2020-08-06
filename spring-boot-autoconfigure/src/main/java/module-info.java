@@ -15,10 +15,17 @@
  */
 
 
-module com.github.commandmosaic.security {
+module com.github.commandmosaic.springboot.autoconfigure {
     requires com.google.common;
+    requires org.slf4j;
+    requires spring.beans;
+    requires spring.boot.autoconfigure;
+    requires spring.context;
 
-    requires transitive com.github.commandmosaic.core;
-    exports com.github.commandmosaic.security;
-    opens com.github.commandmosaic.security.interceptor to com.github.commandmosaic.core;
+    requires transitive com.github.commandmosaic.spring;
+
+    exports com.github.commandmosaic.springboot.autoconfiguration;
+
+    opens com.github.commandmosaic.springboot.autoconfiguration to
+            spring.beans, spring.core, spring.context, spring.boot.autoconfigure;
 }

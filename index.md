@@ -273,7 +273,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
     <dependency>
-        <groupId>org.github.peter-gergely-horvath</groupId>
+        <groupId>com.github.commandmosaic</groupId>
         <artifactId>commandmosaic-plain-java</artifactId>
         <version>LATEST</version>
     </dependency> 
@@ -357,7 +357,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
     <dependency>
-        <groupId>org.github.peter-gergely-horvath</groupId>
+        <groupId>com.github.commandmosaic</groupId>
         <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
         <version>LATEST</version>
     </dependency>
@@ -408,7 +408,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
     <dependency>
-        <groupId>org.github.peter-gergely-horvath</groupId>
+        <groupId>com.github.commandmosaic</groupId>
         <artifactId>commandmosaic-servlet</artifactId>
         <version>LATEST</version>
     </dependency> 
@@ -470,7 +470,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
         <dependency>
-            <groupId>org.github.peter-gergely-horvath</groupId>
+            <groupId>com.github.commandmosaic</groupId>
             <artifactId>commandmosaic-aws-lambda-plain-java</artifactId>
             <version>LATEST</version>
         </dependency> 
@@ -507,7 +507,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
         <dependency>
-            <groupId>org.github.peter-gergely-horvath</groupId>
+            <groupId>com.github.commandmosaic</groupId>
             <artifactId>commandmosaic-aws-lambda-springboot</artifactId>
             <version>LATEST</version>
         </dependency> 

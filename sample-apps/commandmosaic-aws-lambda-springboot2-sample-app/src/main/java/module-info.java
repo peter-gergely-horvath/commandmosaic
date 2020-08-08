@@ -14,27 +14,16 @@
  * limitations under the License.
  */
 
- 
-package com.github.commandmosaic.sample;
 
-import com.github.commandmosaic.api.Command;
-import com.github.commandmosaic.api.Parameter;
-import com.github.commandmosaic.api.CommandContext;
+module com.github.commandmosaic.aws.lambda.springboot.sample {
+    requires com.github.commandmosaic.aws.lambda.springboot;
 
-import java.util.Date;
+    requires spring.boot.autoconfigure;
+    requires spring.context;
+    requires spring.boot;
+    requires spring.beans;
 
-public class GetDateCommand implements Command<String> {
+    opens com.github.commandmosaic.aws.lambda.springboot2.sample
+            to com.github.commandmosaic.plain, com.github.commandmosaic.core, aws.lambda.java.core;
 
-    @Parameter
-    private Date date;
-
-    GetDateCommand() {
-        System.out.println("New instance is created");
-    }
-
-
-    @Override
-    public String execute(CommandContext context) {
-        return "The current date is: " + date;
-    }
 }

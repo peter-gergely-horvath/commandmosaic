@@ -14,24 +14,11 @@
  * limitations under the License.
  */
 
- 
-package com.github.commandmosaic.sample;
 
-import com.github.commandmosaic.api.Command;
-import com.github.commandmosaic.api.Parameter;
-import com.github.commandmosaic.api.CommandContext;
+module com.github.commandmosaic.aws.lambda {
+    requires transitive com.github.commandmosaic.core;
 
-public class GetNumberCommand implements Command<String> {
+    requires aws.lambda.java.core;
 
-    @Parameter
-    private Number number;
-
-    @Override
-    public String execute(CommandContext context) {
-        return "The number is: " + number;
-    }
-
-    public void setNumber(Number number) {
-        this.number = number;
-    }
+    exports com.github.commandmosaic.aws.lambda;
 }

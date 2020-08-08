@@ -15,9 +15,8 @@
  */
 
  
-package com.github.commandmosaic.servlet;
+package com.github.commandmosaic.http.servlet;
 
-import com.github.commandmosaic.http.servlet.CommandDispatcherServlet;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpEntity;

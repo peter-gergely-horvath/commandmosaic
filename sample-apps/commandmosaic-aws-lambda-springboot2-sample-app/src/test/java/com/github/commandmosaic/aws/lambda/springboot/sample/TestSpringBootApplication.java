@@ -15,7 +15,7 @@
  */
 
  
-package com.github.commandmosaic.aws.lambda.springboot2.sample;
+package com.github.commandmosaic.aws.lambda.springboot.sample;
 
 import org.junit.Ignore;
 

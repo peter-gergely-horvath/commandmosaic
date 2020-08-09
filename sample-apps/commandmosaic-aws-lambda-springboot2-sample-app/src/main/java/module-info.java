@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-
 module com.github.commandmosaic.aws.lambda.springboot.sample {
+
     requires com.github.commandmosaic.aws.lambda.springboot;
 
     requires spring.boot.autoconfigure;
-    requires spring.context;
     requires spring.boot;
+    requires spring.context;
     requires spring.beans;
 
-    opens com.github.commandmosaic.aws.lambda.springboot2.sample
-            to com.github.commandmosaic.plain, com.github.commandmosaic.core, aws.lambda.java.core;
-
+    opens com.github.commandmosaic.aws.lambda.springboot.sample to
+            spring.core, spring.context, spring.beans,
+            com.github.commandmosaic.core;
 }

@@ -15,7 +15,7 @@
  */
 
  
-package com.github.commandmosaic.aws.lambda.springboot2.sample;
+package com.github.commandmosaic.aws.lambda.springboot.sample;
 
 import com.github.commandmosaic.api.Command;
 import com.github.commandmosaic.api.Parameter;

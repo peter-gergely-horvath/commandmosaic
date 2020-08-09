@@ -475,6 +475,21 @@ LATEST with the available latest version:
             <version>LATEST</version>
         </dependency> 
 
+### Java module declaration
+
+When using the Java Platform Module System ("Java 9+ modules"), add 
+similar settings to your `module-info.java` module descriptor file.
+(*NOTE: the sample below uses `sampleapp` as module name: do not forget to
+substitute your own module name*)
+
+    module sampleapp {
+    
+        requires com.github.commandmosaic.aws.lambda.plain;
+    
+        opens sampleapp to
+                com.github.commandmosaic.core;
+    }
+
 ### Description 
 
 Once the dependency is added, create a placeholder Java request handler class in your 
@@ -512,6 +527,28 @@ LATEST with the available latest version:
             <artifactId>commandmosaic-aws-lambda-springboot</artifactId>
             <version>LATEST</version>
         </dependency> 
+
+
+### Java module declaration
+
+When using the Java Platform Module System ("Java 9+ modules"), add 
+similar settings to your `module-info.java` module descriptor file.
+(*NOTE: the sample below uses `sampleapp` as module name: do not forget to
+substitute your own module name*)
+
+    module sampleapp {
+    
+        requires com.github.commandmosaic.aws.lambda.springboot;
+    
+        requires spring.boot.autoconfigure;
+        requires spring.boot;
+        requires spring.context;
+        requires spring.beans;
+    
+        opens sampleapp to
+                spring.core, spring.context, spring.beans,
+                com.github.commandmosaic.core;
+    }
 
 ### Description 
 

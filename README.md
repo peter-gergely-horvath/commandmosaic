@@ -22,9 +22,10 @@ CommandMosaic is a project with the following high-level goals:
     
 # Overview    
 
-The Command design pattern is a well-known pattern described in the 
-"Gang of Four" (Erich Gamma, Richard Helm, Ralph Johnson John Vlissides) 
-*Design Patterns: Elements of Reusable Object-Oriented Software* book.
+The [Command design pattern](https://en.wikipedia.org/wiki/Command_pattern) is a 
+well-known pattern described in the ["Gang of Four"](http://wiki.c2.com/?GangOfFour)
+[Design Patterns: Elements of Reusable Object-Oriented Software](https://en.wikipedia.org/wiki/Design_Patterns)
+book.
 
 This Java library contains an implementation of the command pattern, 
 a simple programming interface for passing parameters to commands,

@@ -22,9 +22,10 @@ CommandMosaic is a project with the following high-level goals:
     
 # Overview    
 
-The Command design pattern is a well-known pattern described in the 
-"Gang of Four" (Erich Gamma, Richard Helm, Ralph Johnson John Vlissides) 
-*Design Patterns: Elements of Reusable Object-Oriented Software* book.
+The [Command design pattern](https://en.wikipedia.org/wiki/Command_pattern) is a 
+well-known pattern described in the ["Gang of Four"](http://wiki.c2.com/?GangOfFour)
+[Design Patterns: Elements of Reusable Object-Oriented Software](https://en.wikipedia.org/wiki/Design_Patterns)
+book.
 
 This Java library contains an implementation of the command pattern, 
 a simple programming interface for passing parameters to commands,
@@ -189,7 +190,7 @@ authentication/authorization information from the request via the
 The user-provided security `CommandInterceptor` must be configured within
 `CommandDispatcherConfiguration`, otherwise security will not be enabled. 
 
-    CommandDispatcherConfiguration configuration = CommandDispatcherConfiguration.builder()
+    CommandDispatcherConfiguration commandDispatcherConfiguration = CommandDispatcherConfiguration.builder()
         .rootPackage("com.acme.foobar")
         .interceptor(MyCustomSecurityCommandInterceptor.class)
         .build();
@@ -340,7 +341,7 @@ At the same time, one application can host an arbitrary number of `CommandDispat
     }
     
     
-See [sample application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-helloworld-sample-app)
+See [sample application](sample-apps/commandmosaic-helloworld-sample-app)
     
 ## Command Pattern within a Spring Boot application
 
@@ -394,7 +395,7 @@ the Spring-aware `CommandDispatcher` instance.
 		
 	}
  
-See [sample application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-springboot2-sample-app)
+See [sample application](sample-apps/commandmosaic-springboot2-sample-app)
 
 ## Exposing Commands through a Servlet (without Spring)
 
@@ -475,6 +476,21 @@ LATEST with the available latest version:
             <version>LATEST</version>
         </dependency> 
 
+### Java module declaration
+
+When using the Java Platform Module System ("Java 9+ modules"), add 
+similar settings to your `module-info.java` module descriptor file.
+(*NOTE: the sample below uses `sampleapp` as module name: do not forget to
+substitute your own module name*)
+
+    module sampleapp {
+    
+        requires com.github.commandmosaic.aws.lambda.plain;
+    
+        opens sampleapp to
+                com.github.commandmosaic.core;
+    }
+
 ### Description 
 
 Once the dependency is added, create a placeholder Java request handler class in your 
@@ -484,7 +500,8 @@ and has a no-argument constructor, which invokes the `super` constructor with th
 desired `CommandDispatcherConfiguration` configuration object. 
 
 Once this is done, you can start implementing your `Command` classes and then 
-package your application.
+package your application. Your `Command` classes are Spring beans, so you
+can easily use Spring `@Autowired` depdency injection and other Spring features.
 
 The framework-provided `RequestHandler` base 
 dispatches incoming requests to the corresponding commands. All you have to
@@ -511,6 +528,28 @@ LATEST with the available latest version:
             <artifactId>commandmosaic-aws-lambda-springboot</artifactId>
             <version>LATEST</version>
         </dependency> 
+
+
+### Java module declaration
+
+When using the Java Platform Module System ("Java 9+ modules"), add 
+similar settings to your `module-info.java` module descriptor file.
+(*NOTE: the sample below uses `sampleapp` as module name: do not forget to
+substitute your own module name*)
+
+    module sampleapp {
+    
+        requires com.github.commandmosaic.aws.lambda.springboot;
+    
+        requires spring.boot.autoconfigure;
+        requires spring.boot;
+        requires spring.context;
+        requires spring.beans;
+    
+        opens sampleapp to
+                spring.core, spring.context, spring.beans,
+                com.github.commandmosaic.core;
+    }
 
 ### Description 
 
@@ -548,7 +587,7 @@ You are encouraged to create an AWS Java lambda application skeleton using
 AWS Maven archetype and then add the corresponding library dependency. 
 
 Please check the sample application for a fully working project setup:
-[commandmosaic-aws-lambda-springboot2-sample-app](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
+[commandmosaic-aws-lambda-springboot2-sample-app](sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
 
 ## Monolithic Lambda application?
 
@@ -589,9 +628,9 @@ Please always use Spring Boot 2.x+ versions with this library.
 You are encouraged to check the sample applications: please download the projects
 and remove the `<parent>...</parent>` section from their `pom.xml` file.
 
- * [Hello World application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-helloworld-sample-app)
- * [Minimalistic console Spring Boot2 application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-springboot2-sample-app)
- * [Exposing commands via an AWS Lambda function (request handler)](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
+ * [Hello World application](sample-apps/commandmosaic-helloworld-sample-app)
+ * [Minimalistic console Spring Boot2 application](sample-apps/commandmosaic-springboot2-sample-app)
+ * [Exposing commands via an AWS Lambda function (request handler)](sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
 
  
  

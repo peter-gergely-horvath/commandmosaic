@@ -7,30 +7,30 @@
     <parent>
         <groupId>com.github.commandmosaic</groupId>
         <artifactId>commandmosaic</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>commandmosaic-aws-lambda-springboot</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
 
     <dependencies>
         <dependency>
             <groupId>com.github.commandmosaic</groupId>
             <artifactId>commandmosaic-aws-lambda-common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.commandmosaic</groupId>
             <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.commandmosaic</groupId>
             <artifactId>commandmosaic-spring-container-server</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

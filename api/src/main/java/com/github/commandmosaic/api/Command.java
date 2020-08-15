@@ -20,9 +20,9 @@ package com.github.commandmosaic.api;
 
 /**
  * <p>
- * A {@code Command} encapsulates the business logic and the all the
+ * A {@code Command} encapsulates the business logic and all the
  * parameter information that is needed to execute it. In concrete
- * {@code Command} implementations, Parameters are stored as fields
+ * {@code Command} implementations, parameters are stored as fields
  * and are annotated with the {@code @Parameter} annotation: these
  * parameter fields are then injected by the framework.
  * </p>

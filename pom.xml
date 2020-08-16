@@ -33,6 +33,7 @@
         <module>servlet-common</module>
         <module>servlet</module>
         <module>spring-web</module>
+        <module>spring-security-adapter</module>
         <module>spring-boot-autoconfigure</module>
         <module>spring-container-server</module>
         <module>aws-lambda-common</module>

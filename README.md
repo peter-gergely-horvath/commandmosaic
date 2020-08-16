@@ -1,5 +1,28 @@
-
 # CommandMosaic: a Java command pattern framework 
+
+  * [Introduction](#introduction)
+  * [Overview](#overview)
+  * [The API](#the-api)
+  * [Spring support](#spring-support)
+  * [Exposing Commands as a service](#exposing-commands-as-a-service)
+    * [Using the CommandDispatcherServer server classes](#using-the-commanddispatcherserver-server-classes)
+    * [Command names](#command-names)
+    * [Security](#security)
+    * [Built-in integrations for exposing commands as a service](#built-in-integrations-for-exposing-commands-as-a-service)
+  * [Implementing the Command Pattern](#implementing-the-command-pattern)
+    * [Command Pattern within a Plain Java application](#command-pattern-within-a-plain-java-application)
+    * [Command Pattern within a Spring Boot application](#command-pattern-within-a-spring-boot-application)
+  * [Exposing Commands from a Java application](#exposing-commands-from-a-java-application)
+    * [Exposing Commands through a Servlet (without Spring)](#exposing-commands-through-a-servlet-without-spring)
+    * [Exposing Commands from a Spring Boot application](#exposing-commands-from-a-spring-boot-application)
+  * [Servlerless Cloud with Amazon Lambda](#servlerless-cloud-with-amazon-lambda)
+    * [Plain Java AWS Lambda function (without Spring)](#plain-java-aws-lambda-function-without-spring)
+    * [Using Spring Boot 2.x+](#using-spring-boot-2x)
+    * [Are we building a monolithic Lambda application?](#are-we-building-a-monolithic-lambda-application)
+  * [Which dependency do you need](#which-dependency-do-you-need)
+  * [Spring Boot version required](#spring-boot-version-required)
+  * [Samples](#samples)
+
 
 # Introduction
 
@@ -257,8 +280,7 @@ The following integrations are provided out-of-the-box:
   * Spring HTTP Request handlers
   * Amazon AWS Lambda (with and without Spring Boot)
 
-
-# Overview of use-cases 
+# Implementing the Command Pattern
 
 ## Command Pattern within a Plain Java application 
 
@@ -346,7 +368,7 @@ See [sample application](sample-apps/commandmosaic-helloworld-sample-app)
 ## Command Pattern within a Spring Boot application
 
 The library provides out-of-the-box support for Spring Boot. You can get the 
-libary to automatically initialize by Spring Boot and develop your commands 
+library to automatically initialize by Spring Boot and develop your commands 
 as Spring Beans, with the rich set of functionality offered by Spring, like 
 transaction support, automatic dependency injection through Spring's 
 `@Autowired` annotation etc.
@@ -397,10 +419,28 @@ the Spring-aware `CommandDispatcher` instance.
  
 See [sample application](sample-apps/commandmosaic-springboot2-sample-app)
 
+# Exposing Commands from a Java application
+
 ## Exposing Commands through a Servlet (without Spring)
 
-Commands can be exposed 
+Commands can be exposed as a lightweight REST service,
+where only one operation, the dispatching of a command is published.
+The implementation is inside a framework-provided servlet class
+that expects the same JSON document format as other runtime environments
+use. The users of this library has to configure CommandDispatcherServlet
+bundled within the framework, after which they have to just start
+writing their command implementation. 
 
+A request is simply a JSON document, with similar structure:
+
+    {
+        "command": "Foobar",
+        "parameters" : {
+            "foo": "Hello there",
+            "bar": 42
+        },
+        "protocol": "CM/1.0"    
+    }
 
 ### Dependency
 
@@ -436,7 +476,100 @@ module, which offers standardised annotation based access control and an abstrac
 `CommandInterceptor` base class for plugging in custom authentication and authorization
 logic with minimal amount of code.
 
-# Amazon Lambda Support
+## Exposing Commands from a Spring Boot application
+
+Commands can be exposed as a lightweight REST service,
+where only one operation, the dispatching of a command is published.
+The library provides out-of-the-box support for Spring Boot. You can get the 
+library to automatically initialize by Spring Boot and develop your commands 
+as Spring Beans, with the rich set of functionality offered by Spring, like 
+transaction support, automatic dependency injection through Spring's 
+`@Autowired` annotation etc.
+
+A request is simply a JSON document, with similar structure:
+
+    {
+        "command": "Foobar",
+        "parameters" : {
+            "foo": "Hello there",
+            "bar": 42
+        },
+        "protocol": "CM/1.0"    
+    }
+
+
+### Dependency
+
+Add the following dependency declaration to your Maven `pom.xml`. 
+(or its equivalent in your other preferred build tool), replacing 
+LATEST with the available latest version: 
+
+    <dependency>
+        <groupId>com.github.commandmosaic</groupId>
+        <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
+        <version>LATEST</version>
+    </dependency>
+
+### Description 
+
+With the `commandmosaic-spring-boot-autoconfigure` you can rely on
+Spring Boot library auto-configuration: simply create a `CommandDispatcherConfiguration` 
+and expose it as a Spring bean. 
+
+    package sample.app.config;
+    
+    import com.github.commandmosaic.api.configuration.CommandDispatcherConfiguration;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    
+    @Configuration
+    public class SampleAppConfig {
+    
+        /* other configuration entries... */
+    
+    	@Bean
+    	public CommandDispatcherConfiguration springCommandDispatcherConfiguration() {
+    		return CommandDispatcherConfiguration.builder()
+    				.rootPackage("com.acme.foobar.commands")
+    				.build();
+    	}
+    
+    }
+
+Once done, you can simply expose the `CommandDispatcherServer`
+through a Spring Web REST RestController class similar to the one below.
+(Again: we rely on Spring to configure the dependencies for us.)
+
+    package sample;
+    
+    import com.github.commandmosaic.api.server.CommandDispatcherServer;
+    
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+    
+    import java.io.IOException;
+    import java.io.InputStream;
+    import java.io.OutputStream;
+    
+    @RestController
+    @RequestMapping("/api")
+    public class CommandResource {
+    
+        private final CommandDispatcherServer commandDispatcherServer;
+    
+        public CommandResource(CommandDispatcherServer commandDispatcherServer) {
+            this.commandDispatcherServer = commandDispatcherServer;
+        }
+    
+    
+        @PostMapping("/cmd")
+        public void processCommand(InputStream is, OutputStream os) throws IOException {
+            commandDispatcherServer.serviceRequest(is, os);
+        }
+    }
+
+# Servlerless Cloud with Amazon Lambda
   
 Amazon Lambda (Java) is supported out-of-the-box. Different flavours of this library 
 (Plan Java and Spring Boot support) provide abstract AWS `RequestHandler` base 
@@ -516,7 +649,6 @@ AWS Maven archetype and then add the corresponding library dependency.
 
 ## Using Spring Boot 2.x+
 
-
 ### Dependency
 
 Add the following dependency declaration to your Maven `pom.xml`. 
@@ -589,7 +721,7 @@ AWS Maven archetype and then add the corresponding library dependency.
 Please check the sample application for a fully working project setup:
 [commandmosaic-aws-lambda-springboot2-sample-app](sample-apps/commandmosaic-aws-lambda-springboot2-sample-app)
 
-## Monolithic Lambda application?
+## Are we building a monolithic Lambda application?
 
 The official recommendation from Amazon regarding Lambda functions is to use 
 a separate function for every single operation and use further of their orchestration
@@ -619,10 +751,13 @@ You always want to pick **only one** of the following dependencies:
 | AWS Java Lambda, no Spring         | `commandmosaic-aws-lambda-plain-java`    |
 | AWS Java Lambda, with Spring Boot  | `commandmosaic-aws-lambda-springboot`    |
 
-# Spring Boot version
+# Spring Boot version required
 
-Spring Boot 1.x has been deprecated and is no longer supported by Pivotal.
-Please always use Spring Boot 2.x+ versions with this library.
+As 
+[Spring Boot 1.x has been deprecated and is no longer supported by Pivotal](https://spring.io/blog/2019/08/06/it-is-time-goodbye-spring-boot-1-x), 
+Spring Boot 1.x is not (and will not be) supported at all.
+
+Please always use Spring Boot 2.x+ versions with this library. 
 
 # Samples 
 You are encouraged to check the sample applications: please download the projects

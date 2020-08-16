@@ -19,9 +19,10 @@ module com.github.commandmosaic.spring {
     requires transitive com.github.commandmosaic.core;
 
     requires spring.core;
+    requires spring.boot;
 
     requires logback.classic;
-    requires spring.boot;
+    requires org.slf4j;
 
     requires spring.beans;
     requires spring.context;

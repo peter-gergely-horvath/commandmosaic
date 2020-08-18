@@ -760,8 +760,13 @@ Spring Boot 1.x is not (and will not be) supported at all.
 Please always use Spring Boot 2.x+ versions with this library. 
 
 # Samples 
-You are encouraged to check the sample applications: please download the projects
-and remove the `<parent>...</parent>` section from their `pom.xml` file.
+You are encouraged to check the sample applications: please download the sample application 
+projects referenced below. Before you can work with the sample project, **you need to make
+adjustments to the project `pom.xml` file**:
+
+ 1. Remove the `<parent>...</parent>` section  
+ 2. Uncomment the sections commented out: this provides a working build configuration 
+ 3. Adjust groupId/artifactId to your needs 
 
  * [Hello World application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-helloworld-sample-app)
  * [Minimalistic console Spring Boot2 application](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/sample-apps/commandmosaic-springboot2-sample-app)

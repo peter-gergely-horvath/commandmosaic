@@ -76,9 +76,9 @@ which are automatically injected by the framework.
 
     package sample;
 
-    import com.github.commandmosaic.api.Command;
-    import com.github.commandmosaic.api.Parameter;
-    import com.github.commandmosaic.api.CommandContext;
+    import org.commandmosaic.api.Command;
+    import org.commandmosaic.api.Parameter;
+    import org.commandmosaic.api.CommandContext;
 
     public class GreetingCommand implements Command<String> {
 
@@ -100,9 +100,9 @@ injection through Spring's `@Autowired` annotation.
 
     package sample;
 
-    import com.github.commandmosaic.api.Command;
-    import com.github.commandmosaic.api.Parameter;
-    import com.github.commandmosaic.api.CommandContext;
+    import org.commandmosaic.api.Command;
+    import org.commandmosaic.api.Parameter;
+    import org.commandmosaic.api.CommandContext;
     import org.springframework.beans.factory.annotation.Autowired;
 
     public class GreetCommand implements Command<String> {
@@ -132,7 +132,7 @@ for remote consumption.
 
 This library was designed with the goal of exposing commands as services 
 with minimum amount of code. The API 
-`com.github.commandmosaic.api.server.CommandDispatcherServer` provides
+`org.commandmosaic.api.server.CommandDispatcherServer` provides
  a layer of abstraction between how a command dispatch request is 
 transmitted and represented, and the actual `CommandDispatcher` being used.   
 
@@ -142,7 +142,7 @@ a `java.io.InputStream` and writes the outcome of the command execution to
 as `java.io.InputStream` and can receive the response as bytes being written
 to a `java.io.OutputStream` can easily be integrated.
 
-The class `com.github.commandmosaic.core.server.DefaultCommandDispatcherServer`
+The class `org.commandmosaic.core.server.DefaultCommandDispatcherServer`
 offers a default implementation for building the dispatcher server. 
 
 Its constructor takes a `CommandDispatcher` that it will use to dispatch 
@@ -188,11 +188,11 @@ The module `commandmosaic-security` contains support features for this requireme
 
 Two annotations are provided to mark the access levels of each commands:
 
-  * `com.github.commandmosaic.security.annotation.UnauthenticatedAccess`:
+  * `org.commandmosaic.security.annotation.UnauthenticatedAccess`:
     This annotation must be applied to all command classes that should be
     available without authentication.
     
-  * `com.github.commandmosaic.security.annotation.RestrictedAccess`
+  * `org.commandmosaic.security.annotation.RestrictedAccess`
     This annotation must be applied to all command classes that should only
     be available to authenticated clients. Optionally, role based security
     can be implemented by specifying the roles which should have access to 
@@ -200,10 +200,10 @@ Two annotations are provided to mark the access levels of each commands:
      
 Access control is implemented via `CommandInterceptor`s: application developers
 are required to develop a custom interceptor by extending the framework-provided
-class `com.github.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor`
+class `org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor`
 and configure it for the `CommandDispatcher`. 
 
-`com.github.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor`
+`org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor`
 provides a base implementation for security `CommandInterceptor`s: its 
 `attemptLogin(CommandContext)` method must be implemented by the end-user.
 Such implementations will want to extract the user-defined 
@@ -248,9 +248,9 @@ by the framework code in `AbstractSecurityCommandInterceptor`)
     
     package sample;
     
-    import com.github.commandmosaic.api.CommandContext;
-    import com.github.commandmosaic.security.AuthenticationException;
-    import com.github.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
+    import org.commandmosaic.api.CommandContext;
+    import org.commandmosaic.security.AuthenticationException;
+    import org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
     
     import java.util.Map;
     import java.util.Set;
@@ -296,7 +296,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
     <dependency>
-        <groupId>com.github.commandmosaic</groupId>
+        <groupId>org.commandmosaic</groupId>
         <artifactId>commandmosaic-plain-java</artifactId>
         <version>LATEST</version>
     </dependency> 
@@ -315,15 +315,15 @@ ensures only the intended commands can be executed by a given `CommandDispatcher
 At the same time, one application can host an arbitrary number of `CommandDispatcher`s.
 
 
-    package com.github.commandmosaic.plain.sample;
+    package org.commandmosaic.plain.sample;
     
-    import com.github.commandmosaic.api.Command;
-    import com.github.commandmosaic.api.CommandContext;
-    import com.github.commandmosaic.api.CommandDispatcher;
-    import com.github.commandmosaic.api.Parameter;
-    import com.github.commandmosaic.api.configuration.CommandDispatcherConfiguration;
-    import com.github.commandmosaic.api.factory.CommandDispatcherFactory;
-    import com.github.commandmosaic.plain.PlainCommandDispatcherFactory;
+    import org.commandmosaic.api.Command;
+    import org.commandmosaic.api.CommandContext;
+    import org.commandmosaic.api.CommandDispatcher;
+    import org.commandmosaic.api.Parameter;
+    import org.commandmosaic.api.configuration.CommandDispatcherConfiguration;
+    import org.commandmosaic.api.factory.CommandDispatcherFactory;
+    import org.commandmosaic.plain.PlainCommandDispatcherFactory;
     
     public class SampleApplication {
     
@@ -380,7 +380,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
     <dependency>
-        <groupId>com.github.commandmosaic</groupId>
+        <groupId>org.commandmosaic</groupId>
         <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
         <version>LATEST</version>
     </dependency>
@@ -449,14 +449,14 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
     <dependency>
-        <groupId>com.github.commandmosaic</groupId>
+        <groupId>org.commandmosaic</groupId>
         <artifactId>commandmosaic-servlet</artifactId>
         <version>LATEST</version>
     </dependency> 
 
 ### Description 
 
-Configure the `com.github.commandmosaic.http.servlet.CommandDispatcherServlet` Servlet 
+Configure the `org.commandmosaic.http.servlet.CommandDispatcherServlet` Servlet 
 provided by the framework for the desired URL and configure it using initialization
 parameters according to the following:
 
@@ -505,7 +505,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
     <dependency>
-        <groupId>com.github.commandmosaic</groupId>
+        <groupId>org.commandmosaic</groupId>
         <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
         <version>LATEST</version>
     </dependency>
@@ -518,7 +518,7 @@ and expose it as a Spring bean.
 
     package sample.app.config;
     
-    import com.github.commandmosaic.api.configuration.CommandDispatcherConfiguration;
+    import org.commandmosaic.api.configuration.CommandDispatcherConfiguration;
     import org.springframework.context.annotation.Bean;
     import org.springframework.context.annotation.Configuration;
     
@@ -542,7 +542,7 @@ through a Spring Web REST RestController class similar to the one below.
 
     package sample;
     
-    import com.github.commandmosaic.api.server.CommandDispatcherServer;
+    import org.commandmosaic.api.server.CommandDispatcherServer;
     
     import org.springframework.web.bind.annotation.PostMapping;
     import org.springframework.web.bind.annotation.RequestMapping;
@@ -604,7 +604,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
         <dependency>
-            <groupId>com.github.commandmosaic</groupId>
+            <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-aws-lambda-plain-java</artifactId>
             <version>LATEST</version>
         </dependency> 
@@ -618,17 +618,17 @@ substitute your own module name*)
 
     module sampleapp {
     
-        requires com.github.commandmosaic.aws.lambda.plain;
+        requires org.commandmosaic.aws.lambda.plain;
     
         opens sampleapp to
-                com.github.commandmosaic.core;
+                org.commandmosaic.core;
     }
 
 ### Description 
 
 Once the dependency is added, create a placeholder Java request handler class in your 
 AWS Java lambda application that subclasses  
-`com.github.commandmosaic.aws.lambda.plain.PlainLambdaCommandDispatcherRequestHandler`
+`org.commandmosaic.aws.lambda.plain.PlainLambdaCommandDispatcherRequestHandler`
 and has a no-argument constructor, which invokes the `super` constructor with the 
 desired `CommandDispatcherConfiguration` configuration object. 
 
@@ -656,7 +656,7 @@ Add the following dependency declaration to your Maven `pom.xml`.
 LATEST with the available latest version: 
 
         <dependency>
-            <groupId>com.github.commandmosaic</groupId>
+            <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-aws-lambda-springboot</artifactId>
             <version>LATEST</version>
         </dependency> 
@@ -671,7 +671,7 @@ substitute your own module name*)
 
     module sampleapp {
     
-        requires com.github.commandmosaic.aws.lambda.springboot;
+        requires org.commandmosaic.aws.lambda.springboot;
     
         requires spring.boot.autoconfigure;
         requires spring.boot;
@@ -680,21 +680,21 @@ substitute your own module name*)
     
         opens sampleapp to
                 spring.core, spring.context, spring.beans,
-                com.github.commandmosaic.core;
+                org.commandmosaic.core;
     }
 
 ### Description 
 
 Once the dependency is added, create a placeholder Java request handler class in 
 your AWS Java lambda application that subclasses  
-`com.github.commandmosaic.aws.lambda.springboot.SpringBootLambdaCommandDispatcherRequestHandler`
+`org.commandmosaic.aws.lambda.springboot.SpringBootLambdaCommandDispatcherRequestHandler`
 and has a no-argument constructor, which invokes the `super` constructor with the desired
 configuration, passing the class of the Spring Boot application class and optionally, 
 the profiles used.
 
     package sample;
 
-    import com.github.commandmosaic.aws.lambda.springboot.SpringBootLambdaCommandDispatcherRequestHandler;
+    import org.commandmosaic.aws.lambda.springboot.SpringBootLambdaCommandDispatcherRequestHandler;
 
     public class SampleApplicationRequestHandlerSpringBootLambda extends SpringBootLambdaCommandDispatcherRequestHandler {
 

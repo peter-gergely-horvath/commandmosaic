@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.commandmosaic</groupId>
+        <groupId>org.commandmosaic</groupId>
         <artifactId>commandmosaic</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -16,19 +16,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.commandmosaic</groupId>
+            <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-aws-lambda-common</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.commandmosaic</groupId>
+            <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.commandmosaic</groupId>
+            <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-spring-container-server</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>

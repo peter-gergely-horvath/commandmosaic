@@ -15,10 +15,10 @@
  */
 
 
-module com.github.commandmosaic.aws.lambda {
-    requires transitive com.github.commandmosaic.core;
+module org.commandmosaic.aws.lambda {
+    requires transitive org.commandmosaic.core;
 
     requires aws.lambda.java.core;
 
-    exports com.github.commandmosaic.aws.lambda;
+    exports org.commandmosaic.aws.lambda;
 }

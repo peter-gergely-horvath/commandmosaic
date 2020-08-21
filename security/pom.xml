@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>commandmosaic</artifactId>
-        <groupId>com.github.commandmosaic</groupId>
+        <groupId>org.commandmosaic</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.commandmosaic</groupId>
+            <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-core</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
@@ -24,7 +24,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.commandmosaic</groupId>
+            <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-plain-java</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>test</scope>

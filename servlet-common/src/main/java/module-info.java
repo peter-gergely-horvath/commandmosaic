@@ -15,9 +15,9 @@
  */
 
 
-module com.github.commandmosaic.servlet.common {
-    requires transitive com.github.commandmosaic.api;
+module org.commandmosaic.servlet.common {
+    requires transitive org.commandmosaic.api;
     requires javax.servlet.api;
 
-    exports com.github.commandmosaic.http.servlet.common;
+    exports org.commandmosaic.http.servlet.common;
 }

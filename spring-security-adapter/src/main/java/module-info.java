@@ -15,12 +15,12 @@
  */
 
 
-module com.github.commandmosaic.spring.security.adapter {
-    requires transitive com.github.commandmosaic.security;
+module org.commandmosaic.spring.security.adapter {
+    requires transitive org.commandmosaic.security;
 
     requires spring.security.core;
 
-    opens com.github.commandmosaic.spring.security.adapter to com.github.commandmosaic.core, spring.beans, spring.core;
+    opens org.commandmosaic.spring.security.adapter to org.commandmosaic.core, spring.beans, spring.core;
 
-    exports com.github.commandmosaic.spring.security.adapter;
+    exports org.commandmosaic.spring.security.adapter;
 }

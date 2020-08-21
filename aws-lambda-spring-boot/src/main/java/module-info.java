@@ -15,14 +15,14 @@
  */
 
 
-module com.github.commandmosaic.aws.lambda.springboot {
-    requires transitive com.github.commandmosaic.aws.lambda;
-    requires transitive com.github.commandmosaic.spring.container;
-    requires transitive com.github.commandmosaic.springboot.autoconfigure;
+module org.commandmosaic.aws.lambda.springboot {
+    requires transitive org.commandmosaic.aws.lambda;
+    requires transitive org.commandmosaic.spring.container;
+    requires transitive org.commandmosaic.springboot.autoconfigure;
 
     requires aws.lambda.java.core;
     requires spring.boot;
     requires spring.context;
 
-    exports com.github.commandmosaic.aws.lambda.springboot;
+    exports org.commandmosaic.aws.lambda.springboot;
 }

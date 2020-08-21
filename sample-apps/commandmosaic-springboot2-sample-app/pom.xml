@@ -6,7 +6,7 @@
 
     <!-- When working with the sample: Remove below parent block -->
     <parent>
-        <groupId>com.github.commandmosaic</groupId>
+        <groupId>org.commandmosaic</groupId>
         <artifactId>commandmosaic-sample-apps</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -20,7 +20,7 @@
     - uncomment the below block and
     - adjust groupId/artifactId to your needs
 
-    <groupId>com.github.commandmosaic</groupId>
+    <groupId>org.commandmosaic</groupId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,7 +46,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.commandmosaic</groupId>
+            <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>

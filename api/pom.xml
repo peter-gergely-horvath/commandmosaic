@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>commandmosaic</artifactId>
-        <groupId>com.github.commandmosaic</groupId>
+        <groupId>org.commandmosaic</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -18,7 +18,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <additionalOptions>--limit-modules com.github.commandmosaic.api</additionalOptions>
+                    <additionalOptions>--limit-modules org.commandmosaic.api</additionalOptions>
                 </configuration>
             </plugin>
         </plugins>

@@ -15,9 +15,9 @@
  */
 
 
-module com.github.commandmosaic.aws.lambda.plain {
-    requires transitive com.github.commandmosaic.aws.lambda;
-    requires transitive com.github.commandmosaic.plain;
+module org.commandmosaic.aws.lambda.plain {
+    requires transitive org.commandmosaic.aws.lambda;
+    requires transitive org.commandmosaic.plain;
 
     requires aws.lambda.java.core;
 }

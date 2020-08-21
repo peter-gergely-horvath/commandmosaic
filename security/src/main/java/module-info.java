@@ -15,14 +15,14 @@
  */
 
 
-module com.github.commandmosaic.security {
+module org.commandmosaic.security {
     requires com.google.common;
 
-    requires transitive com.github.commandmosaic.core;
+    requires transitive org.commandmosaic.core;
 
-    exports com.github.commandmosaic.security;
-    exports com.github.commandmosaic.security.annotation;
-    exports com.github.commandmosaic.security.interceptor;
+    exports org.commandmosaic.security;
+    exports org.commandmosaic.security.annotation;
+    exports org.commandmosaic.security.interceptor;
 
-    opens com.github.commandmosaic.security.interceptor to com.github.commandmosaic.core;
+    opens org.commandmosaic.security.interceptor to org.commandmosaic.core;
 }

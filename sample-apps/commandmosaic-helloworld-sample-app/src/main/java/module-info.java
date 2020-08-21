@@ -15,9 +15,9 @@
  */
 
 
-module com.github.commandmosaic.plain.sample {
-    requires com.github.commandmosaic.plain;
+module org.commandmosaic.plain.sample {
+    requires org.commandmosaic.plain;
 
-    opens com.github.commandmosaic.plain.sample
-            to com.github.commandmosaic.plain, com.github.commandmosaic.core;
+    opens org.commandmosaic.plain.sample
+            to org.commandmosaic.plain, org.commandmosaic.core;
 }

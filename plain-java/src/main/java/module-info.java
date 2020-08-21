@@ -15,11 +15,11 @@
  */
 
 
-module com.github.commandmosaic.plain {
-    requires transitive com.github.commandmosaic.core;
+module org.commandmosaic.plain {
+    requires transitive org.commandmosaic.core;
     requires org.slf4j;
 
-    opens com.github.commandmosaic.plain;
+    opens org.commandmosaic.plain;
 
-    exports com.github.commandmosaic.plain;
+    exports org.commandmosaic.plain;
 }

@@ -15,8 +15,8 @@
  */
 
 
-module com.github.commandmosaic.spring {
-    requires transitive com.github.commandmosaic.core;
+module org.commandmosaic.spring {
+    requires transitive org.commandmosaic.core;
 
     requires spring.core;
     requires spring.boot;
@@ -27,7 +27,7 @@ module com.github.commandmosaic.spring {
     requires spring.beans;
     requires spring.context;
 
-    opens com.github.commandmosaic.spring to com.github.commandmosaic.core, spring.beans, spring.core;
+    opens org.commandmosaic.spring to org.commandmosaic.core, spring.beans, spring.core;
 
-    exports com.github.commandmosaic.spring;
+    exports org.commandmosaic.spring;
 }

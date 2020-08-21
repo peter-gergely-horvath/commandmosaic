@@ -15,14 +15,14 @@
  */
 
 
-module com.github.commandmosaic.http.servlet {
-    requires transitive com.github.commandmosaic.servlet.common;
-    requires transitive com.github.commandmosaic.plain;
+module org.commandmosaic.http.servlet {
+    requires transitive org.commandmosaic.servlet.common;
+    requires transitive org.commandmosaic.plain;
 
     requires javax.servlet.api;
     requires com.google.gson;
 
-    exports com.github.commandmosaic.http.servlet;
+    exports org.commandmosaic.http.servlet;
 
-    opens com.github.commandmosaic.http.servlet to com.github.commandmosaic.core;
+    opens org.commandmosaic.http.servlet to org.commandmosaic.core;
 }

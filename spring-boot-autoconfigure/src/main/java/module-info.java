@@ -15,17 +15,17 @@
  */
 
 
-module com.github.commandmosaic.springboot.autoconfigure {
+module org.commandmosaic.springboot.autoconfigure {
     requires com.google.common;
     requires org.slf4j;
     requires spring.beans;
     requires spring.boot.autoconfigure;
     requires spring.context;
 
-    requires transitive com.github.commandmosaic.spring;
+    requires transitive org.commandmosaic.spring;
 
-    exports com.github.commandmosaic.springboot.autoconfiguration;
+    exports org.commandmosaic.springboot.autoconfiguration;
 
-    opens com.github.commandmosaic.springboot.autoconfiguration to
+    opens org.commandmosaic.springboot.autoconfiguration to
             spring.beans, spring.core, spring.context, spring.boot.autoconfigure;
 }

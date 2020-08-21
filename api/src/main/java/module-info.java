@@ -15,13 +15,13 @@
  */
 
 
-module com.github.commandmosaic.api {
-    exports com.github.commandmosaic.api;
-    exports com.github.commandmosaic.api.configuration;
-    exports com.github.commandmosaic.api.configuration.conversion;
-    exports com.github.commandmosaic.api.conversion;
-    exports com.github.commandmosaic.api.executor;
-    exports com.github.commandmosaic.api.factory;
-    exports com.github.commandmosaic.api.interceptor;
-    exports com.github.commandmosaic.api.server;
+module org.commandmosaic.api {
+    exports org.commandmosaic.api;
+    exports org.commandmosaic.api.configuration;
+    exports org.commandmosaic.api.configuration.conversion;
+    exports org.commandmosaic.api.conversion;
+    exports org.commandmosaic.api.executor;
+    exports org.commandmosaic.api.factory;
+    exports org.commandmosaic.api.interceptor;
+    exports org.commandmosaic.api.server;
 }

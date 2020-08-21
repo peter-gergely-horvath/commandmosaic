@@ -3,21 +3,21 @@
         This file lists issues FindBug should not report as bugs.
     -->
     <Match>
-        <Class name="com.github.commandmosaic.core.parameter.ReflectionOperations" />
+        <Class name="org.commandmosaic.core.parameter.ReflectionOperations" />
         <Method name="loadDeclaredFields" />
         <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
         <!-- Detection of this bug is incorrect -->
     </Match>
 
     <Match>
-        <Class name="com.github.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor" />
+        <Class name="org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor" />
         <Method name="loadCommandRequiredRoles" />
         <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
         <!-- Detection of this bug is incorrect -->
     </Match>
 
     <Match>
-        <Class name="com.github.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor" />
+        <Class name="org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor" />
         <Method name="loadUnauthenticatedAccess" />
         <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
         <!-- Detection of this bug is incorrect -->

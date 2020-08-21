@@ -15,8 +15,8 @@
  */
 
 
-module com.github.commandmosaic.spring.container {
-    exports com.github.commandmosaic.spring.container;
-    requires transitive com.github.commandmosaic.core;
+module org.commandmosaic.spring.container {
+    exports org.commandmosaic.spring.container;
+    requires transitive org.commandmosaic.core;
     requires spring.beans;
 }

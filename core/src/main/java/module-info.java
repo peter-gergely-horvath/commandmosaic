@@ -15,19 +15,19 @@
  */
 
 
-module com.github.commandmosaic.core {
-    requires transitive com.github.commandmosaic.api;
+module org.commandmosaic.core {
+    requires transitive org.commandmosaic.api;
 
     requires com.google.gson;
     requires com.google.common;
     requires org.slf4j;
 
-    exports com.github.commandmosaic.core;
-    exports com.github.commandmosaic.core.conversion;
-    exports com.github.commandmosaic.core.factory;
-    exports com.github.commandmosaic.core.interceptor;
-    exports com.github.commandmosaic.core.parameter.source;
-    exports com.github.commandmosaic.core.server;
-    exports com.github.commandmosaic.core.server.model;
-    exports com.github.commandmosaic.core.parameter;
+    exports org.commandmosaic.core;
+    exports org.commandmosaic.core.conversion;
+    exports org.commandmosaic.core.factory;
+    exports org.commandmosaic.core.interceptor;
+    exports org.commandmosaic.core.parameter.source;
+    exports org.commandmosaic.core.server;
+    exports org.commandmosaic.core.server.model;
+    exports org.commandmosaic.core.parameter;
 }

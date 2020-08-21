@@ -15,9 +15,9 @@
  */
 
 
-module com.github.commandmosaic.spring.web {
-    requires transitive com.github.commandmosaic.servlet.common;
+module org.commandmosaic.spring.web {
+    requires transitive org.commandmosaic.servlet.common;
     requires javax.servlet.api;
     requires spring.web;
-    exports com.github.commandmosaic.spring.web;
+    exports org.commandmosaic.spring.web;
 }

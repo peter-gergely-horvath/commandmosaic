@@ -15,14 +15,14 @@
  */
 
 
-module com.github.commandmosaic.spring.container.sample {
-    requires com.github.commandmosaic.springboot.autoconfigure;
+module org.commandmosaic.spring.container.sample {
+    requires org.commandmosaic.springboot.autoconfigure;
 
     requires spring.boot.autoconfigure;
     requires spring.context;
     requires spring.boot;
     requires spring.beans;
 
-    opens com.github.commandmosaic.spring.container.sample to
+    opens org.commandmosaic.spring.container.sample to
             spring.beans, spring.context, spring.boot, spring.core;
 }

@@ -5,10 +5,10 @@
   * [The API](#the-api)
   * [Spring support](#spring-support)
   * [Exposing Commands as a service](#exposing-commands-as-a-service)
-    * [Using the CommandDispatcherServer server classes](#using-the-commanddispatcherserver-server-classes)
     * [Command names](#command-names)
     * [Security](#security)
     * [Built-in integrations for exposing commands as a service](#built-in-integrations-for-exposing-commands-as-a-service)
+    * [Using the CommandDispatcherServer server classes](#using-the-commanddispatcherserver-server-classes)
   * [Implementing the Command Pattern](#implementing-the-command-pattern)
     * [Command Pattern within a Plain Java application](#command-pattern-within-a-plain-java-application)
     * [Command Pattern within a Spring Boot application](#command-pattern-within-a-spring-boot-application)
@@ -122,37 +122,48 @@ injection through Spring's `@Autowired` annotation.
 
 # Exposing Commands as a service 
 
-Commands implemented using this library can easily be exposed as a service
-for remote clients. Here, the only API operation exposed is dispatching of a 
-command: this allows keeping the interface minimal and focusing on the 
-business logic instead of writing boilerplate code for exposing operations
-for remote consumption.
+Today, the typical implementation pattern for building interactive web
+applications is using RESTful web services: that is, mapping HTTP URL patterns
+and certain HTTP operations (GET, POST, PUT and DELETE) to the respective handler code.
 
-## Using the CommandDispatcherServer server classes
+While this is a nice and clear approach, there might be some drawbacks, esecially
+with more complex applications. As the application grows, the exposed interface
+becomes larger and larger. While Frameworks like Spring REST offer massive help
+with the implementation, some challenges still remain:
 
-This library was designed with the goal of exposing commands as services 
-with minimum amount of code. The API 
-`org.commandmosaic.api.server.CommandDispatcherServer` provides
- a layer of abstraction between how a command dispatch request is 
-transmitted and represented, and the actual `CommandDispatcher` being used.   
+  * The service interfaces still have to be individually declared
+    * If you work with Spring, you will use @RestController, @RequestMapping etc annotations 
+		on the controller class. These make the declaration easy, but still: you have to write them.
+	
+  * Dispatching logic still has to be written for each reqzest 
+    * If you work with Spring, you write the invocation of your @Service classes within 
+		your @RestController. While Spring offers a great deal of support here, this part of a 
+		RESTful service does not give to much value and can be considered as boilerplate code. 
+	
+  * Permission management is commonly based on HTTP URL patterns and HTTP operations.
+	  While you can surely bake your own solution, it takes time and effort to implement it properly.
+	  	  
+Based on this we can see the limitations of a implementing a service through a RESTful interfaces: 
 
-A `CommandDispatcherServer` reads the incoming dispatch request from
-a `java.io.InputStream` and writes the outcome of the command execution to 
-`java.io.OutputStream`. Any container that can provide incoming messages
-as `java.io.InputStream` and can receive the response as bytes being written
-to a `java.io.OutputStream` can easily be integrated.
+  * Quite a lot of boilterplate coding is required
+  * The assumption that all business logic operations can be squeezed into a Create/Read/Update/Delete a resource pattern
+  * The exposed interface becomes large as the application grows
+  
+  
+Unlike the traditional RESTful API pattern, CommandMosaic offers a slightly different approach:
+building the application out of small blocks -- commands -- and exposing one service, that
+allows the remote remote clients to request the execution of a command. Security is managed at 
+the level of commands: each command simply declares who can execute it (role based security),
+but has to know nothing how its it actaully invoked.
 
-The class `org.commandmosaic.core.server.DefaultCommandDispatcherServer`
-offers a default implementation for building the dispatcher server. 
+With CommandMosaic, the only API operation exposed is dispatching of a command: this allows 
+keeping the interface minimal and focusing on the business logic instead of writing boilerplate 
+code for exposing operations for remote consumption. One simply does not have to write *any code* 
+to expose a new feature implemented in the application. This concept makes a great deal of difference
+with larger and more complex application. 
 
-Its constructor takes a `CommandDispatcher` that it will use to dispatch 
-incoming requests. Its only public method `serviceRequest` reads 
-the dispatch requests from the supplied `InputStream` as JSON and writes the 
-response back to the `OutputStream` as JSON as well. This allows easy integration
-to any request handling mechanism where the application has access to the request
-streams. (For example: Apache Netty network servers etc.)
-
-A request is simply a JSON document, with similar structure:
+By default, a CommandMosaic command dispatch request is simply a JSON document sent 
+to the dispatch handler via HTTP POST with similar structure:
 
     {
         "command": "Foobar",
@@ -279,6 +290,31 @@ The following integrations are provided out-of-the-box:
   * Servlet
   * Spring HTTP Request handlers
   * Amazon AWS Lambda (with and without Spring Boot)
+
+## Using the CommandDispatcherServer server classes
+
+This library was designed with the goal of exposing commands as services 
+with minimum amount of code. The API 
+`org.commandmosaic.api.server.CommandDispatcherServer` provides
+ a layer of abstraction between how a command dispatch request is 
+transmitted and represented, and the actual `CommandDispatcher` being used.   
+
+A `CommandDispatcherServer` reads the incoming dispatch request from
+a `java.io.InputStream` and writes the outcome of the command execution to 
+`java.io.OutputStream`. Any container that can provide incoming messages
+as `java.io.InputStream` and can receive the response as bytes being written
+to a `java.io.OutputStream` can easily be integrated.
+
+The class `org.commandmosaic.core.server.DefaultCommandDispatcherServer`
+offers a default implementation for building the dispatcher server. 
+
+Its constructor takes a `CommandDispatcher` that it will use to dispatch 
+incoming requests. Its only public method `serviceRequest` reads 
+the dispatch requests from the supplied `InputStream` as JSON and writes the 
+response back to the `OutputStream` as JSON as well. This allows easy integration
+to any request handling mechanism where the application has access to the request
+streams. (For example: Apache Netty network servers etc.)
+
 
 # Implementing the Command Pattern
 

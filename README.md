@@ -56,8 +56,8 @@ and a minimalistic container for easily exposing commands as a
 simple service with minimal amount of boilerplate code. 
 
 In addition to this, out-of-the-box support is provided for the 
-industry standard Spring Frameworks allowing the library consumer
-to develop his/her commands as pure Spring Beans, with the rich
+industry standard Spring Framework allowing the library consumers
+to develop their commands as pure Spring Beans, with the rich
 set of functionality offered by Spring, like transaction support, 
 automatic dependency injection through Spring's `@Autowired` 
 annotation etc.
@@ -135,7 +135,7 @@ with the implementation, some challenges still remain:
     * If you work with Spring, you will use @RestController, @RequestMapping etc annotations 
 		on the controller class. These make the declaration easy, but still: you have to write them.
 	
-  * Dispatching logic still has to be written for each reqzest 
+  * Dispatching logic still has to be written for each request 
     * If you work with Spring, you write the invocation of your @Service classes within 
 		your @RestController. While Spring offers a great deal of support here, this part of a 
 		RESTful service does not give to much value and can be considered as boilerplate code. 
@@ -143,24 +143,26 @@ with the implementation, some challenges still remain:
   * Permission management is commonly based on HTTP URL patterns and HTTP operations.
 	  While you can surely bake your own solution, it takes time and effort to implement it properly.
 	  	  
-Based on this we can see the limitations of a implementing a service through a RESTful interfaces: 
+Based on this we can see the limitations of a implementing a service through via RESTful interfaces: 
 
-  * Quite a lot of boilterplate coding is required
-  * The assumption that all business logic operations can be squeezed into a Create/Read/Update/Delete a resource pattern
-  * The exposed interface becomes large as the application grows
-  
-  
+  * Quite a lot of boilerplate coding is required
+  * The assumption that all business logic operations can be squeezed into a 
+    Create/Read/Update/Delete a resource pattern
+  * The exposed interface becomes large as the application grows. This makes
+    working with the interface more complex (e.g. consider AWS API Gateway and Lambda)
+    
+   
 Unlike the traditional RESTful API pattern, CommandMosaic offers a slightly different approach:
 building the application out of small blocks -- commands -- and exposing one service, that
 allows the remote remote clients to request the execution of a command. Security is managed at 
 the level of commands: each command simply declares who can execute it (role based security),
-but has to know nothing how its it actaully invoked.
+but has to know nothing how its it actually invoked.
 
 With CommandMosaic, the only API operation exposed is dispatching of a command: this allows 
 keeping the interface minimal and focusing on the business logic instead of writing boilerplate 
 code for exposing operations for remote consumption. One simply does not have to write *any code* 
-to expose a new feature implemented in the application. This concept makes a great deal of difference
-with larger and more complex application. 
+to expose a new feature implemented as a command in the application. 
+This concept makes a great deal of difference with larger and more complex application. 
 
 By default, a CommandMosaic command dispatch request is simply a JSON document sent 
 to the dispatch handler via HTTP POST with similar structure:
@@ -195,7 +197,8 @@ to be executed:
 
 In remote service cases, having proper security is essential so that commands
 can only be executed by authorized clients only.  
-The module `commandmosaic-security` contains support features for this requirement.
+The module [commandmosaic-security](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/security) 
+contains support features for this requirement.
 
 Two annotations are provided to mark the access levels of each commands:
 
@@ -224,7 +227,7 @@ authentication/authorization information from the request via the
 The user-provided security `CommandInterceptor` must be configured within
 `CommandDispatcherConfiguration`, otherwise security will not be enabled. 
 
-    CommandDispatcherConfiguration commandDispatcherConfiguration = CommandDispatcherConfiguration.builder()
+    CommandDispatcherConfiguration configuration = CommandDispatcherConfiguration.builder()
         .rootPackage("com.acme.foobar")
         .interceptor(MyCustomSecurityCommandInterceptor.class)
         .build();
@@ -235,10 +238,11 @@ Each command dispatch request can have a user defined, field "`auth`", which hol
 key-value pairs: when security is enabled, this must be provided for all requests
 that dispatch a command marked with `@RestrictedAccess` annotation. 
 
-The content of the field is not specified; the only restriction is that it must
-be deserializable to a `HashMap`.
+The content of the field is user-defined key value pairs; the only restriction is 
+that it must be deserializable to a `HashMap`.
 
-For example, the following sample shows passing two fields in the "`auth`" Map field:
+For example, the following sample shows passing two fields in the "`auth`" Map field,
+`username` and `password`. 
 
     {
       "command": "foo/bar/Foobar",
@@ -275,8 +279,7 @@ by the framework code in `AbstractSecurityCommandInterceptor`)
             String username = (String) auth.get("username");
             String password = (String) auth.get("password");
     
-            // throw exception if login fails,
-            // otherwise retrieve user roles
+            // throw AuthenticationException if login fails, otherwise retrieve user roles
     
             Set<String> rolesOfTheUser = // retrieve user roles ...
     
@@ -507,7 +510,7 @@ parameters according to the following:
 
 You will likely want to secure access to particular commands and
 implement proper authentication and access management (authorization).
-For this, please refer to the features of [commandmosaic-security](security)
+For this, please refer to the features of [commandmosaic-security](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/security)
 module, which offers standardised annotation based access control and an abstract
 `CommandInterceptor` base class for plugging in custom authentication and authorization
 logic with minimal amount of code.
@@ -606,13 +609,26 @@ through a Spring Web REST RestController class similar to the one below.
     }
 
 # Servlerless Cloud with Amazon Lambda
-  
+
 Amazon Lambda (Java) is supported out-of-the-box. Different flavours of this library 
-(Plan Java and Spring Boot support) provide abstract AWS `RequestHandler` base 
-implementations that dispatch the command specified. You, as the user of the 
-framework have to subclass these base implementations with a placeholder class, 
-that does nothing apart from passing configuration to the framework-provided 
-superclass's constructor. This placeholder class has to be configured as your 
+(Plain Java and Spring Boot support) provide abstract AWS `RequestHandler` base 
+implementations that dispatch the command specified. 
+  
+The benefit of using CommandMosaic with Amazon Lambda is the small interface
+footprint. You deploy you Lambda application with one AWS RequestHandler and
+configure AWS API Gateway with one HTTP resource. You then can add further 
+commands to your code base without having to even touch the existing AWS 
+API Gateway configuration as the only operation exposed is dispatching a 
+command. These commands can easily be tested in a Junit / TestNG test or
+you can use the standard Servlet or Spring HttpRequestHandler containers to 
+start a mock server for an full-blown integration test, which will provide 
+exactly the same behaviour as the container running in the cloud (as the 
+core behaviour is shared across all runtime environments).
+   
+When using CommandMosaic with Amazon Lambda, you, as the user of the 
+framework have to subclass the appropriate base `RequestHandler` class with a 
+placeholder class, that does nothing apart from passing configuration to the 
+framework-provided superclass's constructor. This placeholder class has to be configured as your 
 lambda function: the framework provides the behaviour, while your placeholder 
 sub-class provides the configuration only. 
 

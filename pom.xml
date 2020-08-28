@@ -22,6 +22,7 @@
 
         <spotbug.version>4.0.4</spotbug.version>
         <junit.version>4.13</junit.version>
+        <easymock.version>4.2</easymock.version>
     </properties>
 
     <modules>
@@ -169,6 +170,14 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>${easymock.version}</version>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

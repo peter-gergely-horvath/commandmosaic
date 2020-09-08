@@ -133,7 +133,7 @@ with the implementation, some challenges still remain:
 
   * The service interfaces still have to be individually declared
     * If you work with Spring, you will use @RestController, @RequestMapping etc annotations 
-		on the controller class. These make the declaration easy, but still: you have to write them.
+		on the controller class. These make the declaration easy, but still: you have to write it.
 	
   * Dispatching logic still has to be written for each request 
     * If you work with Spring, you write the invocation of your @Service classes within 
@@ -154,9 +154,9 @@ Based on this we can see the limitations of a implementing a service through via
    
 Unlike the traditional RESTful API pattern, CommandMosaic offers a slightly different approach:
 building the application out of small blocks -- commands -- and exposing one service, that
-allows the remote remote clients to request the execution of a command. Security is managed at 
+allows the remote clients to request the execution of a command. Security is managed at 
 the level of commands: each command simply declares who can execute it (role based security),
-but has to know nothing how its it actually invoked.
+but has to know nothing how it is actually invoked.
 
 With CommandMosaic, the only API operation exposed is dispatching of a command: this allows 
 keeping the interface minimal and focusing on the business logic instead of writing boilerplate 

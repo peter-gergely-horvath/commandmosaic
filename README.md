@@ -41,7 +41,7 @@ CommandMosaic is a project with the following high-level goals:
     developed for serverless cloud platforms without using any vendor-specific tooling. 
    
   * Provide first class support for Spring Framework and Spring Boot features 
-    (auto-configuration, dependency injection, etc) without mandating their usage.mv
+    (auto-configuration, dependency injection, etc) without mandating their usage.
     
 # Overview    
 

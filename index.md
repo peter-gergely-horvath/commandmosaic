@@ -91,7 +91,7 @@ which are automatically injected by the framework.
         }
     }
 
-# Spring support 
+# Spring Framework support 
 
 Spring is supported out-of-the box: a Command class can also be 
 a Spring bean, allowing it to be used according to powerful and 

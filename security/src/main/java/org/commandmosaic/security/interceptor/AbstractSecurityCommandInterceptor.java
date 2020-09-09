@@ -124,9 +124,9 @@ public abstract class AbstractSecurityCommandInterceptor implements CommandInter
                                                                  Set<String> presentRoles) {
 
         if (!requiredRoles.isEmpty() && (presentRoles == null
-                        || !presentRoles.containsAll(requiredRoles))) {
+                        || presentRoles.stream().noneMatch(requiredRoles::contains))) {
 
-            // We had at least one requiredRole, that was not present for the given user
+            // None of the required roles is present for the given user
             throw new AccessDeniedException("Access Denied: " + commandClass.getName());
         }
     }

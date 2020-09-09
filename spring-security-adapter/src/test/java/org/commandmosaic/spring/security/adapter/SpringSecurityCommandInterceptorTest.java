@@ -18,64 +18,80 @@ package org.commandmosaic.spring.security.adapter;
 
 
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.security.AuthenticationException;
+import org.commandmosaic.api.executor.ParameterSource;
+import org.commandmosaic.api.interceptor.InterceptorChain;
+import org.commandmosaic.core.parameter.source.ParameterSources;
+import org.commandmosaic.security.AccessDeniedException;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 
 public class SpringSecurityCommandInterceptorTest {
 
     private SpringSecurityCommandInterceptor springSecurityCommandInterceptor;
     private CommandContext mockCommandContext;
+    private InterceptorChain mockInterceptorChain;
+    private ParameterSource parameterSource;
 
     @Before
     public void beforeTest() {
         springSecurityCommandInterceptor = new SpringSecurityCommandInterceptor();
 
         mockCommandContext = EasyMock.createStrictMock(CommandContext.class);
+        mockInterceptorChain = EasyMock.createStrictMock(InterceptorChain.class);
+
+        parameterSource = ParameterSources.mapParameterSource(Collections.emptyMap());
     }
 
     @After
     public void afterTest() {
-        EasyMock.verify(mockCommandContext);
+        EasyMock.verify(mockCommandContext, mockInterceptorChain);
     }
 
+
     @Test
-    public void testNullAuthentication() {
-        EasyMock.replay(mockCommandContext);
+    public void testPublicCommandWithNullAuthentication() {
+
+        EasyMock.expect(
+                mockInterceptorChain.execute(PublicCommand.class, parameterSource, mockCommandContext))
+                .andReturn(null)
+                .once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         securityContext.setAuthentication(null);
 
-        Assert.assertThrows(AuthenticationException.class, () ->
-                springSecurityCommandInterceptor.attemptLogin(mockCommandContext));
+        springSecurityCommandInterceptor.intercept(PublicCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
     }
 
     @Test
-    public void testAnonymousAuthenticationTokenAuthentication() {
-        EasyMock.replay(mockCommandContext);
+    public void testPublicCommandWithAnonymousAuthentication() {
 
+        EasyMock.expect(
+                mockInterceptorChain.execute(PublicCommand.class, parameterSource, mockCommandContext))
+                .andReturn(null)
+                .once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
         GrantedAuthority anonymousAuthority = new SimpleGrantedAuthority("ROLE_anonymous");
         List<GrantedAuthority> grantedAuthorities = Collections.singletonList(anonymousAuthority);
-        UserDetails user = new User("anonymous", "anonymous", grantedAuthorities);
 
         AnonymousAuthenticationToken anonymousAuthenticationToken =
                 new AnonymousAuthenticationToken("anonymous", "anonymous", grantedAuthorities);
@@ -84,31 +100,215 @@ public class SpringSecurityCommandInterceptorTest {
 
         securityContext.setAuthentication(anonymousAuthenticationToken);
 
-        Assert.assertThrows(AuthenticationException.class, () ->
-                springSecurityCommandInterceptor.attemptLogin(mockCommandContext));
+        springSecurityCommandInterceptor.intercept(PublicCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
     }
 
     @Test
-    public void testLoggedInAuthentication() {
-        EasyMock.replay(mockCommandContext);
+    public void testPublicCommandWithUserAuthentication() {
 
+        EasyMock.expect(
+                mockInterceptorChain.execute(PublicCommand.class, parameterSource, mockCommandContext))
+                .andReturn(null)
+                .once();
 
-        GrantedAuthority anonymousAuthority = new SimpleGrantedAuthority("ROLE_STANDARD_USER");
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        GrantedAuthority anonymousAuthority = new SimpleGrantedAuthority("ROLE_USER");
         List<GrantedAuthority> grantedAuthorities = Collections.singletonList(anonymousAuthority);
-        UserDetails user = new User("foobar", "foobar", grantedAuthorities);
 
         Authentication authentication =
-                new TestingAuthenticationToken("foobar", "foobar", grantedAuthorities);
+                new UsernamePasswordAuthenticationToken("user", "user", grantedAuthorities);
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         securityContext.setAuthentication(authentication);
 
-        Set<String> roles = springSecurityCommandInterceptor.attemptLogin(mockCommandContext);
-
-        Assert.assertEquals(1, roles.size());
-        Assert.assertTrue(roles.contains("ROLE_STANDARD_USER"));
+        springSecurityCommandInterceptor.intercept(PublicCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
     }
 
+    @Test
+    public void testPublicCommandWithAdminAuthentication() {
 
+        EasyMock.expect(
+                mockInterceptorChain.execute(PublicCommand.class, parameterSource, mockCommandContext))
+                .andReturn(null)
+                .once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        GrantedAuthority anonymousAuthority = new SimpleGrantedAuthority("ROLE_ADMIN");
+        List<GrantedAuthority> grantedAuthorities = Collections.singletonList(anonymousAuthority);
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken("admin", "admin", grantedAuthorities);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
+
+        springSecurityCommandInterceptor.intercept(PublicCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
+    }
+
+    @Test
+    public void testUserCommandWithNullAuthentication() {
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(null);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                springSecurityCommandInterceptor.intercept(UserCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testUserCommandWithAnonymousAuthentication() {
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        GrantedAuthority anonymousAuthority = new SimpleGrantedAuthority("ROLE_anonymous");
+        List<GrantedAuthority> grantedAuthorities = Collections.singletonList(anonymousAuthority);
+
+        AnonymousAuthenticationToken anonymousAuthenticationToken =
+                new AnonymousAuthenticationToken("anonymous", "anonymous", grantedAuthorities);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(anonymousAuthenticationToken);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                springSecurityCommandInterceptor.intercept(UserCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testUserCommandWithUserAuthentication() {
+
+        EasyMock.expect(
+                mockInterceptorChain.execute(UserCommand.class, parameterSource, mockCommandContext))
+                .andReturn(null)
+                .once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_USER");
+        List<GrantedAuthority> grantedAuthorities = Collections.singletonList(grantedAuthority);
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken("user", "user", grantedAuthorities);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
+
+        springSecurityCommandInterceptor.intercept(UserCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
+    }
+
+    @Test
+    public void testUserCommandWithAdminAuthentication() {
+
+        EasyMock.expect(
+                mockInterceptorChain.execute(UserCommand.class, parameterSource, mockCommandContext))
+                .andReturn(null)
+                .once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        GrantedAuthority anonymousAuthority = new SimpleGrantedAuthority("ROLE_ADMIN");
+        List<GrantedAuthority> grantedAuthorities = Collections.singletonList(anonymousAuthority);
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken("admin", "admin", grantedAuthorities);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
+
+        springSecurityCommandInterceptor.intercept(UserCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
+    }
+
+    @Test
+    public void testAdminCommandWithNullAuthentication() {
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(null);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                springSecurityCommandInterceptor.intercept(AdminCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testAdminCommandWithAnonymousAuthentication() {
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        GrantedAuthority anonymousAuthority = new SimpleGrantedAuthority("ROLE_anonymous");
+        List<GrantedAuthority> grantedAuthorities = Collections.singletonList(anonymousAuthority);
+
+        AnonymousAuthenticationToken anonymousAuthenticationToken =
+                new AnonymousAuthenticationToken("anonymous", "anonymous", grantedAuthorities);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(anonymousAuthenticationToken);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                springSecurityCommandInterceptor.intercept(AdminCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testAdminCommandWithUserAuthentication() {
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_USER");
+        List<GrantedAuthority> grantedAuthorities = Collections.singletonList(grantedAuthority);
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken("user", "user", grantedAuthorities);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                springSecurityCommandInterceptor.intercept(AdminCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testAdminCommandWithAdminAuthentication() {
+
+        EasyMock.expect(
+                mockInterceptorChain.execute(AdminCommand.class, parameterSource, mockCommandContext))
+                .andReturn(null)
+                .once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        GrantedAuthority anonymousAuthority = new SimpleGrantedAuthority("ROLE_ADMIN");
+        List<GrantedAuthority> grantedAuthorities = Collections.singletonList(anonymousAuthority);
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken("admin", "admin", grantedAuthorities);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
+
+        springSecurityCommandInterceptor.intercept(AdminCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
+    }
 }

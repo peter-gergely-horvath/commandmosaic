@@ -150,19 +150,21 @@ public class AbstractSecurityCommandInterceptorTest {
 
 
     @Test
-    public void testRolesWithCorrectAuthenticationButPartialAuthorization() {
+    public void testRolesWithCorrectAuthenticationAndOneRoleAuthorization() {
 
         Map<String, Object> authMap = new HashMap<>();
         authMap.put("username", "johnsmith");
         authMap.put("password", "foobar");
         authMap.put("roles", Collections.singleton("FOO"));
 
-        Assert.assertThrows(AccessDeniedException.class, () -> commandDispatcher.dispatchCommand(
-                RolesCommand.class, null, new DefaultCommandContext(authMap)));
+        String result = commandDispatcher.dispatchCommand(
+                RolesCommand.class, null, new DefaultCommandContext(authMap));
+
+        Assert.assertEquals("Response from RolesCommand", result);
     }
 
     @Test
-    public void testRolesWithCorrectAuthenticationAndCorrectAuthorization() {
+    public void testRolesWithCorrectAuthenticationAndAllAuthorization() {
 
         Map<String, Object> authMap = new HashMap<>();
         authMap.put("username", "johnsmith");

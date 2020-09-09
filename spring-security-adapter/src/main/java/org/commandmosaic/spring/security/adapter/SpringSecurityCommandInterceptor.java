@@ -17,6 +17,7 @@
 package org.commandmosaic.spring.security.adapter;
 
 import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.security.AccessDeniedException;
 import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
 
@@ -56,7 +57,7 @@ public final class SpringSecurityCommandInterceptor extends AbstractSecurityComm
         Authentication authentication = context.getAuthentication();
         if (authentication == null
                 || authentication instanceof AnonymousAuthenticationToken) {
-            throw new AuthenticationException("not authenticated");
+            throw new AccessDeniedException("not authenticated");
         }
 
 

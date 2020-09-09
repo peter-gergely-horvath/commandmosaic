@@ -49,11 +49,15 @@ import java.lang.annotation.*;
 @Documented
 public @interface RestrictedAccess {
     /**
-     * Declares the roles required to execute to command.
-     * If the caller is no authenticated or does not have all the requiredRoles,
-     * the command cannot be executed.
+     * Declares the roles required to execute the command.
+     * Might be empty, in which case only authentication
+     * is required for executing the command.
+     * If the caller is not authenticated or does not have at
+     * least one of the {@code requiredRoles}, the command
+     * cannot be executed.
      *
-     * @return an array of role names required to execute the command
+     * @return an array of role names required to execute the command.
+     *      Might be empty, in which case only authentication is required for executing the command.
      */
     String[] requiredRoles();
 }

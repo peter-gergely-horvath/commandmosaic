@@ -1,1 +1,2 @@
 
+SonaType JIRA issue https://issues.sonatype.org/browse/OSSRH-60537 was raised by the owner of this domain.

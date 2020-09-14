@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package org.commandmosaic.security.interceptor;
 
 import org.commandmosaic.api.Command;
@@ -77,8 +77,8 @@ public abstract class AbstractSecurityCommandInterceptor implements CommandInter
                 are present: this is clearly invalid. We rather prevent the usage completely than exposing a
                 @RestrictedAccess command, which was accidentally marked with @UnauthenticatedAccess as well.
                 */
-                throw new IllegalStateException(
-                        "Both @UnauthenticatedAccess and @RestrictedAccess are present on " + clazz);
+            throw new IllegalStateException(
+                    "Both @UnauthenticatedAccess and @RestrictedAccess are present on " + clazz);
         }
 
         return unauthenticatedAccessAnnotation != null;
@@ -108,23 +108,29 @@ public abstract class AbstractSecurityCommandInterceptor implements CommandInter
             if (!unauthenticatedAccess) {
                 Set<String> requiredRoles = commandRequiredRolesCache.get(commandClass);
 
-                Set<String> rolesExtractedFromTheRequest = attemptLogin(context);
+                try {
+                    Set<String> rolesExtractedFromTheRequest = attemptLogin(context);
 
-                checkAuthorization(commandClass, requiredRoles, rolesExtractedFromTheRequest);
+                    checkAuthorization(commandClass, requiredRoles, rolesExtractedFromTheRequest);
+
+                } catch (AuthenticationException e) {
+
+                    throw new AccessDeniedException("Access Denied: " + commandClass.getName()
+                            + ": authentication failure", e);
+                }
             }
 
-        }
-        catch (ExecutionException | UncheckedExecutionException e) {
+        } catch (ExecutionException | UncheckedExecutionException e) {
             throw new IllegalStateException("Failed to fetch command security metadata for " + commandClass, e);
         }
     }
 
-    protected  <R, C extends Command<R>> void checkAuthorization(Class<C> commandClass,
-                                                                 Set<String> requiredRoles,
-                                                                 Set<String> presentRoles) {
+    protected <R, C extends Command<R>> void checkAuthorization(Class<C> commandClass,
+                                                                Set<String> requiredRoles,
+                                                                Set<String> presentRoles) {
 
         if (!requiredRoles.isEmpty() && (presentRoles == null
-                        || presentRoles.stream().noneMatch(requiredRoles::contains))) {
+                || presentRoles.stream().noneMatch(requiredRoles::contains))) {
 
             // None of the required roles is present for the given user
             throw new AccessDeniedException("Access Denied: " + commandClass.getName());
@@ -138,7 +144,6 @@ public abstract class AbstractSecurityCommandInterceptor implements CommandInter
      *
      * @param commandContext the command context
      * @return the roles of the successfully authenticated user
-     *
      * @throws AuthenticationException if authentication was not successful
      */
     protected abstract Set<String> attemptLogin(CommandContext commandContext) throws AuthenticationException;

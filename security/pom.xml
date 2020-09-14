@@ -23,6 +23,13 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-plain-java</artifactId>

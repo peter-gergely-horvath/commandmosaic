@@ -14,206 +14,315 @@
  * limitations under the License.
  */
 
- 
 package org.commandmosaic.security.interceptor;
 
+
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.api.CommandDispatcher;
-import org.commandmosaic.api.configuration.CommandDispatcherConfiguration;
-import org.commandmosaic.core.server.model.DefaultCommandContext;
-import org.commandmosaic.plain.PlainCommandDispatcherFactory;
-import org.commandmosaic.security.AuthenticationException;
+import org.commandmosaic.api.executor.ParameterSource;
+import org.commandmosaic.api.interceptor.InterceptorChain;
+import org.commandmosaic.core.parameter.source.ParameterSources;
 import org.commandmosaic.security.AccessDeniedException;
+import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
 
+
 public class AbstractSecurityCommandInterceptorTest {
 
-    private CommandDispatcher commandDispatcher;
-
-    public static final class MockAbstractSecurityCommandInterceptor extends AbstractSecurityCommandInterceptor {
-
-
-        @Override
-        protected Set<String> attemptLogin(CommandContext commandContext) {
-            Map<String, Object> auth = commandContext.getAuth();
-            if (auth != null) {
-                String userName = (String) auth.get("username");
-                String password = (String) auth.get("password");
-
-                if ((!"johnsmith".equals(userName) || !"foobar".equals(password))) {
-                    throw new AuthenticationException("Authentication failed");
-                }
-
-                @SuppressWarnings("unchecked")
-                Set<String> roles = (Set<String>) auth.get("roles");
-
-
-                return roles != null ? roles : Collections.emptySet();
-            }
-
-            throw new AuthenticationException("Failed to login: no auth");
-        }
-    }
+    private MockAbstractSecurityCommandInterceptor securityCommandInterceptor;
+    private CommandContext mockCommandContext;
+    private InterceptorChain mockInterceptorChain;
+    private ParameterSource parameterSource;
 
     @Before
     public void beforeTest() {
 
-        CommandDispatcherConfiguration configuration = CommandDispatcherConfiguration.builder()
-                .rootPackageFromClass(AbstractSecurityCommandInterceptorTest.class)
-                .interceptor(MockAbstractSecurityCommandInterceptor.class)
-                .build();
+        Map<String, String> userNameToPasswordMap = new HashMap<>();
+        userNameToPasswordMap.put("foo-user", "foo-password");
+        userNameToPasswordMap.put("bar-user", "bar-password");
+        userNameToPasswordMap.put("admin-user", "admin-password");
 
-        commandDispatcher = PlainCommandDispatcherFactory.getInstance().getCommandDispatcher(configuration);
+        Map<String, Set<String>> userNameToRolesMap = new HashMap<>();
+        userNameToRolesMap.put("foo-user", new HashSet<>(Arrays.asList("ROLE_USER")));
+        userNameToRolesMap.put("admin-user", new HashSet<>(Arrays.asList("ROLE_ADMIN")));
 
+        securityCommandInterceptor =
+                new MockAbstractSecurityCommandInterceptor(userNameToPasswordMap, userNameToRolesMap);
+
+        mockCommandContext = EasyMock.createStrictMock(CommandContext.class);
+        mockInterceptorChain = EasyMock.createStrictMock(InterceptorChain.class);
+
+        parameterSource = ParameterSources.mapParameterSource(Collections.emptyMap());
     }
 
-    @Test
-    public void testAuthenticationOnlyWithMissingCredentials() {
-
-        Map<String, Object> authMap = Collections.emptyMap();
-
-        Assert.assertThrows(AuthenticationException.class, () -> commandDispatcher.dispatchCommand(
-                AuthenticationOnlyCommand.class, null, new DefaultCommandContext(authMap)));
+    @After
+    public void afterTest() {
+        EasyMock.verify(mockCommandContext, mockInterceptorChain);
     }
 
-    @Test
-    public void testAuthenticationOnlyWithCorrectCredentials() {
 
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "foobar");
-
-        String response = commandDispatcher.dispatchCommand(
-                AuthenticationOnlyCommand.class, null, new DefaultCommandContext(authMap));
-
-        Assert.assertEquals("Response from AuthenticationOnlyCommand", response);
-    }
-
-    @Test
-    public void testAuthenticationOnlyWithInvalidUserName() {
-
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "NOT_THE_RIGHT_ONE");
-        authMap.put("password", "foobar");
-
-        Assert.assertThrows(AuthenticationException.class, () -> commandDispatcher.dispatchCommand(
-                AuthenticationOnlyCommand.class, null, new DefaultCommandContext(authMap)));
-    }
-
-    @Test
-    public void testAuthenticationOnlyWithInvalidPassword() {
-
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "NOT_THE_RIGHT_ONE");
-
-        Assert.assertThrows(AuthenticationException.class, () -> commandDispatcher.dispatchCommand(
-                AuthenticationOnlyCommand.class, null, new DefaultCommandContext(authMap)));
-    }
-
-    @Test
-    public void testRolesWithAuthenticationOnly() {
-
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "foobar");
-
-        Assert.assertThrows(AccessDeniedException.class, () -> commandDispatcher.dispatchCommand(
-                RolesCommand.class, null, new DefaultCommandContext(authMap)));
-    }
-
-    @Test
-    public void testRolesWithInvalidUserName() {
-
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "NOT_THE_RIGHT_ONE");
-        authMap.put("password", "foobar");
-
-        Assert.assertThrows(AuthenticationException.class, () -> commandDispatcher.dispatchCommand(
-                RolesCommand.class, null, new DefaultCommandContext(authMap)));
-    }
-
-    @Test
-    public void testRolesWithInvalidPassword() {
-
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "NOT_THE_RIGHT_ONE");
-
-        Assert.assertThrows(AuthenticationException.class, () -> commandDispatcher.dispatchCommand(
-                RolesCommand.class, null, new DefaultCommandContext(authMap)));
+    private void expectCommandIsExecuted(Class commandClass) {
+        EasyMock.expect(
+                mockInterceptorChain.execute(commandClass, parameterSource, mockCommandContext))
+                .andReturn(null)
+                .once();
     }
 
 
     @Test
-    public void testRolesWithCorrectAuthenticationAndOneRoleAuthorization() {
+    public void testPublicCommandWithNullAuthenticationIsAllowed() {
 
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "foobar");
-        authMap.put("roles", Collections.singleton("FOO"));
+        expectCommandIsExecuted(PublicCommand.class);
 
-        String result = commandDispatcher.dispatchCommand(
-                RolesCommand.class, null, new DefaultCommandContext(authMap));
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
-        Assert.assertEquals("Response from RolesCommand", result);
+        securityCommandInterceptor.intercept(PublicCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
     }
 
     @Test
-    public void testRolesWithCorrectAuthenticationAndAllAuthorization() {
+    public void testAuthenticationOnlyCommandWithNullAuthenticationIsDenied() {
 
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "foobar");
-        authMap.put("roles", new HashSet<>(Arrays.asList("FOO", "BAR")));
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(null).once();
 
-        String result = commandDispatcher.dispatchCommand(
-                RolesCommand.class, null, new DefaultCommandContext(authMap));
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
-        Assert.assertEquals("Response from RolesCommand", result);
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(AuthenticationOnlyCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
     }
 
     @Test
-    public void testRolesWithCorrectAuthenticationAndAdditionalAuthorization() {
+    public void testAuthenticationOnlyCommandWithInvalidCredentialsIsDenied() {
 
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "foobar");
-        authMap.put("roles", new HashSet<>(Arrays.asList("FOO", "BAR", "BAZ")));
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "foo-user");
+        authMap.put("password", "NOT_THE_RIGHT_PASSWORD");
 
-        String result = commandDispatcher.dispatchCommand(
-                RolesCommand.class, null, new DefaultCommandContext(authMap));
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
 
-        Assert.assertEquals("Response from RolesCommand", result);
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(AuthenticationOnlyCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
     }
 
     @Test
-    public void testMisconfiguredCommand() {
+    public void testAuthenticationOnlyCommandWithValidCredentialsAndNoRolesIsAllowed() {
 
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "foobar");
-        authMap.put("roles", new HashSet<>(Arrays.asList("FOO", "BAR", "BAZ")));
+        HashMap<String, Object> authMap = new HashMap<>();
+        // NOTE: 'bar-user' has no roles associated with it
+        authMap.put("username", "bar-user");
+        authMap.put("password", "bar-password");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        expectCommandIsExecuted(AuthenticationOnlyCommand.class);
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        securityCommandInterceptor.intercept(AuthenticationOnlyCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
+    }
+
+    @Test
+    public void testAuthenticationOnlyCommandWithValidCredentialsAndRolesIsAllowed() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "foo-user");
+        authMap.put("password", "foo-password");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        expectCommandIsExecuted(AuthenticationOnlyCommand.class);
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        securityCommandInterceptor.intercept(AuthenticationOnlyCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
+    }
+
+
+    @Test
+    public void testUserCommandWithNullAuthenticationIsDenied() {
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(null).once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(UserCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testUserCommandWithInvalidCredentialsIsDenied() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "foo-user");
+        authMap.put("password", "NOT_THE_RIGHT_PASSWORD");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(UserCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testUserCommandWithValidCredentialsButNoRolesIsDenied() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "bar-user");
+        authMap.put("password", "bar-password");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(UserCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testUserCommandWithValidCredentialsAndRolesIsAllowed() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "foo-user");
+        authMap.put("password", "foo-password");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        expectCommandIsExecuted(UserCommand.class);
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        securityCommandInterceptor.intercept(UserCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
+    }
+
+
+    @Test
+    public void testAdminCommandWithNullAuthenticationIsDenied() {
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(null).once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(AdminCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testAdminCommandWithInvalidCredentialsIsDenied() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "foo-user");
+        authMap.put("password", "NOT_THE_RIGHT_PASSWORD");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(AdminCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testAdminCommandWithInvalidAdminCredentialsIsDenied() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "admin-user");
+        authMap.put("password", "NOT_THE_RIGHT_PASSWORD");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(AdminCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testAdminCommandWithValidUserCredentialsAndNoRolesIsDenied() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        // NOTE: 'bar-user' has no roles associated with it
+        authMap.put("username", "bar-user");
+        authMap.put("password", "bar-password");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(AdminCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testAdminCommandWithValidUserCredentialsAndRolesIsDenied() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "foo-user");
+        authMap.put("password", "foo-password");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(AccessDeniedException.class, () ->
+                securityCommandInterceptor.intercept(AdminCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testAdminCommandWithValidAdminCredentialsAndRolesIsAllowed() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "admin-user");
+        authMap.put("password", "admin-password");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        expectCommandIsExecuted(AdminCommand.class);
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        securityCommandInterceptor.intercept(AdminCommand.class,
+                parameterSource, mockCommandContext, mockInterceptorChain);
+    }
+
+    @Test
+    public void testMisconfiguredCommandFailsWithIllegalStateException() {
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
         Assert.assertThrows(IllegalStateException.class, () ->
-                commandDispatcher.dispatchCommand(
-                MisconfiguredCommand.class, null, new DefaultCommandContext(authMap)));
+                securityCommandInterceptor.intercept(MisconfiguredCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
     }
 
-    @Test
-    public void testNotAnnotatedCommand() {
 
-        Map<String, Object> authMap = new HashMap<>();
-        authMap.put("username", "johnsmith");
-        authMap.put("password", "foobar");
-        authMap.put("roles", new HashSet<>(Arrays.asList("FOO", "BAR", "BAZ")));
+    @Test
+    public void testNotAnnotatedCommandFailsWithIllegalStateException() {
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
         Assert.assertThrows(IllegalStateException.class, () ->
-                commandDispatcher.dispatchCommand(
-                        NotAnnotatedCommand.class, null, new DefaultCommandContext(authMap)));
+                securityCommandInterceptor.intercept(NotAnnotatedCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
     }
 }

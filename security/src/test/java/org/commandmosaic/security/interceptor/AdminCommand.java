@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
- 
 package org.commandmosaic.security.interceptor;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.security.annotation.UnauthenticatedAccess;
+import org.commandmosaic.security.annotation.RestrictedAccess;
 
-@UnauthenticatedAccess
-public class UnauthenticatedCommand implements Command<String> {
+@RestrictedAccess(requiredRoles = "ROLE_ADMIN")
+public class AdminCommand implements Command<String> {
+
     @Override
     public String execute(CommandContext context) {
-        return "Response from " + UnauthenticatedCommand.class.getSimpleName();
+        return "AdminCommand";
     }
 }

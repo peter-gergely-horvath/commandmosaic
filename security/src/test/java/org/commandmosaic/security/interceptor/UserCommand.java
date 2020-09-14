@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
- 
 package org.commandmosaic.security.interceptor;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.annotation.RestrictedAccess;
 
-@RestrictedAccess(requiredRoles = {"FOO", "BAR"})
-public class RolesCommand implements Command<String> {
+@RestrictedAccess(requiredRoles = {"ROLE_USER", "ROLE_ADMIN"})
+public class UserCommand implements Command<String> {
+
     @Override
     public String execute(CommandContext context) {
-        return "Response from " + RolesCommand.class.getSimpleName();
+        return "AdminCommand";
     }
 }

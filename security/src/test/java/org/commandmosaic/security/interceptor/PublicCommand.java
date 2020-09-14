@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
- 
-package org.commandmosaic.security;
+package org.commandmosaic.security.interceptor;
 
-import org.commandmosaic.api.server.CommandException;
+import org.commandmosaic.api.Command;
+import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.security.annotation.UnauthenticatedAccess;
 
-public class AccessDeniedException extends CommandException {
-
-    public AccessDeniedException(String message) {
-        super(message);
-    }
-
-    public AccessDeniedException(Throwable cause) {
-        super(cause);
-    }
-
-    public AccessDeniedException(String message, Throwable cause) {
-        super(message, cause);
+@UnauthenticatedAccess
+public class PublicCommand implements Command<String> {
+    @Override
+    public String execute(CommandContext context) {
+        return "PublicCommand";
     }
 }

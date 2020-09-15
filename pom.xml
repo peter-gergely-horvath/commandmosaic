@@ -5,12 +5,46 @@
 
     <groupId>org.commandmosaic</groupId>
     <artifactId>commandmosaic</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>commandmosaic: a command pattern framework</name>
+    <name>CommandMosaic</name>
+    <description>
+        CommandMosaic is a framework for implementing Java services based on the command design pattern.
+    </description>
+    <url>https://commandmosaic.org</url>
 
-    <url>https://github.com/peter-gergely-horvath/commandmosaic</url>
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>https://opensource.org/licenses/Apache-2.0</url>
+            <distribution>repo</distribution>
+            <comments>Apache License, Version 2.0</comments>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>
+            scm:git:https://github.com/peter-gergely-horvath/commandmosaic.git
+        </connection>
+        <developerConnection>
+            scm:git:https://github.com/peter-gergely-horvath/commandmosaic.git
+        </developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/peter-gergely-horvath/commandmosaic</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>peter-gergely-horvath</id>
+            <name>Peter G. Horvath</name>
+            <email>peter.gergely.horvath@gmail.com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>Europe/Vienna</timezone>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,30 +59,12 @@
         <easymock.version>4.2</easymock.version>
     </properties>
 
-    <modules>
-        <module>api</module>
-        <module>core</module>
-        <module>plain-java</module>
-        <module>security</module>
-        <module>spring</module>
-        <module>servlet-common</module>
-        <module>servlet</module>
-        <module>spring-web</module>
-        <module>spring-security-adapter</module>
-        <module>spring-boot-autoconfigure</module>
-        <module>spring-container-server</module>
-        <module>aws-lambda-common</module>
-        <module>aws-lambda-plain-java</module>
-        <module>aws-lambda-spring-boot</module>
-        <module>sample-apps</module>
-    </modules>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.commandmosaic</groupId>
                 <artifactId>commandmosaic-core</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
 
             <dependency>
@@ -68,7 +84,6 @@
                 <artifactId>spring-tx</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-
 
 
             <dependency>
@@ -181,6 +196,377 @@
         </dependencies>
     </dependencyManagement>
 
+
+
+    <profiles>
+
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <modules>
+                <module>api</module>
+                <module>core</module>
+                <module>plain-java</module>
+                <module>security</module>
+                <module>spring</module>
+                <module>servlet-common</module>
+                <module>servlet</module>
+                <module>spring-web</module>
+                <module>spring-security-adapter</module>
+                <module>spring-boot-autoconfigure</module>
+                <module>spring-container-server</module>
+                <module>aws-lambda-common</module>
+                <module>aws-lambda-plain-java</module>
+                <module>aws-lambda-spring-boot</module>
+                <module>sample-apps</module>
+            </modules>
+
+            <build>
+                <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+                    <plugins>
+                        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+                        <plugin>
+                            <artifactId>maven-clean-plugin</artifactId>
+                            <version>3.1.0</version>
+                        </plugin>
+                        <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+                        <plugin>
+                            <artifactId>maven-resources-plugin</artifactId>
+                            <version>3.0.2</version>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.8.0</version>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>2.22.1</version>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-jar-plugin</artifactId>
+                            <version>3.0.2</version>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-install-plugin</artifactId>
+                            <version>2.5.2</version>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-deploy-plugin</artifactId>
+                            <version>2.8.2</version>
+                        </plugin>
+                        <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+                        <plugin>
+                            <artifactId>maven-site-plugin</artifactId>
+                            <version>3.7.1</version>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                            <version>3.0.0</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs-maven-plugin</artifactId>
+                            <version>${spotbug.version}</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>xml-maven-plugin</artifactId>
+                            <version>1.0.2</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-source-plugin</artifactId>
+                            <version>3.2.1</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>3.2.0</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-pmd-plugin</artifactId>
+                            <version>3.13.0</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.0</version>
+                        <configuration>
+                            <release>11</release>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <linkXRef>true</linkXRef>
+                            <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+                            <minimumTokens>30</minimumTokens>
+                            <failOnViolation>true</failOnViolation>
+                            <printFailingErrors>true</printFailingErrors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                    <goal>cpd-check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <configuration>
+                            <!-- Enables analysis which takes more memory but finds more bugs.
+                                If you run out of memory, changes the value of the effort element to 'Low'. -->
+                            <effort>Max</effort>
+
+                            <!-- Location of SpotBugs exclude filter file -->
+                            <excludeFilterFile>build-config/spotbugs-exclude.xml</excludeFilterFile>
+
+
+                            <!-- Build shall fail if problems are found -->
+                            <failOnError>true</failOnError>
+
+                            <!-- Reports all bugs (other values are medium and max) -->
+                            <threshold>Low</threshold>
+
+                            <!-- Produces XML report -->
+                            <xmlOutput>true</xmlOutput>
+
+                            <!-- Configures the directory in which the XML report is created -->
+                            <spotbugsXmlOutputDirectory>${project.build.directory}/spotbugs
+                            </spotbugsXmlOutputDirectory>
+                        </configuration>
+                        <executions>
+                            <!-- Ensures that FindBugs inspects source code when project is compiled. -->
+                            <execution>
+                                <id>analyze-compile</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <configuration>
+                            <transformationSets>
+                                <transformationSet>
+                                    <!-- Configures the source directory of XML files. -->
+                                    <dir>${project.build.directory}/spotbugs</dir>
+                                    <includes>
+                                        <!-- only transform findbugsXml.xml to generate FindBugs HTML report -->
+                                        <include>spotbugsXml.xml</include>
+                                    </includes>
+
+                                    <!-- Configures the directory in which the FindBugs report is written. -->
+                                    <outputDir>${project.build.directory}/spotbugs</outputDir>
+
+                                    <!-- Selects the used stylesheet. -->
+                                    <!-- <stylesheet>fancy-hist.xsl</stylesheet> -->
+                                    <!--<stylesheet>default.xsl</stylesheet> -->
+                                    <!--<stylesheet>plain.xsl</stylesheet> -->
+                                    <stylesheet>fancy.xsl</stylesheet>
+                                    <!--<stylesheet>summary.xsl</stylesheet> -->
+                                    <fileMappers>
+                                        <!-- Configures the file extension of the output files. -->
+                                        <fileMapper
+                                                implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                            <targetExtension>.html</targetExtension>
+                                        </fileMapper>
+                                    </fileMappers>
+                                </transformationSet>
+                            </transformationSets>
+                        </configuration>
+                        <executions>
+                            <!-- Ensures that the XSLT transformation is run when the project
+                                is compiled. -->
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>transform</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.github.spotbugs</groupId>
+                                <artifactId>spotbugs</artifactId>
+                                <version>${spotbug.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.rat</groupId>
+                        <artifactId>apache-rat-plugin</artifactId>
+                        <version>0.13</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <excludeSubProjects default-value="true">false</excludeSubProjects>
+                            <excludes>
+                                <exclude>CHANGES</exclude>
+                                <exclude>NOTICE</exclude>
+                                <exclude>README</exclude>
+                                <exclude>README.md</exclude>
+                                <exclude>mvnw</exclude>
+                                <exclude>mvnw.cmd</exclude>
+                                <exclude>.mvn/**/*</exclude>
+                                <exclude>**/*.iml</exclude>
+                                <exclude>**/pom.xml</exclude>
+                                <exclude>build-config/**</exclude>
+                                <exclude>**/target/**/*</exclude>
+                                <exclude>**/src/main/resources/**/*</exclude>
+                                <exclude>**/src/test/resources/**/*</exclude>
+                                <exclude>.pmd</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>maven-repo-promotion</id>
+            <activation>
+                <property>
+                    <name>maven-repo-promotion</name>
+                    <value>true</value>
+                </property>
+            </activation>
+
+
+            <modules>
+                <module>api</module>
+                <module>core</module>
+                <module>plain-java</module>
+                <module>security</module>
+                <module>spring</module>
+                <module>servlet-common</module>
+                <module>servlet</module>
+                <module>spring-web</module>
+                <module>spring-security-adapter</module>
+                <module>spring-boot-autoconfigure</module>
+                <module>spring-container-server</module>
+                <module>aws-lambda-common</module>
+                <module>aws-lambda-plain-java</module>
+                <module>aws-lambda-spring-boot</module>
+                <!--
+                We do NOT promote sample-apps to Maven Central
+                <module>sample-apps</module>
+                -->
+            </modules>
+
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+
     <build>
         <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
             <plugins>
@@ -250,177 +636,5 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <release>11</release>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <linkXRef>true</linkXRef>
-                    <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
-                    <minimumTokens>30</minimumTokens>
-                    <failOnViolation>true</failOnViolation>
-                    <printFailingErrors>true</printFailingErrors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                            <goal>cpd-check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <configuration>
-                    <!-- Enables analysis which takes more memory but finds more bugs.
-                        If you run out of memory, changes the value of the effort element to 'Low'. -->
-                    <effort>Max</effort>
-
-                    <!-- Location of SpotBugs exclude filter file -->
-                    <excludeFilterFile>build-config/spotbugs-exclude.xml</excludeFilterFile>
-
-
-                    <!-- Build shall fail if problems are found -->
-                    <failOnError>true</failOnError>
-
-                    <!-- Reports all bugs (other values are medium and max) -->
-                    <threshold>Low</threshold>
-
-                    <!-- Produces XML report -->
-                    <xmlOutput>true</xmlOutput>
-
-                    <!-- Configures the directory in which the XML report is created -->
-                    <spotbugsXmlOutputDirectory>${project.build.directory}/spotbugs
-                    </spotbugsXmlOutputDirectory>
-                </configuration>
-                <executions>
-                    <!-- Ensures that FindBugs inspects source code when project is compiled. -->
-                    <execution>
-                        <id>analyze-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>xml-maven-plugin</artifactId>
-                <configuration>
-                    <transformationSets>
-                        <transformationSet>
-                            <!-- Configures the source directory of XML files. -->
-                            <dir>${project.build.directory}/spotbugs</dir>
-                            <includes>
-                                <!-- only transform findbugsXml.xml to generate FindBugs HTML report -->
-                                <include>spotbugsXml.xml</include>
-                            </includes>
-
-                            <!-- Configures the directory in which the FindBugs report is written. -->
-                            <outputDir>${project.build.directory}/spotbugs</outputDir>
-
-                            <!-- Selects the used stylesheet. -->
-                            <!-- <stylesheet>fancy-hist.xsl</stylesheet> -->
-                            <!--<stylesheet>default.xsl</stylesheet> -->
-                            <!--<stylesheet>plain.xsl</stylesheet> -->
-                            <stylesheet>fancy.xsl</stylesheet>
-                            <!--<stylesheet>summary.xsl</stylesheet> -->
-                            <fileMappers>
-                                <!-- Configures the file extension of the output files. -->
-                                <fileMapper
-                                        implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
-                                    <targetExtension>.html</targetExtension>
-                                </fileMapper>
-                            </fileMappers>
-                        </transformationSet>
-                    </transformationSets>
-                </configuration>
-                <executions>
-                    <!-- Ensures that the XSLT transformation is run when the project
-                        is compiled. -->
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>transform</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>${spotbug.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>0.13</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <excludeSubProjects default-value="true">false</excludeSubProjects>
-                    <excludes>
-                        <exclude>CHANGES</exclude>
-                        <exclude>NOTICE</exclude>
-                        <exclude>README</exclude>
-                        <exclude>README.md</exclude>
-                        <exclude>mvnw</exclude>
-                        <exclude>mvnw.cmd</exclude>
-                        <exclude>.mvn/**/*</exclude>
-                        <exclude>**/*.iml</exclude>
-                        <exclude>**/pom.xml</exclude>
-                        <exclude>build-config/**</exclude>
-                        <exclude>**/target/**/*</exclude>
-                        <exclude>**/src/main/resources/**/*</exclude>
-                        <exclude>**/src/test/resources/**/*</exclude>
-                        <exclude>.pmd</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 </project>

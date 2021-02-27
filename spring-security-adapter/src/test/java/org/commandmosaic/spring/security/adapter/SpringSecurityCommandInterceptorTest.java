@@ -38,6 +38,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Collections;
 import java.util.List;
 
+import static org.easymock.EasyMock.*;
 
 public class SpringSecurityCommandInterceptorTest {
 
@@ -190,7 +191,10 @@ public class SpringSecurityCommandInterceptorTest {
     public void testUserCommandWithUserAuthentication() {
 
         EasyMock.expect(
-                mockInterceptorChain.execute(UserCommand.class, parameterSource, mockCommandContext))
+                mockInterceptorChain.execute(
+                        eq(UserCommand.class),
+                        eq(parameterSource),
+                        anyObject(CommandContext.class)))
                 .andReturn(null)
                 .once();
 
@@ -214,7 +218,10 @@ public class SpringSecurityCommandInterceptorTest {
     public void testUserCommandWithAdminAuthentication() {
 
         EasyMock.expect(
-                mockInterceptorChain.execute(UserCommand.class, parameterSource, mockCommandContext))
+                mockInterceptorChain.execute(
+                        eq(UserCommand.class),
+                        eq(parameterSource),
+                        anyObject(CommandContext.class)))
                 .andReturn(null)
                 .once();
 
@@ -292,7 +299,10 @@ public class SpringSecurityCommandInterceptorTest {
     public void testAdminCommandWithAdminAuthentication() {
 
         EasyMock.expect(
-                mockInterceptorChain.execute(AdminCommand.class, parameterSource, mockCommandContext))
+                mockInterceptorChain.execute(
+                        eq(AdminCommand.class),
+                        eq(parameterSource),
+                        anyObject(CommandContext.class)))
                 .andReturn(null)
                 .once();
 

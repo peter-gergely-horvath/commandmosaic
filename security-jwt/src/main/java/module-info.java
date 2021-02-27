@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
- 
-package org.commandmosaic.security;
 
-import org.commandmosaic.api.server.CommandException;
+module org.commandmosaic.security.jwt {
+    requires com.google.common;
 
-public class AuthenticationException extends CommandException {
+    requires transitive org.commandmosaic.security;
 
-    public AuthenticationException(String message) {
-        super(message);
-    }
-
-    public AuthenticationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    opens com.commandmosaic.security.jwt.interceptor to org.commandmosaic.core;
 }

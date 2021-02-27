@@ -19,6 +19,7 @@ package org.commandmosaic.core.server.model;
 
 import org.commandmosaic.api.CommandContext;
 
+import java.security.Principal;
 import java.util.*;
 
 public class DefaultCommandContext implements CommandContext {
@@ -59,6 +60,11 @@ public class DefaultCommandContext implements CommandContext {
     @Override
     public Map<String, Object> getAuth() {
         return auth;
+    }
+
+    @Override
+    public Principal getCallerPrincipal() {
+        return null;
     }
 
     @Override

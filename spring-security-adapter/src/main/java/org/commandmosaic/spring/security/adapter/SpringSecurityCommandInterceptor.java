@@ -17,10 +17,10 @@
 package org.commandmosaic.spring.security.adapter;
 
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.security.AccessDeniedException;
 import org.commandmosaic.security.AuthenticationException;
+import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.identity.SimpleCallerIdentity;
 import org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
-
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -50,22 +50,24 @@ import java.util.stream.Collectors;
 public final class SpringSecurityCommandInterceptor extends AbstractSecurityCommandInterceptor {
 
     @Override
-    protected Set<String> attemptLogin(CommandContext commandContext) throws AuthenticationException {
+    protected CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
 
         SecurityContext context = SecurityContextHolder.getContext();
 
         Authentication authentication = context.getAuthentication();
         if (authentication == null
                 || authentication instanceof AnonymousAuthenticationToken) {
-            throw new AccessDeniedException("not authenticated");
+            return null; // not authenticated
         }
-
 
         Collection<? extends GrantedAuthority> grantedAuthorities = authentication.getAuthorities();
 
-        return grantedAuthorities.stream().
+        String name = authentication.getName();
+        Set<String> authorities = grantedAuthorities.stream().
                 map(SpringSecurityCommandInterceptor::mapToString)
                 .collect(Collectors.toUnmodifiableSet());
+
+        return new SimpleCallerIdentity(name, authorities);
     }
 
     private static String mapToString(GrantedAuthority grantedAuthority) {

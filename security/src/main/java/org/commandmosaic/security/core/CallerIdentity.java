@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
- 
-package org.commandmosaic.security;
 
-import org.commandmosaic.api.server.CommandException;
+package org.commandmosaic.security.core;
 
-public class AuthenticationException extends CommandException {
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.Set;
 
-    public AuthenticationException(String message) {
-        super(message);
-    }
+/**
+ * Represents the identity of the caller.
+ * <p>
+ * Once an incoming command dispatch request has been authenticated,
+ * the <code>CallerIdentity</code> is stored in the <code>CommandContext</code>
+ */
+public interface CallerIdentity extends Principal, Serializable {
 
-    public AuthenticationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    Set<String> getRoles();
 }

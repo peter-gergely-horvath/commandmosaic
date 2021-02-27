@@ -211,6 +211,7 @@
                 <module>core</module>
                 <module>plain-java</module>
                 <module>security</module>
+                <module>security-jwt</module>
                 <module>spring</module>
                 <module>servlet-common</module>
                 <module>servlet</module>
@@ -482,6 +483,7 @@
                 <module>core</module>
                 <module>plain-java</module>
                 <module>security</module>
+                <module>security-jwt</module>
                 <module>spring</module>
                 <module>servlet-common</module>
                 <module>servlet</module>

@@ -19,6 +19,7 @@ package org.commandmosaic.api;
 
 import org.commandmosaic.api.interceptor.CommandInterceptor;
 
+import java.security.Principal;
 import java.util.Map;
 import java.util.Optional;
 
@@ -58,6 +59,18 @@ public interface CommandContext {
      * @return read-only authentication/authorization field received as part of the request (might be {@code null})
      */
     Map<String, Object> getAuth();
+
+    /**
+     * <p>
+     * If the command dispatch was requested by a remote client, this method
+     * returns a <code>java.security.Principal</code> object representing the caller user.
+     * This <code>Principal</code> is established by a security
+     * {@link CommandInterceptor CommandInterceptor}. </p>
+     *
+     * @return Returns a <code>java.security.Principal</code> object representing the caller user.
+     *          If the caller has not been authenticated, the method returns {@code null}.
+     */
+    Principal getCallerPrincipal();
 
     /**
      * Returns an {@code Optional} of the specified Attribute with the desired class.

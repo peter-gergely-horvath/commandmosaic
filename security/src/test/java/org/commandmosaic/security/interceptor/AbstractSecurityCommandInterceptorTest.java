@@ -28,8 +28,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
 
 public class AbstractSecurityCommandInterceptorTest {
 
@@ -41,33 +44,33 @@ public class AbstractSecurityCommandInterceptorTest {
     @Before
     public void beforeTest() {
 
-        Map<String, String> userNameToPasswordMap = new HashMap<>();
-        userNameToPasswordMap.put("foo-user", "foo-password");
-        userNameToPasswordMap.put("bar-user", "bar-password");
-        userNameToPasswordMap.put("admin-user", "admin-password");
+        securityCommandInterceptor = new MockAbstractSecurityCommandInterceptor(
+                        new UserNamePasswordCallerIdentity(
+                                "foo-user", "foo-password", "ROLE_USER"),
+                        new UserNamePasswordCallerIdentity(
+                                "bar-user", "bar-password"),
+                        new UserNamePasswordCallerIdentity("admin-user",
+                                "admin-password", "ROLE_ADMIN"));
 
-        Map<String, Set<String>> userNameToRolesMap = new HashMap<>();
-        userNameToRolesMap.put("foo-user", new HashSet<>(Arrays.asList("ROLE_USER")));
-        userNameToRolesMap.put("admin-user", new HashSet<>(Arrays.asList("ROLE_ADMIN")));
-
-        securityCommandInterceptor =
-                new MockAbstractSecurityCommandInterceptor(userNameToPasswordMap, userNameToRolesMap);
-
-        mockCommandContext = EasyMock.createStrictMock(CommandContext.class);
-        mockInterceptorChain = EasyMock.createStrictMock(InterceptorChain.class);
+        mockCommandContext = EasyMock.createStrictMock("CommandContext", CommandContext.class);
+        mockInterceptorChain = EasyMock.createStrictMock("InterceptorChain", InterceptorChain.class);
 
         parameterSource = ParameterSources.mapParameterSource(Collections.emptyMap());
     }
 
     @After
     public void afterTest() {
-        EasyMock.verify(mockCommandContext, mockInterceptorChain);
+        EasyMock.verify(mockCommandContext);
+        EasyMock.verify(mockInterceptorChain);
     }
 
-
+    @SuppressWarnings("unchecked")
     private void expectCommandIsExecuted(Class commandClass) {
         EasyMock.expect(
-                mockInterceptorChain.execute(commandClass, parameterSource, mockCommandContext))
+                mockInterceptorChain.execute(
+                        eq(commandClass),
+                        eq(parameterSource),
+                        anyObject(CommandContext.class)))
                 .andReturn(null)
                 .once();
     }
@@ -92,8 +95,11 @@ public class AbstractSecurityCommandInterceptorTest {
         EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
         Assert.assertThrows(AccessDeniedException.class, () ->
-                securityCommandInterceptor.intercept(AuthenticationOnlyCommand.class,
-                        parameterSource, mockCommandContext, mockInterceptorChain));
+                securityCommandInterceptor.intercept(
+                        AuthenticationOnlyCommand.class,
+                        parameterSource,
+                        mockCommandContext,
+                        mockInterceptorChain));
     }
 
     @Test
@@ -317,7 +323,25 @@ public class AbstractSecurityCommandInterceptorTest {
 
 
     @Test
-    public void testNotAnnotatedCommandFailsWithIllegalStateException() {
+    public void testNotAnnotatedCommandFailsWithIllegalStateExceptionWhenAuthenticated() {
+
+        HashMap<String, Object> authMap = new HashMap<>();
+        authMap.put("username", "admin-user");
+        authMap.put("password", "admin-password");
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
+
+        EasyMock.replay(mockCommandContext, mockInterceptorChain);
+
+        Assert.assertThrows(IllegalStateException.class, () ->
+                securityCommandInterceptor.intercept(NotAnnotatedCommand.class,
+                        parameterSource, mockCommandContext, mockInterceptorChain));
+    }
+
+    @Test
+    public void testNotAnnotatedCommandFailsWithIllegalStateExceptionWhenNotLoggedIn() {
+
+        EasyMock.expect(mockCommandContext.getAuth()).andReturn(null).once();
 
         EasyMock.replay(mockCommandContext, mockInterceptorChain);
 

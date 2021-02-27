@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
- 
-package org.commandmosaic.security;
+package com.commandmosaic.security.jwt.interceptor;
 
-import org.commandmosaic.api.server.CommandException;
+import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.security.AuthenticationException;
+import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
 
-public class AuthenticationException extends CommandException {
+public class JwtSecurityCommandInterceptor extends AbstractSecurityCommandInterceptor {
 
-    public AuthenticationException(String message) {
-        super(message);
-    }
-
-    public AuthenticationException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    protected CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
+        throw new UnsupportedOperationException();
     }
 }

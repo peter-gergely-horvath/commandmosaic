@@ -30,6 +30,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import org.commandmosaic.security.core.CallerIdentity;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -87,42 +88,48 @@ public abstract class AbstractSecurityCommandInterceptor implements CommandInter
     @Override
     public final <R, C extends Command<R>> R intercept(Class<C> commandClass, ParameterSource parameters,
                                                        CommandContext context, InterceptorChain next) {
-        /*
-        checkAccess prevents propagation by throwing an exception
-        if the user does not have the required permissions
-        */
-        this.checkAccess(commandClass, parameters, context);
+
+        try {
+            Boolean unauthenticatedAccessAllowed = unauthenticatedAccessCache.get(commandClass);
+            Objects.requireNonNull(unauthenticatedAccessAllowed,
+                    "unauthenticatedAccessAllowed cannot be null");
+
+            if (!unauthenticatedAccessAllowed) {
+                CallerIdentity callerIdentity = authenticate(context);
+
+                checkAuthorization(commandClass, callerIdentity);
+
+                if (callerIdentity != null) {
+                    context = new SecurityAwareCommandContext(context, callerIdentity);
+                }
+            }
+
+        } catch (AuthenticationException e) {
+
+            throw new AccessDeniedException(
+                    "Access Denied: " + commandClass.getName() + ": authentication failure", e);
+
+        } catch (ExecutionException | UncheckedExecutionException e) {
+
+            throw new IllegalStateException("Failed to fetch command security metadata for " + commandClass, e);
+
+        }
 
         return next.execute(commandClass, parameters, context);
     }
 
-    private <R, C extends Command<R>> void checkAccess(Class<C> commandClass,
-                                                       ParameterSource parameters,
-                                                       CommandContext context)
-            throws AuthenticationException, AccessDeniedException {
+    private <R, C extends Command<R>> void checkAuthorization(Class<C> commandClass, CallerIdentity callerIdentity)
+            throws ExecutionException {
 
-        try {
-            Boolean unauthenticatedAccess = unauthenticatedAccessCache.get(commandClass);
-            Objects.requireNonNull(unauthenticatedAccess, "unauthenticatedAccess cannot be null");
+        Set<String> requiredRoles = commandRequiredRolesCache.get(commandClass);
 
-            if (!unauthenticatedAccess) {
-                Set<String> requiredRoles = commandRequiredRolesCache.get(commandClass);
-
-                try {
-                    Set<String> rolesExtractedFromTheRequest = attemptLogin(context);
-
-                    checkAuthorization(commandClass, requiredRoles, rolesExtractedFromTheRequest);
-
-                } catch (AuthenticationException e) {
-
-                    throw new AccessDeniedException("Access Denied: " + commandClass.getName()
-                            + ": authentication failure", e);
-                }
-            }
-
-        } catch (ExecutionException | UncheckedExecutionException e) {
-            throw new IllegalStateException("Failed to fetch command security metadata for " + commandClass, e);
+        if (callerIdentity == null) {
+            throw new AccessDeniedException(
+                    "Access Denied: " + commandClass.getName() + ": authentication required");
         }
+        Set<String> callerRoles = callerIdentity.getRoles();
+
+        checkAuthorization(commandClass, requiredRoles, callerRoles);
     }
 
     protected <R, C extends Command<R>> void checkAuthorization(Class<C> commandClass,
@@ -138,14 +145,19 @@ public abstract class AbstractSecurityCommandInterceptor implements CommandInter
     }
 
     /**
-     * Attempts to perform a login based on information available in the
-     * command context. Throws {@code AuthenticationException}
-     * if authentication was not successful for any reason.
+     * Attempts to authenticate the caller based on information available in the
+     * command context. Returns a representation of the caller's identity or <code>null</code>
+     * if authentication information was not present.
+     * Throws {@code AuthenticationException} if authentication
+     * information was present, but authentication was not successful for any reason.
      *
      * @param commandContext the command context
-     * @return the roles of the successfully authenticated user
-     * @throws AuthenticationException if authentication was not successful
+     *
+     * @return a <code>CallerIdentity</code>, which represents roles of the successfully authenticated user,
+     *          or <code>null</code>, if authentication information was not present
+     *
+     * @throws AuthenticationException if authentication information was present, but authentication failed
      */
-    protected abstract Set<String> attemptLogin(CommandContext commandContext) throws AuthenticationException;
+    protected abstract CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException;
 
 }

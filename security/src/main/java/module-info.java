@@ -21,6 +21,8 @@ module org.commandmosaic.security {
     requires transitive org.commandmosaic.core;
 
     exports org.commandmosaic.security;
+    exports org.commandmosaic.security.core;
+    exports org.commandmosaic.security.core.identity;
     exports org.commandmosaic.security.annotation;
     exports org.commandmosaic.security.interceptor;
 

@@ -16,43 +16,46 @@
 
 package org.commandmosaic.security.interceptor;
 
+import com.google.common.base.Functions;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.AuthenticationException;
+import org.commandmosaic.security.core.CallerIdentity;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 final class MockAbstractSecurityCommandInterceptor extends AbstractSecurityCommandInterceptor {
 
-    private final Map<String, String> userNameToPasswordMap;
-    private final Map<String, Set<String>> userNameToRolesMap;
+    private final Collection<UserNamePasswordCallerIdentity> users;
 
     MockAbstractSecurityCommandInterceptor(
-            Map<String, String> userNameToPasswordMap, Map<String, Set<String>> userNameToRolesMap) {
-        this.userNameToPasswordMap = userNameToPasswordMap;
-        this.userNameToRolesMap = userNameToRolesMap;
+            UserNamePasswordCallerIdentity... callerIdentities) {
+
+        this.users = Arrays.asList(callerIdentities);
     }
 
 
     @Override
-    protected Set<String> attemptLogin(CommandContext commandContext) {
+    protected CallerIdentity authenticate(CommandContext commandContext) {
         Map<String, Object> auth = commandContext.getAuth();
         if (auth != null) {
             String userName = (String) auth.get("username");
             String password = (String) auth.get("password");
 
-            String storedPassword = userNameToPasswordMap.get(userName);
+            UserNamePasswordCallerIdentity callerIdentity = users.stream()
+                    .filter(it -> it.getName().equalsIgnoreCase(userName))
+                    .findFirst()
+                    .orElseThrow(() -> new AuthenticationException("Failed to authenticate: user is not found"));
 
-            if (storedPassword == null) {
-                throw new AuthenticationException("Failed to authenticate");
-            } else if (!storedPassword.equals(password)) {
-                throw new AuthenticationException("Failed to authenticate");
-            } else {
-                return userNameToRolesMap.get(userName);
+            if (!callerIdentity.getPassword().equals(password)) {
+                throw new AuthenticationException("Failed to authenticate: password is invalid");
             }
+
+            return callerIdentity;
         }
 
-        throw new AuthenticationException("Failed to login: no auth");
+        return null;
     }
 }

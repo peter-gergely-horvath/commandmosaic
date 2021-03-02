@@ -97,12 +97,12 @@ public class CommandDispatcherConfiguration {
             return this;
         }
 
-        public <S, T> Builder typeConverter(Class<S> sourceType, Class<T> toType, TypeConverter<S, T> converter) {
+        public <S, T> Builder typeConverter(Class<S> sourceType, Class<T> targetType, TypeConverter<S, T> converter) {
             if (typeConversions == null) {
                 typeConversions = new LinkedHashSet<>();
             }
 
-            typeConversions.add(new TypeConversion<>(sourceType, toType, converter));
+            typeConversions.add(new TypeConversion<>(sourceType, targetType, converter));
 
             return this;
         }

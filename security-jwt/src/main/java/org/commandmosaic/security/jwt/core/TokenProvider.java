@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
+package org.commandmosaic.security.jwt.core;
 
-module org.commandmosaic.security.jwt {
-    requires com.google.common;
+import org.commandmosaic.security.core.CallerIdentity;
 
-    requires transitive org.commandmosaic.security;
-    requires org.slf4j;
-    requires jjwt.api;
+import java.util.Optional;
 
-    exports org.commandmosaic.security.jwt.core;
-    exports org.commandmosaic.security.jwt.interceptor;
+public interface TokenProvider {
+    String createToken(CallerIdentity authentication, boolean rememberMe);
 
-    opens org.commandmosaic.security.jwt.interceptor to org.commandmosaic.core;
-
-    exports org.commandmosaic.security.jwt.config;
-    exports org.commandmosaic.security.jwt.command;
+    Optional<CallerIdentity> getCallerIdentity(String token);
 }

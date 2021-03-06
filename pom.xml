@@ -212,6 +212,8 @@
                 <module>plain-java</module>
                 <module>security</module>
                 <module>security-jwt</module>
+                <module>security-jwt-spring</module>
+                <module>security-jwt-spring-boot-autoconfigure</module>
                 <module>spring</module>
                 <module>servlet-common</module>
                 <module>servlet</module>
@@ -484,6 +486,8 @@
                 <module>plain-java</module>
                 <module>security</module>
                 <module>security-jwt</module>
+                <module>security-jwt-spring</module>
+                <module>security-jwt-spring-boot-autoconfigure</module>
                 <module>spring</module>
                 <module>servlet-common</module>
                 <module>servlet</module>

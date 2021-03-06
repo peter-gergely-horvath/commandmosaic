@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
+package org.commandmosaic.security.interceptor;
 
-module org.commandmosaic.security.jwt {
-    requires com.google.common;
+import org.commandmosaic.api.interceptor.CommandInterceptor;
 
-    requires transitive org.commandmosaic.security;
-    requires org.slf4j;
-    requires jjwt.api;
+/**
+ * A marker interface for {@code CommandInterceptor}s that provide
+ * security features.
+ */
+public interface SecurityCommandInterceptor extends CommandInterceptor {
 
-    exports org.commandmosaic.security.jwt.core;
-    exports org.commandmosaic.security.jwt.interceptor;
-
-    opens org.commandmosaic.security.jwt.interceptor to org.commandmosaic.core;
-
-    exports org.commandmosaic.security.jwt.config;
-    exports org.commandmosaic.security.jwt.command;
 }

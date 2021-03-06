@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.commandmosaic.security.jwt.interceptor;
 
-import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.security.AuthenticationException;
-import org.commandmosaic.security.core.CallerIdentity;
-import org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
+module org.commandmosaic.security.jwt.spring {
 
-public class JwtSecurityCommandInterceptor extends AbstractSecurityCommandInterceptor {
 
-    @Override
-    protected CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
-        throw new UnsupportedOperationException();
-    }
+    requires transitive org.commandmosaic.security.jwt;
+    requires org.slf4j;
+    requires spring.security.core;
+
+    opens org.commandmosaic.security.jwt.spring.command to org.commandmosaic.core, spring.beans, spring.core;
 }

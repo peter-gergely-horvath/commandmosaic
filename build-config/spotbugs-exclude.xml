@@ -22,4 +22,25 @@
         <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
         <!-- Detection of this bug is incorrect -->
     </Match>
+
+    <Match>
+        <Class name="org.commandmosaic.security.jwt.config.JwtSecurityConfiguration" />
+        <Method name="getJwtKey" />
+        <Bug pattern="EI_EXPOSE_REP" />
+        <!-- The key array should not be changed by the caller -->
+    </Match>
+
+    <Match>
+        <Class name="org.commandmosaic.security.jwt.config.JwtSecurityConfiguration" />
+        <Method name="setJwtKey" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+        <!-- The key array should not be changed by the caller -->
+    </Match>
+
+    <Match>
+        <Class name="org.commandmosaic.security.jwt.config.JwtSecurityConfiguration$Builder" />
+        <Method name="setJwtKey" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+        <!-- The key array should not be changed by the caller -->
+    </Match>
 </FindBugsFilter>

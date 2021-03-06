@@ -15,18 +15,20 @@
  */
 
 
-module org.commandmosaic.security.jwt {
-    requires com.google.common;
+module org.commandmosaic.security.jwt.spring.boot.autoconfigure {
 
-    requires transitive org.commandmosaic.security;
+
+    requires transitive org.commandmosaic.security.jwt.spring;
+
     requires org.slf4j;
-    requires jjwt.api;
 
-    exports org.commandmosaic.security.jwt.core;
-    exports org.commandmosaic.security.jwt.interceptor;
+    requires spring.security.core;
+    requires spring.boot.autoconfigure;
+    requires spring.context;
 
-    opens org.commandmosaic.security.jwt.interceptor to org.commandmosaic.core;
 
-    exports org.commandmosaic.security.jwt.config;
-    exports org.commandmosaic.security.jwt.command;
+    exports org.commandmosaic.security.jwt.spring.autoconfiguration;
+
+    opens org.commandmosaic.security.jwt.spring.autoconfiguration to
+            spring.beans, spring.core, spring.context, spring.boot.autoconfigure;
 }

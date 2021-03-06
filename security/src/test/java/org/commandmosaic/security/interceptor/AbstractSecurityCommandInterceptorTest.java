@@ -329,8 +329,6 @@ public class AbstractSecurityCommandInterceptorTest {
         authMap.put("username", "admin-user");
         authMap.put("password", "admin-password");
 
-        EasyMock.expect(mockCommandContext.getAuth()).andReturn(authMap).once();
-
         EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
         Assert.assertThrows(IllegalStateException.class, () ->
@@ -340,8 +338,6 @@ public class AbstractSecurityCommandInterceptorTest {
 
     @Test
     public void testNotAnnotatedCommandFailsWithIllegalStateExceptionWhenNotLoggedIn() {
-
-        EasyMock.expect(mockCommandContext.getAuth()).andReturn(null).once();
 
         EasyMock.replay(mockCommandContext, mockInterceptorChain);
 

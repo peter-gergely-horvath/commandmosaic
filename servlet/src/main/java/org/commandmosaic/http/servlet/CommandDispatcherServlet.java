@@ -23,7 +23,8 @@ import org.commandmosaic.api.factory.CommandDispatcherFactory;
 import org.commandmosaic.api.interceptor.CommandInterceptor;
 import org.commandmosaic.api.server.CommandDispatcherServer;
 import org.commandmosaic.core.server.DefaultCommandDispatcherServer;
-import org.commandmosaic.http.servlet.common.HttpServletRequestHandler;
+import org.commandmosaic.http.servlet.common.HttpCommandDispatchRequestHandler;
+import org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
 import org.commandmosaic.plain.PlainCommandDispatcherFactory;
 
 import javax.servlet.ServletException;
@@ -45,7 +46,7 @@ public class CommandDispatcherServlet extends HttpServlet {
      * We follow the same pattern as javax.servlet.GenericServlet#config,
      * where no external synchronisation is used.
      */
-    private transient HttpServletRequestHandler httpServletRequestHandler;
+    private transient HttpCommandDispatchRequestHandler httpCommandDispatchRequestHandler;
 
     @Override
     public void init() throws ServletException {
@@ -65,7 +66,11 @@ public class CommandDispatcherServlet extends HttpServlet {
 
         CommandDispatcherServer dispatcherServer = new DefaultCommandDispatcherServer(commandDispatcher);
 
-        this.httpServletRequestHandler = new HttpServletRequestHandler(dispatcherServer);
+        HttpCommandDispatchRequestHandlerFactory commandDispatchRequestHandlerFactory =
+                HttpCommandDispatchRequestHandlerFactory.newInstance();
+
+        this.httpCommandDispatchRequestHandler =
+                commandDispatchRequestHandlerFactory.getHttpCommandDispatchRequestHandler(dispatcherServer);
     }
 
     private CommandDispatcherConfiguration getConfiguration(
@@ -118,7 +123,7 @@ public class CommandDispatcherServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        httpServletRequestHandler.handleRequest(request, response);
+        httpCommandDispatchRequestHandler.handleRequest(request, response);
     }
 }
 

@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
+package org.commandmosaic.http.servlet.common;
 
-import org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-module org.commandmosaic.servlet.common {
-    uses HttpCommandDispatchRequestHandlerFactory;
-    requires transitive org.commandmosaic.api;
-    requires javax.servlet.api;
+public interface HttpCommandDispatchRequestHandler {
 
-    exports org.commandmosaic.http.servlet.common;
-    exports org.commandmosaic.http.servlet.common.factory;
+    void handleRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException;
+
 }

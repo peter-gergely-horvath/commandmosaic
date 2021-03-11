@@ -19,6 +19,8 @@ module org.commandmosaic.security.jwt {
     requires com.google.common;
 
     requires transitive org.commandmosaic.security;
+    requires transitive org.commandmosaic.security.web;
+
     requires org.slf4j;
     requires jjwt.api;
 

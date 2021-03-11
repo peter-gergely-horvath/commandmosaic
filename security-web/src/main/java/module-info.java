@@ -15,13 +15,13 @@
  */
 
 
-import org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
+module org.commandmosaic.security.web {
 
-module org.commandmosaic.servlet.common {
-    uses HttpCommandDispatchRequestHandlerFactory;
-    requires transitive org.commandmosaic.api;
+    requires transitive org.commandmosaic.servlet.common;
+    requires transitive org.commandmosaic.security;
     requires javax.servlet.api;
 
-    exports org.commandmosaic.http.servlet.common;
-    exports org.commandmosaic.http.servlet.common.factory;
+    exports org.commandmosaic.security.web.factory;
+
+    opens org.commandmosaic.security.web.factory to org.commandmosaic.servlet.common;
 }

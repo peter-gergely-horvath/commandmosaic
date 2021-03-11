@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
+package org.commandmosaic.security.web.factory;
 
+import org.commandmosaic.api.server.CommandDispatcherServer;
+import org.commandmosaic.http.servlet.common.HttpCommandDispatchRequestHandler;
 import org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
+import org.commandmosaic.security.web.SecurityAwareHttpCommandDispatchRequestHandler;
 
-module org.commandmosaic.servlet.common {
-    uses HttpCommandDispatchRequestHandlerFactory;
-    requires transitive org.commandmosaic.api;
-    requires javax.servlet.api;
+public class SecurityAwareHttpCommandDispatchRequestHandlerFactory extends HttpCommandDispatchRequestHandlerFactory {
 
-    exports org.commandmosaic.http.servlet.common;
-    exports org.commandmosaic.http.servlet.common.factory;
+    @Override
+    public HttpCommandDispatchRequestHandler getHttpCommandDispatchRequestHandler(
+            CommandDispatcherServer commandDispatcherServer) {
+
+        return new SecurityAwareHttpCommandDispatchRequestHandler(commandDispatcherServer);
+    }
 }

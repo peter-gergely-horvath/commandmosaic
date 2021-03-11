@@ -19,7 +19,11 @@
         <dependency>
             <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-core</artifactId>
-            <version>1.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.commandmosaic</groupId>
+            <artifactId>commandmosaic-security-web</artifactId>
         </dependency>
 
         <dependency>

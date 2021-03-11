@@ -18,7 +18,8 @@
 package org.commandmosaic.spring.web;
 
 import org.commandmosaic.api.server.CommandDispatcherServer;
-import org.commandmosaic.http.servlet.common.HttpServletRequestHandler;
+import org.commandmosaic.http.servlet.common.HttpCommandDispatchRequestHandler;
+import org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
 import org.springframework.web.HttpRequestHandler;
 
 import javax.servlet.ServletException;
@@ -28,10 +29,12 @@ import java.io.IOException;
 
 public class CommandDispatcherRequestHandler implements HttpRequestHandler {
 
-    private final HttpServletRequestHandler httpServletRequestHandler;
+    private final HttpCommandDispatchRequestHandler httpServletRequestHandler;
 
     public CommandDispatcherRequestHandler(CommandDispatcherServer commandDispatcherServer) {
-        this.httpServletRequestHandler = new HttpServletRequestHandler(commandDispatcherServer);
+        HttpCommandDispatchRequestHandlerFactory factory = HttpCommandDispatchRequestHandlerFactory.newInstance();
+
+        this.httpServletRequestHandler = factory.getHttpCommandDispatchRequestHandler(commandDispatcherServer);
     }
 
     @Override

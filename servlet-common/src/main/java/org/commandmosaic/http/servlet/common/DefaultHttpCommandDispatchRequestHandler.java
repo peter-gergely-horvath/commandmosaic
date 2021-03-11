@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
- 
 package org.commandmosaic.http.servlet.common;
 
 import org.commandmosaic.api.server.CommandDispatcherServer;
@@ -29,35 +28,44 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-public class HttpServletRequestHandler {
+public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDispatchRequestHandler {
 
     private final CommandDispatcherServer commandDispatcherServer;
 
-    public HttpServletRequestHandler(CommandDispatcherServer commandDispatcherServer) {
+    public DefaultHttpCommandDispatchRequestHandler(CommandDispatcherServer commandDispatcherServer) {
         this.commandDispatcherServer = commandDispatcherServer;
     }
 
+    @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
-            ServletInputStream inputStream = request.getInputStream();
-            ServletOutputStream outputStream = response.getOutputStream();
-
-            commandDispatcherServer.serviceRequest(inputStream, outputStream);
+            doHandleRequest(request, response);
         }
         catch (InvalidRequestException e) {
-            response.reset();
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            e.printStackTrace(response.getWriter());
+            sendStatusCodeResponse(response, e, HttpServletResponse.SC_BAD_REQUEST);
         }
         catch (CommandException e) {
-            response.reset();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            e.printStackTrace(response.getWriter());
+            sendStatusCodeResponse(response, e, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
         catch (RuntimeException e) {
             throw new ServletException(e);
         }
     }
+
+    protected void sendStatusCodeResponse(HttpServletResponse response, Throwable t, int statusCode) throws IOException {
+        response.reset();
+        response.setStatus(statusCode);
+        t.printStackTrace(response.getWriter());
+    }
+
+    protected void doHandleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        ServletInputStream inputStream = request.getInputStream();
+        ServletOutputStream outputStream = response.getOutputStream();
+
+        commandDispatcherServer.serviceRequest(inputStream, outputStream);
+    }
+
+
 }

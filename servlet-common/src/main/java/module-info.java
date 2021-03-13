@@ -15,11 +15,13 @@
  */
 
 
-import org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
-
 module org.commandmosaic.servlet.common {
-    uses HttpCommandDispatchRequestHandlerFactory;
+
+    uses org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
+
     requires transitive org.commandmosaic.api;
+    requires org.slf4j;
+
     requires javax.servlet.api;
 
     exports org.commandmosaic.http.servlet.common;

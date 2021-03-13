@@ -41,7 +41,7 @@ public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDisp
             throws ServletException, IOException {
 
         try {
-            doHandleRequest(request, response);
+            dispatchRequest(request, response);
         }
         catch (InvalidRequestException e) {
             sendStatusCodeResponse(response, e, HttpServletResponse.SC_BAD_REQUEST);
@@ -54,18 +54,18 @@ public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDisp
         }
     }
 
-    protected void sendStatusCodeResponse(HttpServletResponse response, Throwable t, int statusCode) throws IOException {
-        response.reset();
-        response.setStatus(statusCode);
-        t.printStackTrace(response.getWriter());
-    }
-
-    protected void doHandleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void dispatchRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ServletInputStream inputStream = request.getInputStream();
         ServletOutputStream outputStream = response.getOutputStream();
 
         commandDispatcherServer.serviceRequest(inputStream, outputStream);
     }
 
+    protected void sendStatusCodeResponse(HttpServletResponse response, Throwable t, int statusCode)
+            throws IOException {
 
+        response.reset();
+        response.setStatus(statusCode);
+        t.printStackTrace(response.getWriter());
+    }
 }

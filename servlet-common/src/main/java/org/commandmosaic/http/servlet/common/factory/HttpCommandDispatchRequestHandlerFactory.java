@@ -18,38 +18,54 @@ package org.commandmosaic.http.servlet.common.factory;
 
 import org.commandmosaic.api.server.CommandDispatcherServer;
 import org.commandmosaic.http.servlet.common.HttpCommandDispatchRequestHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
 public abstract class HttpCommandDispatchRequestHandlerFactory {
 
-    protected HttpCommandDispatchRequestHandlerFactory() {
-
-    }
+    private static final Logger log = LoggerFactory.getLogger(HttpCommandDispatchRequestHandlerFactory.class);
 
     public static HttpCommandDispatchRequestHandlerFactory newInstance() {
+        log.debug("Constructing new instance of HttpCommandDispatchRequestHandlerFactory");
 
+        log.trace("Performing ServiceLoader load for: {}", HttpCommandDispatchRequestHandlerFactory.class);
         ServiceLoader<HttpCommandDispatchRequestHandlerFactory> serviceLoader = ServiceLoader
                 .load(HttpCommandDispatchRequestHandlerFactory.class);
 
+        log.trace("Discovering available HttpCommandDispatchRequestHandlerFactory types");
         Iterator<HttpCommandDispatchRequestHandlerFactory> iterator = serviceLoader.iterator();
 
-        if (iterator.hasNext()) {
+        HttpCommandDispatchRequestHandlerFactory factory;
+        if (!iterator.hasNext()) {
+            log.debug("No custom factory is discovered by ServiceLoader, falling back to default");
+            factory = new DefaultHttpCommandDispatchRequestHandlerFactory();
+        } else {
             HttpCommandDispatchRequestHandlerFactory singleExpectedFactory = iterator.next();
+            if (log.isTraceEnabled()) {
+                log.trace("Factory discovered: {}", singleExpectedFactory);
+            }
 
             if (iterator.hasNext()) {
                 HttpCommandDispatchRequestHandlerFactory unexpectedAnotherFactoryFound = iterator.next();
+                log.warn("Unexpected additional factory discovered: {}", unexpectedAnotherFactoryFound);
 
                 throw new IllegalStateException(
                         "Multiple implementations found (this is caused by misconfigured dependencies): "
                                 + singleExpectedFactory.getClass() + ", " + unexpectedAnotherFactoryFound.getClass());
             }
 
-            return singleExpectedFactory;
+            factory = singleExpectedFactory;
         }
 
-        return new DefaultHttpCommandDispatchRequestHandlerFactory();
+
+        if(log.isDebugEnabled()) {
+            log.debug("Factory used: {}", factory.getClass());
+        }
+
+        return factory;
     }
 
     public abstract HttpCommandDispatchRequestHandler getHttpCommandDispatchRequestHandler(

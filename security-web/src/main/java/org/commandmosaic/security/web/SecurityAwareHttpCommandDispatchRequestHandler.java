@@ -32,9 +32,9 @@ public class SecurityAwareHttpCommandDispatchRequestHandler extends DefaultHttpC
     }
 
     @Override
-    protected void doHandleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void dispatchRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            super.doHandleRequest(request, response);
+            super.dispatchRequest(request, response);
 
         } catch (AuthenticationException ex) {
 

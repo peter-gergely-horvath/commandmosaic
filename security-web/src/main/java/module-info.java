@@ -21,7 +21,10 @@ module org.commandmosaic.security.web {
     requires transitive org.commandmosaic.security;
     requires javax.servlet.api;
 
-    exports org.commandmosaic.security.web.factory;
+    exports org.commandmosaic.security.web;
+
+    provides org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory
+            with org.commandmosaic.security.web.factory.SecurityAwareHttpCommandDispatchRequestHandlerFactory;
 
     opens org.commandmosaic.security.web.factory to org.commandmosaic.servlet.common;
 }

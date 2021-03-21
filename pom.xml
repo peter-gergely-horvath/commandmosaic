@@ -55,7 +55,7 @@
         <springboot.version>2.3.1.RELEASE</springboot.version>
 
         <spotbug.version>4.0.4</spotbug.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <easymock.version>4.2</easymock.version>
     </properties>
 

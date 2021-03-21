@@ -122,7 +122,7 @@ public abstract class AbstractSecurityCommandInterceptor implements SecurityComm
                 CallerIdentity callerIdentity = authenticate(context);
                 if (callerIdentity == null) {
                     throw new AccessDeniedException(
-                            "Access Denied: " + commandClass.getName() + ": authentication required");
+                            "Access Denied: authentication required");
                 }
 
                 Set<String> callerRoles = callerIdentity.getRoles();
@@ -134,7 +134,7 @@ public abstract class AbstractSecurityCommandInterceptor implements SecurityComm
 
         } catch (AuthenticationException e) {
             throw new AccessDeniedException(
-                    "Access Denied: " + commandClass.getName() + ": authentication failure", e);
+                    "Access Denied: authentication failure", e);
 
         } catch (ExecutionException | UncheckedExecutionException e) {
             throw new IllegalStateException("Failed to fetch command security metadata for " + commandClass, e);

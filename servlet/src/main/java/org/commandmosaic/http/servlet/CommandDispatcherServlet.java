@@ -67,7 +67,7 @@ public class CommandDispatcherServlet extends HttpServlet {
         CommandDispatcherServer dispatcherServer = new DefaultCommandDispatcherServer(commandDispatcher);
 
         HttpCommandDispatchRequestHandlerFactory commandDispatchRequestHandlerFactory =
-                HttpCommandDispatchRequestHandlerFactory.newInstance();
+                HttpCommandDispatchRequestHandlerFactory.getInstance();
 
         this.httpCommandDispatchRequestHandler =
                 commandDispatchRequestHandlerFactory.getHttpCommandDispatchRequestHandler(dispatcherServer);

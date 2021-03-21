@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
- 
-package org.commandmosaic.api.server;
+package org.commandmosaic.core.marshaller;
 
-public class CommandExecutionException extends CommandException {
+final class DefaultMarshallerFactory extends MarshallerFactory {
 
-    public CommandExecutionException(String message) {
-        super(message);
-    }
-
-    public CommandExecutionException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    public Marshaller getMarshaller() {
+        return new DefaultMarshaller();
     }
 }

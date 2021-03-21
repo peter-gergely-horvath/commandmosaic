@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
+package org.commandmosaic.core.marshaller;
 
-module org.commandmosaic.servlet.common {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-    uses org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
+public interface Marshaller {
+    <T> T unmarshal(InputStream requestInputStream, Class<T> object) throws IOException;
 
-    requires transitive org.commandmosaic.api;
-    requires org.slf4j;
+    void marshal(OutputStream responseOutputStream, Object response) throws IOException;
 
-    requires javax.servlet.api;
-    requires org.commandmosaic.core;
-
-    exports org.commandmosaic.http.servlet.common;
-    exports org.commandmosaic.http.servlet.common.factory;
+    void marshalFailure(OutputStream responseOutputStream, Throwable throwable) throws IOException;
 }

@@ -17,52 +17,89 @@
  
 package org.commandmosaic.core.server;
 
+import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.api.CommandDispatcher;
+import org.commandmosaic.api.server.CommandDispatcherServer;
+import org.commandmosaic.api.server.InvalidRequestException;
+import org.commandmosaic.core.marshaller.Marshaller;
+import org.commandmosaic.core.marshaller.MarshallerFactory;
 import org.commandmosaic.core.server.model.CommandDispatchRequest;
 import org.commandmosaic.core.server.model.CommandDispatchResponse;
-import com.google.gson.Gson;
+import org.commandmosaic.core.server.model.DefaultCommandContext;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
+import java.util.Objects;
 
-/**
- * The default {@code CommandDispatcherServer} implementation, which uses JSON format
- * for the {@link CommandDispatchRequest} and {@link CommandDispatchResponse}.
- */
-public class DefaultCommandDispatcherServer extends AbstractCommandDispatcherServer {
+public class DefaultCommandDispatcherServer implements CommandDispatcherServer {
 
-    /**
-     * Thread-safe according to the the JavaDoc of GSON:
-     * "Gson instances are Thread-safe so you can reuse them freely across multiple threads."
-     */
-    private static final Gson gson = new Gson();
+    private final CommandDispatcher commandDispatcher;
+    private final Marshaller marshaller;
 
     public DefaultCommandDispatcherServer(CommandDispatcher commandDispatcher) {
-        super(commandDispatcher);
+        this(commandDispatcher, MarshallerFactory.getInstance().getMarshaller());
     }
 
+    protected DefaultCommandDispatcherServer(CommandDispatcher commandDispatcher, Marshaller marshaller) {
+        Objects.requireNonNull(commandDispatcher, "commandDispatcher cannot be null");
+        Objects.requireNonNull(marshaller, "marshaller cannot be null");
+
+        this.commandDispatcher = commandDispatcher;
+        this.marshaller = marshaller;
+    }
+
+
     @Override
+    public void serviceRequest(InputStream requestInputStream, OutputStream responseOutputStream)
+            throws IOException, InvalidRequestException {
+
+        CommandDispatchRequest request = unmarshalRequest(requestInputStream);
+
+        String requestProtocol = request.getProtocol();
+        String expectedProtocolVersion = ProtocolConstants.PROTOCOL_VERSION;
+        if (!expectedProtocolVersion.equals(requestProtocol)) {
+            throw new InvalidRequestException("Request protocol version is invalid: '"
+                    + requestProtocol +"'; expected: " + expectedProtocolVersion);
+        }
+
+        String commandName = request.getCommand();
+        if (commandName == null || commandName.trim().isEmpty()) {
+            throw new InvalidRequestException("Command is not specified");
+        }
+
+        Map<String, Object> parameters = request.getParameters();
+        Map<String, Object> auth = request.getAuth();
+
+        CommandContext commandContext = new DefaultCommandContext(auth);
+
+        Object result = commandDispatcher.dispatchCommand(commandName, parameters, commandContext);
+
+        Object responseModel = buildResponseModel(result);
+
+        marshalResponse(responseOutputStream, responseModel);
+    }
+
     protected CommandDispatchRequest unmarshalRequest(InputStream requestInputStream) throws IOException {
-
-        try (InputStreamReader inputStreamReader = new InputStreamReader(requestInputStream, StandardCharsets.UTF_8)) {
-            return gson.fromJson(inputStreamReader, CommandDispatchRequest.class);
-        }
-        catch (IOException e) {
-            throw new IOException("Failed to unmarshal request", e);
-        }
+        return marshaller.unmarshal(requestInputStream, CommandDispatchRequest.class);
     }
 
-    @Override
+
+    /**
+     * Template method to build the object representation that will be
+     * passed to {@link #marshalResponse(OutputStream, Object)} for marshaling back to the caller.
+     *
+     * @param result the result of the command execution
+     *
+     * @return the object, the representation of which will be sent back to the client
+     */
+    protected Object buildResponseModel(Object result) {
+        return new CommandDispatchResponse(result);
+    }
+
+
     protected void marshalResponse(OutputStream responseOutputStream, Object response) throws IOException {
-
-        String jsonString = gson.toJson(response);
-
-        try (OutputStreamWriter writer = new OutputStreamWriter(responseOutputStream, StandardCharsets.UTF_8)) {
-            writer.write(jsonString);
-        }
-        catch (IOException e) {
-            throw new IOException("Failed to marshal response", e);
-        }
+        marshaller.marshal(responseOutputStream, response);
     }
-
 }

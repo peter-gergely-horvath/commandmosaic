@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.http.servlet.common.factory;
+package org.commandmosaic.core.marshaller;
 
-import org.commandmosaic.api.server.CommandDispatcherServer;
-import org.commandmosaic.http.servlet.common.HttpCommandDispatchRequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-public abstract class HttpCommandDispatchRequestHandlerFactory {
+public abstract class MarshallerFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpCommandDispatchRequestHandlerFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(MarshallerFactory.class);
 
-    public static HttpCommandDispatchRequestHandlerFactory getInstance() {
-        log.debug("Constructing new instance of HttpCommandDispatchRequestHandlerFactory");
+    public static MarshallerFactory getInstance() {
+        log.debug("Constructing new instance of MarshallerFactory");
 
-        log.trace("Performing ServiceLoader load for: {}", HttpCommandDispatchRequestHandlerFactory.class);
-        ServiceLoader<HttpCommandDispatchRequestHandlerFactory> serviceLoader = ServiceLoader
-                .load(HttpCommandDispatchRequestHandlerFactory.class);
+        log.trace("Performing ServiceLoader load for: {}", MarshallerFactory.class);
+        ServiceLoader<MarshallerFactory> serviceLoader = ServiceLoader
+                .load(MarshallerFactory.class);
 
-        log.trace("Discovering available HttpCommandDispatchRequestHandlerFactory types");
-        Iterator<HttpCommandDispatchRequestHandlerFactory> iterator = serviceLoader.iterator();
+        log.trace("Discovering available MarshallerFactory types");
+        Iterator<MarshallerFactory> iterator = serviceLoader.iterator();
 
-        HttpCommandDispatchRequestHandlerFactory factory;
+        MarshallerFactory factory;
         if (!iterator.hasNext()) {
             log.debug("No custom factory is discovered by ServiceLoader, falling back to default");
-            factory = new DefaultHttpCommandDispatchRequestHandlerFactory();
+            factory = new DefaultMarshallerFactory();
         } else {
-            HttpCommandDispatchRequestHandlerFactory singleExpectedFactory = iterator.next();
+            MarshallerFactory singleExpectedFactory = iterator.next();
             if (log.isTraceEnabled()) {
                 log.trace("Factory discovered: {}", singleExpectedFactory);
             }
 
             if (iterator.hasNext()) {
-                HttpCommandDispatchRequestHandlerFactory unexpectedAnotherFactoryFound = iterator.next();
+                MarshallerFactory unexpectedAnotherFactoryFound = iterator.next();
                 log.warn("Unexpected additional factory discovered: {}", unexpectedAnotherFactoryFound);
 
                 throw new IllegalStateException(
@@ -68,6 +66,5 @@ public abstract class HttpCommandDispatchRequestHandlerFactory {
         return factory;
     }
 
-    public abstract HttpCommandDispatchRequestHandler getHttpCommandDispatchRequestHandler(
-            CommandDispatcherServer commandDispatcherServer);
+    public abstract Marshaller getMarshaller();
 }

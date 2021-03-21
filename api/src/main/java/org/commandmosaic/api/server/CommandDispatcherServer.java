@@ -67,8 +67,7 @@ public interface CommandDispatcherServer {
      *                      later on response payload cannot be written to the {@code OutputStream})
      *
      * @throws InvalidRequestException if the request was invalid (e.g does not contain the command name)
-     * @throws CommandExecutionException if the command execution failed with an exception
      */
     void serviceRequest(InputStream requestInputStream, OutputStream responseOutputStream)
-            throws IOException, InvalidRequestException, CommandExecutionException;
+            throws IOException, InvalidRequestException;
 }

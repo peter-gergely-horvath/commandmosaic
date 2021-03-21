@@ -32,7 +32,7 @@ public class CommandDispatcherRequestHandler implements HttpRequestHandler {
     private final HttpCommandDispatchRequestHandler httpServletRequestHandler;
 
     public CommandDispatcherRequestHandler(CommandDispatcherServer commandDispatcherServer) {
-        HttpCommandDispatchRequestHandlerFactory factory = HttpCommandDispatchRequestHandlerFactory.newInstance();
+        HttpCommandDispatchRequestHandlerFactory factory = HttpCommandDispatchRequestHandlerFactory.getInstance();
 
         this.httpServletRequestHandler = factory.getHttpCommandDispatchRequestHandler(commandDispatcherServer);
     }

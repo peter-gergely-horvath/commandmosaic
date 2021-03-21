@@ -16,6 +16,7 @@
 
 
 module org.commandmosaic.core {
+    uses org.commandmosaic.core.marshaller.MarshallerFactory;
     requires transitive org.commandmosaic.api;
 
     requires com.google.gson;
@@ -30,4 +31,6 @@ module org.commandmosaic.core {
     exports org.commandmosaic.core.server;
     exports org.commandmosaic.core.server.model;
     exports org.commandmosaic.core.parameter;
+    exports org.commandmosaic.core.marshaller;
+    exports org.commandmosaic.core.marshaller.model;
 }

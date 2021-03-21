@@ -19,6 +19,8 @@ package org.commandmosaic.http.servlet.common;
 import org.commandmosaic.api.server.CommandDispatcherServer;
 import org.commandmosaic.api.server.CommandException;
 import org.commandmosaic.api.server.InvalidRequestException;
+import org.commandmosaic.core.marshaller.Marshaller;
+import org.commandmosaic.core.marshaller.MarshallerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -31,9 +33,17 @@ import java.io.IOException;
 public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDispatchRequestHandler {
 
     private final CommandDispatcherServer commandDispatcherServer;
+    private final Marshaller marshaller;
 
     public DefaultHttpCommandDispatchRequestHandler(CommandDispatcherServer commandDispatcherServer) {
+        this(commandDispatcherServer, MarshallerFactory.getInstance().getMarshaller());
+    }
+
+
+    public DefaultHttpCommandDispatchRequestHandler(CommandDispatcherServer commandDispatcherServer,
+                                                    Marshaller marshaller) {
         this.commandDispatcherServer = commandDispatcherServer;
+        this.marshaller = marshaller;
     }
 
     @Override
@@ -61,11 +71,12 @@ public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDisp
         commandDispatcherServer.serviceRequest(inputStream, outputStream);
     }
 
-    protected void sendStatusCodeResponse(HttpServletResponse response, Throwable t, int statusCode)
+    protected void sendStatusCodeResponse(HttpServletResponse response, Throwable throwable, int statusCode)
             throws IOException {
 
         response.reset();
         response.setStatus(statusCode);
-        t.printStackTrace(response.getWriter());
+
+        marshaller.marshalFailure(response.getOutputStream(), throwable);
     }
 }

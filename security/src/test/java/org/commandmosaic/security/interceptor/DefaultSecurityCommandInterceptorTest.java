@@ -17,6 +17,7 @@
 package org.commandmosaic.security.interceptor;
 
 
+import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.api.executor.ParameterSource;
 import org.commandmosaic.api.interceptor.InterceptorChain;
@@ -34,9 +35,9 @@ import java.util.HashMap;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
 
-public class AbstractSecurityCommandInterceptorTest {
+public class DefaultSecurityCommandInterceptorTest {
 
-    private MockAbstractSecurityCommandInterceptor securityCommandInterceptor;
+    private MockDefaultSecurityCommandInterceptor securityCommandInterceptor;
     private CommandContext mockCommandContext;
     private InterceptorChain mockInterceptorChain;
     private ParameterSource parameterSource;
@@ -44,7 +45,7 @@ public class AbstractSecurityCommandInterceptorTest {
     @Before
     public void beforeTest() {
 
-        securityCommandInterceptor = new MockAbstractSecurityCommandInterceptor(
+        securityCommandInterceptor = new MockDefaultSecurityCommandInterceptor(
                         new UserNamePasswordCallerIdentity(
                                 "foo-user", "foo-password", "ROLE_USER"),
                         new UserNamePasswordCallerIdentity(
@@ -65,7 +66,7 @@ public class AbstractSecurityCommandInterceptorTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void expectCommandIsExecuted(Class commandClass) {
+    private void expectCommandIsExecuted(Class<? extends Command> commandClass) {
         EasyMock.expect(
                 mockInterceptorChain.execute(
                         eq(commandClass),

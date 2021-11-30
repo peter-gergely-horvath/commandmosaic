@@ -202,11 +202,11 @@ contains support features for this requirement.
 
 Two annotations are provided to mark the access levels of each commands:
 
-  * `org.commandmosaic.security.annotation.UnauthenticatedAccess`:
+  * `org.commandmosaic.security.annotation.Access.IsPublic`:
     This annotation must be applied to all command classes that should be
     available without authentication.
     
-  * `org.commandmosaic.security.annotation.RestrictedAccess`
+  * `org.commandmosaic.security.annotation.Access.RequiresAnyOfTheRoles`
     This annotation must be applied to all command classes that should only
     be available to authenticated clients. Optionally, role based security
     can be implemented by specifying the roles which should have access to 
@@ -214,10 +214,10 @@ Two annotations are provided to mark the access levels of each commands:
      
 Access control is implemented via `CommandInterceptor`s: application developers
 are required to develop a custom interceptor by extending the framework-provided
-class `org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor`
+class `org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor`
 and configure it for the `CommandDispatcher`. 
 
-`org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor`
+`org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor`
 provides a base implementation for security `CommandInterceptor`s: its 
 `attemptLogin(CommandContext)` method must be implemented by the end-user.
 Such implementations will want to extract the user-defined 
@@ -265,7 +265,7 @@ by the framework code in `AbstractSecurityCommandInterceptor`)
     
     import org.commandmosaic.api.CommandContext;
     import org.commandmosaic.security.AuthenticationException;
-    import org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
+    import org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor;
     
     import java.util.Map;
     import java.util.Set;

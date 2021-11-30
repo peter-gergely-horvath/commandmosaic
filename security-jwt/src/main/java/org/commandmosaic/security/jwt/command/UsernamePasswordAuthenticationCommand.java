@@ -20,13 +20,13 @@ import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.api.Parameter;
 import org.commandmosaic.security.AuthenticationException;
-import org.commandmosaic.security.annotation.UnauthenticatedAccess;
+import org.commandmosaic.security.annotation.Access;
 import org.commandmosaic.security.core.CallerIdentity;
 import org.commandmosaic.security.jwt.core.TokenProvider;
 
 import java.util.Objects;
 
-@UnauthenticatedAccess
+@Access.IsPublic
 public abstract class UsernamePasswordAuthenticationCommand implements Command<String> {
 
     private final TokenProvider tokenProvider;

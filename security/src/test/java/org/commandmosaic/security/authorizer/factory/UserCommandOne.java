@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
- 
-package org.commandmosaic.security.interceptor;
+package org.commandmosaic.security.authorizer.factory;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.annotation.Access;
 
-@Access.IsPublic
-@Access.RequiresAnyOfTheRoles("ROLE_ADMIN")
-public class MisconfiguredCommand implements Command<String> {
+@Access.RequiresAnyOfTheRoles("ROLE_USER")
+public class UserCommandOne implements Command<String> {
+
     @Override
     public String execute(CommandContext context) {
-        throw new RuntimeException("This should never be reached");
+        return "UserCommandOne";
     }
 }

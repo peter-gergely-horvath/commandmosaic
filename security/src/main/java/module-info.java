@@ -17,6 +17,9 @@
 
 module org.commandmosaic.security {
     requires com.google.common;
+    requires org.slf4j;
+
+    uses org.commandmosaic.security.authorizer.factory.AuthorizerFactory;
 
     requires transitive org.commandmosaic.core;
 
@@ -25,6 +28,11 @@ module org.commandmosaic.security {
     exports org.commandmosaic.security.core.identity;
     exports org.commandmosaic.security.annotation;
     exports org.commandmosaic.security.interceptor;
+
+    exports org.commandmosaic.security.authenticator;
+
+    exports org.commandmosaic.security.authorizer;
+    exports org.commandmosaic.security.authorizer.factory;
 
     opens org.commandmosaic.security.interceptor to org.commandmosaic.core;
 }

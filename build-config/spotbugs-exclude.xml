@@ -1,6 +1,6 @@
 <FindBugsFilter>
     <!--
-        This file lists issues FindBug should not report as bugs.
+        This file lists issues SpotBug should not report as bugs.
     -->
     <Match>
         <Class name="org.commandmosaic.core.parameter.ReflectionOperations" />
@@ -10,14 +10,14 @@
     </Match>
 
     <Match>
-        <Class name="org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor" />
+        <Class name="org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor" />
         <Method name="loadCommandRequiredRoles" />
         <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
         <!-- Detection of this bug is incorrect -->
     </Match>
 
     <Match>
-        <Class name="org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor" />
+        <Class name="org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor" />
         <Method name="loadUnauthenticatedAccess" />
         <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
         <!-- Detection of this bug is incorrect -->
@@ -43,4 +43,43 @@
         <Bug pattern="EI_EXPOSE_REP2" />
         <!-- The key array should not be changed by the caller -->
     </Match>
+
+
+    <Match>
+        <Class name="org.commandmosaic.security.authorizer.factory.DefaultAuthorizerFactory$1" />
+        <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
+        <!-- This is the cache loader callback -->
+    </Match>
+
+    <Match>
+        <Class name="org.commandmosaic.core.server.model.CommandDispatchRequest" />
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP" />
+            <Bug pattern="EI_EXPOSE_REP2" />
+        </Or>
+        <!-- This is a plain POJO class, this is intentional -->
+    </Match>
+
+    <Match>
+        <Class name="org.commandmosaic.core.marshaller.model.FailureModel" />
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP" />
+            <Bug pattern="EI_EXPOSE_REP2" />
+        </Or>
+        <!-- This is a plain POJO class, this is intentional -->
+    </Match>
+
+    <Match>
+        <Class name="org.commandmosaic.core.server.model.DefaultCommandContext" />
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP" />
+            <Bug pattern="EI_EXPOSE_REP2" />
+        </Or>
+        <Or>
+            <Method name="getAuth" />
+            <Method name="setAuth" />
+        </Or>
+        <!-- This is a plain POJO class, this is intentional -->
+    </Match>
+
 </FindBugsFilter>

@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
- 
-package org.commandmosaic.security.interceptor;
+package org.commandmosaic.security.authorizer;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.security.annotation.Access;
+import org.commandmosaic.api.executor.ParameterSource;
+import org.commandmosaic.security.AccessDeniedException;
+import org.commandmosaic.security.core.CallerIdentity;
 
-@Access.IsPublic
-@Access.RequiresAnyOfTheRoles("ROLE_ADMIN")
-public class MisconfiguredCommand implements Command<String> {
-    @Override
-    public String execute(CommandContext context) {
-        throw new RuntimeException("This should never be reached");
-    }
+public interface Authorizer {
+
+    void checkAuthorization(Class<? extends Command<?>> commandClass,
+                            CallerIdentity callerIdentity,
+                            ParameterSource parameters,
+                            CommandContext context) throws AccessDeniedException;
+
+    boolean isAuthenticationRequired();
 }

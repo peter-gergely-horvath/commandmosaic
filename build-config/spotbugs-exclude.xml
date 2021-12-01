@@ -46,7 +46,7 @@
 
 
     <Match>
-        <Class name="org.commandmosaic.security.authorizer.factory.DefaultAuthorizerFactory$1" />
+        <Class name="org.commandmosaic.security.authorizer.factory.DefaultAuthorizerFactory" />
         <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
         <!-- This is the cache loader callback -->
     </Match>

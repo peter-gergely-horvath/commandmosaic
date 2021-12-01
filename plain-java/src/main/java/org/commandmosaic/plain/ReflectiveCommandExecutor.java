@@ -26,6 +26,8 @@ import org.commandmosaic.core.parameter.ParameterInjector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
+
 final class ReflectiveCommandExecutor implements CommandExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(ReflectiveCommandExecutor.class);
@@ -51,8 +53,12 @@ final class ReflectiveCommandExecutor implements CommandExecutor {
 
     private <R, C extends Command<R>> C instantiateCommand(Class<C> commandClass) {
         try {
-            return commandClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return commandClass.getDeclaredConstructor().newInstance();
+
+        } catch (NoSuchMethodException
+                | InstantiationException
+                | IllegalAccessException
+                | InvocationTargetException e) {
             throw new RuntimeException("Failed to instantiate Command: " + commandClass, e);
         }
     }

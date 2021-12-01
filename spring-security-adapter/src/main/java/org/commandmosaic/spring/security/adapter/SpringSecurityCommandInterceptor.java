@@ -18,9 +18,10 @@ package org.commandmosaic.spring.security.adapter;
 
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.AuthenticationException;
+import org.commandmosaic.security.authenticator.Authenticator;
 import org.commandmosaic.security.core.CallerIdentity;
 import org.commandmosaic.security.core.identity.SimpleCallerIdentity;
-import org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
+import org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,39 +45,44 @@ import java.util.stream.Collectors;
  * existing Spring or Spring Boot application using the application's existing
  * Spring Security infrastructure.
  * </p>
- *
- *
  */
-public final class SpringSecurityCommandInterceptor extends AbstractSecurityCommandInterceptor {
+public final class SpringSecurityCommandInterceptor extends DefaultSecurityCommandInterceptor {
 
-    @Override
-    protected CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
-
-        SecurityContext context = SecurityContextHolder.getContext();
-
-        Authentication authentication = context.getAuthentication();
-        if (authentication == null
-                || authentication instanceof AnonymousAuthenticationToken) {
-            return null; // not authenticated
-        }
-
-        Collection<? extends GrantedAuthority> grantedAuthorities = authentication.getAuthorities();
-
-        String name = authentication.getName();
-        Set<String> authorities = grantedAuthorities.stream().
-                map(SpringSecurityCommandInterceptor::mapToString)
-                .collect(Collectors.toUnmodifiableSet());
-
-        return new SimpleCallerIdentity(name, authorities);
+    public SpringSecurityCommandInterceptor() {
+        super(new SpringSecurityAdapterAuthenticator());
     }
 
-    private static String mapToString(GrantedAuthority grantedAuthority) {
-        String authority = grantedAuthority.getAuthority();
-        if (authority == null) {
-            throw new IllegalStateException(
-                    "authority is null: " + SpringSecurityCommandInterceptor.class + " does not support this case");
+    private static class SpringSecurityAdapterAuthenticator implements Authenticator {
+
+        @Override
+        public CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
+
+            SecurityContext context = SecurityContextHolder.getContext();
+
+            Authentication authentication = context.getAuthentication();
+            if (authentication == null
+                    || authentication instanceof AnonymousAuthenticationToken) {
+                return null; // not authenticated
+            }
+
+            Collection<? extends GrantedAuthority> grantedAuthorities = authentication.getAuthorities();
+
+            String name = authentication.getName();
+            Set<String> authorities = grantedAuthorities.stream().
+                    map(this::mapToString)
+                    .collect(Collectors.toUnmodifiableSet());
+
+            return new SimpleCallerIdentity(name, authorities);
         }
 
-        return authority;
+        private String mapToString(GrantedAuthority grantedAuthority) {
+            String authority = grantedAuthority.getAuthority();
+            if (authority == null) {
+                throw new IllegalStateException(
+                        "authority is null: " + SpringSecurityCommandInterceptor.class + " does not support this case");
+            }
+
+            return authority;
+        }
     }
 }

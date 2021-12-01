@@ -27,5 +27,19 @@ package org.commandmosaic.api.conversion;
  */
 public interface TypeConversionService {
 
+    /**
+     * Converts the specified object to the desired target type or throws an Exception.
+     *
+     * @param value the input value to convert
+     * @param targetType the target type to convert to
+     *
+     * @param <S> type of the source
+     * @param <T> type of the target
+     *
+     * @return the value converted to the target type
+     *
+     * @throws TypeConversionException if conversion fails; e.g. the conversion is not feasible
+     *              or has no {@code TypeConverter} registered
+     */
     <S, T> T convert(S value, Class<T> targetType) throws TypeConversionException;
 }

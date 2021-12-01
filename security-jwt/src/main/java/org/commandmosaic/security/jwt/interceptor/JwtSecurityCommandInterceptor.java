@@ -16,43 +16,53 @@
 
 package org.commandmosaic.security.jwt.interceptor;
 
+import org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor;
 import org.commandmosaic.security.jwt.core.TokenProvider;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.core.CallerIdentity;
-import org.commandmosaic.security.interceptor.AbstractSecurityCommandInterceptor;
+
+import org.commandmosaic.security.authenticator.Authenticator;
 
 import java.util.Map;
 
-public class JwtSecurityCommandInterceptor extends AbstractSecurityCommandInterceptor {
+public class JwtSecurityCommandInterceptor extends DefaultSecurityCommandInterceptor {
 
     private static final String KEY_TOKEN = "token";
 
-    private final TokenProvider tokenProvider;
-
     public JwtSecurityCommandInterceptor(TokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
+        super(new JwtAuthenticator(tokenProvider));
     }
 
-    @Override
-    protected CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
+    private static class JwtAuthenticator implements Authenticator {
 
-        Map<String, Object> auth = commandContext.getAuth();
-        if (auth != null) {
-            Object token = auth.get(KEY_TOKEN);
+        private final TokenProvider tokenProvider;
 
-            if (token != null) {
-                if (!(token instanceof String)) {
-                    throw new AuthenticationException(
-                            "'" + KEY_TOKEN + "' must be a String, but was: " + token.getClass());
-                }
-
-                String tokenString = (String) token;
-
-                return tokenProvider.getCallerIdentity(tokenString).orElse(null);
-            }
+        private JwtAuthenticator(TokenProvider tokenProvider) {
+            this.tokenProvider = tokenProvider;
         }
 
-        return null;
+        @Override
+        public CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
+
+            Map<String, Object> auth = commandContext.getAuth();
+            if (auth != null) {
+                Object token = auth.get(KEY_TOKEN);
+
+                if (token != null) {
+                    if (!(token instanceof String)) {
+                        throw new AuthenticationException(
+                                "'" + KEY_TOKEN + "' must be a String, but was: " + token.getClass());
+                    }
+
+                    String tokenString = (String) token;
+
+                    return tokenProvider.getCallerIdentity(tokenString).orElse(null);
+                }
+            }
+
+            return null;
+        }
+
     }
 }

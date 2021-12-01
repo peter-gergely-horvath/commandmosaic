@@ -18,9 +18,9 @@ package org.commandmosaic.spring.security.adapter;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.security.annotation.UnauthenticatedAccess;
+import org.commandmosaic.security.annotation.Access;
 
-@UnauthenticatedAccess
+@Access.IsPublic
 public class PublicCommand implements Command<String> {
     @Override
     public String execute(CommandContext context) {

@@ -18,13 +18,13 @@ package org.commandmosaic.security.interceptor;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.security.annotation.RestrictedAccess;
+import org.commandmosaic.security.annotation.Access;
 
-@RestrictedAccess(requiredRoles = {"ROLE_USER", "ROLE_ADMIN"})
+@Access.RequiresAnyOfTheRoles("ROLE_USER")
 public class UserCommand implements Command<String> {
 
     @Override
     public String execute(CommandContext context) {
-        return "AdminCommand";
+        return "UserCommand";
     }
 }

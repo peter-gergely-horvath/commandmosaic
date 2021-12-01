@@ -18,9 +18,9 @@ package org.commandmosaic.spring.security.adapter;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.security.annotation.RestrictedAccess;
+import org.commandmosaic.security.annotation.Access;
 
-@RestrictedAccess(requiredRoles = "ROLE_ADMIN")
+@Access.RequiresAnyOfTheRoles(value = "ROLE_ADMIN")
 public class AdminCommand implements Command<String> {
 
     @Override

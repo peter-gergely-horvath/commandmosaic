@@ -22,7 +22,7 @@ import org.commandmosaic.api.CommandContext;
 import java.security.Principal;
 import java.util.*;
 
-public class DefaultCommandContext implements CommandContext {
+public final class DefaultCommandContext implements CommandContext {
 
     private static final class AttributeEntry {
         private final AttributeType attributeType;
@@ -53,7 +53,7 @@ public class DefaultCommandContext implements CommandContext {
 
 
     public DefaultCommandContext(Map<String, Object> auth) {
-        this.auth = auth != null ? Collections.unmodifiableMap(auth) : null;
+        this.setAuth(auth);
     }
 
 
@@ -126,7 +126,7 @@ public class DefaultCommandContext implements CommandContext {
 
 
     public void setAuth(Map<String, Object> auth) {
-        this.auth = auth;
+        this.auth = auth != null ? Collections.unmodifiableMap(auth) : null;
     }
 
     @Override

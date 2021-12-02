@@ -11,7 +11,6 @@
     </parent>
 
     <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
-    <version>1.2.0</version>
 
 
     <dependencies>

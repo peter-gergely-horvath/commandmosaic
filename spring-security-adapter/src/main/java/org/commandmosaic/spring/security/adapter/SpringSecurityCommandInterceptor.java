@@ -16,6 +16,7 @@
 
 package org.commandmosaic.spring.security.adapter;
 
+import com.google.common.collect.ImmutableSet;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.authenticator.Authenticator;
@@ -30,7 +31,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -70,7 +70,7 @@ public final class SpringSecurityCommandInterceptor extends DefaultSecurityComma
             String name = authentication.getName();
             Set<String> authorities = grantedAuthorities.stream().
                     map(this::mapToString)
-                    .collect(Collectors.toUnmodifiableSet());
+                    .collect(ImmutableSet.toImmutableSet());
 
             return new SimpleCallerIdentity(name, authorities);
         }

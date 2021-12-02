@@ -16,11 +16,12 @@
 
 package org.commandmosaic.security.jwt.spring.command;
 
-import org.commandmosaic.security.core.identity.SimpleCallerIdentity;
-import org.springframework.security.authentication.AuthenticationManager;
+import com.google.common.collect.ImmutableSet;
 import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.identity.SimpleCallerIdentity;
 import org.commandmosaic.security.jwt.command.UsernamePasswordAuthenticationCommand;
 import org.commandmosaic.security.jwt.core.TokenProvider;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,7 +29,6 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SpringUsernamePasswordAuthenticationCommand extends UsernamePasswordAuthenticationCommand {
 
@@ -58,9 +58,9 @@ public class SpringUsernamePasswordAuthenticationCommand extends UsernamePasswor
         Collection<? extends GrantedAuthority> grantedAuthorities = authentication.getAuthorities();
 
         String name = authentication.getName();
-        Set<String> authorities = grantedAuthorities.stream().
-                map(SpringUsernamePasswordAuthenticationCommand::mapToString)
-                .collect(Collectors.toUnmodifiableSet());
+        Set<String> authorities = grantedAuthorities.stream()
+                .map(SpringUsernamePasswordAuthenticationCommand::mapToString)
+                .collect(ImmutableSet.toImmutableSet());
 
         return new SimpleCallerIdentity(name, authorities);
     }

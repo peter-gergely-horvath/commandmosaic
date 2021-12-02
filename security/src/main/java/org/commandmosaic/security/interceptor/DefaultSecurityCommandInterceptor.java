@@ -43,7 +43,7 @@ public abstract class DefaultSecurityCommandInterceptor implements SecurityComma
 
     // CPD-OFF
     private final LoadingCache<Class<? extends Command<?>>, Authorizer> authorizerCache = CacheBuilder.newBuilder()
-            .softValues().build(new CacheLoader<>() {
+            .softValues().build(new CacheLoader<Class<? extends Command<?>>, Authorizer>() {
                 @Override
                 public Authorizer load(Class<? extends Command<?>> clazz) {
                     return getAuthorizer(clazz);

@@ -19,6 +19,7 @@ package org.commandmosaic.security.authorizer.factory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
@@ -111,7 +112,7 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
 
     // CPD-OFF
     private final LoadingCache<Set<String>, Authorizer> authorizerCache = CacheBuilder.newBuilder()
-            .softValues().build(new CacheLoader<>() {
+            .softValues().build(new CacheLoader<Set<String>, Authorizer>() {
                 @Override
                 public Authorizer load(Set<String> roles) {
                     return new RequiresAnyOfTheRolesAuthorizer(roles);
@@ -164,7 +165,7 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
                         "@RequiresAnyOfTheRoles annotation does not declare any roles on: " + clazz.getName());
             }
 
-            final Set<String> rolesSet = Set.of(roles);
+            final Set<String> rolesSet = ImmutableSet.copyOf(roles);
 
             return authorizerCache.get(rolesSet);
 

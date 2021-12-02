@@ -48,7 +48,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.language.version>11</java.language.version>
+        <java.language.version>1.8</java.language.version>
 
         <maven.compiler.source>${java.language.version}</maven.compiler.source>
         <maven.compiler.target>${java.language.version}</maven.compiler.target>
@@ -251,7 +251,7 @@
                         </plugin>
                         <plugin>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <version>3.8.0</version>
+                            <version>3.8.1</version>
                         </plugin>
                         <plugin>
                             <artifactId>maven-surefire-plugin</artifactId>
@@ -309,10 +309,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.8.0</version>
-                        <configuration>
-                            <release>11</release>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

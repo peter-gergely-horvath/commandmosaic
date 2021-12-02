@@ -15,7 +15,6 @@
 
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
         <dependency>
             <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-core</artifactId>

@@ -16,6 +16,7 @@
 
 package org.commandmosaic.security.jwt.core;
 
+import com.google.common.collect.ImmutableSet;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -31,7 +32,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -97,7 +97,7 @@ public class DefaultTokenProvider implements TokenProvider {
     @Override
     public Optional<CallerIdentity> getCallerIdentity(String token) {
 
-        if (token == null || token.isBlank()) {
+        if (token == null || token.trim().isEmpty()) {
             return Optional.empty();
         }
 
@@ -118,7 +118,7 @@ public class DefaultTokenProvider implements TokenProvider {
         String rolesMultiValueString = claims.get(ROLES_KEY).toString();
 
         Set<String> rolesSet = Arrays.stream(rolesMultiValueString.split(MULTI_VALUE_SEPARATOR))
-                .collect(Collectors.toUnmodifiableSet());
+                .collect(ImmutableSet.toImmutableSet());
 
         return Optional.of(new SimpleCallerIdentity(claims.getSubject(), rolesSet));
     }

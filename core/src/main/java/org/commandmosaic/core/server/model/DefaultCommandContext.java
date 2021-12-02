@@ -17,6 +17,7 @@
  
 package org.commandmosaic.core.server.model;
 
+import com.google.common.collect.ImmutableMap;
 import org.commandmosaic.api.CommandContext;
 
 import java.security.Principal;
@@ -44,7 +45,7 @@ public final class DefaultCommandContext implements CommandContext {
     }
 
     public DefaultCommandContext(DefaultCommandContext other) {
-        // no defensive copy is required as authentication is an unmodifiableMap already
+        // no defensive copy is required as authentication is an immutable Map already
         this.auth = other.auth;
 
         //noinspection IncompleteCopyConstructor: only create a defensive copy if it's not null
@@ -72,8 +73,7 @@ public final class DefaultCommandContext implements CommandContext {
         if (attributes == null) {
             return Collections::emptyIterator;
         } else {
-            HashSet<String> snapshot = new HashSet<>(attributes.keySet());
-            return snapshot::iterator;
+            return Collections.unmodifiableSet(attributes.keySet());
         }
 
     }
@@ -126,7 +126,7 @@ public final class DefaultCommandContext implements CommandContext {
 
 
     public void setAuth(Map<String, Object> auth) {
-        this.auth = auth != null ? Collections.unmodifiableMap(auth) : null;
+        this.auth = auth != null ? ImmutableMap.copyOf(auth) : null;
     }
 
     @Override

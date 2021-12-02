@@ -17,13 +17,11 @@
         <dependency>
             <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-servlet-common</artifactId>
-            <version>1.2.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.commandmosaic</groupId>
             <artifactId>commandmosaic-plain-java</artifactId>
-            <version>1.2.0</version>
         </dependency>
 
 

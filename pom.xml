@@ -65,6 +65,12 @@
         <dependencies>
             <dependency>
                 <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-api</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
                 <artifactId>commandmosaic-core</artifactId>
                 <version>1.2.0</version>
             </dependency>
@@ -72,6 +78,60 @@
             <dependency>
                 <groupId>org.commandmosaic</groupId>
                 <artifactId>commandmosaic-security-web</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-aws-lambda-common</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-plain-java</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-servlet-common</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-security</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-spring</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-spring-container-server</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-security-jwt</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commandmosaic</groupId>
+                <artifactId>commandmosaic-security-jwt-spring</artifactId>
                 <version>1.2.0</version>
             </dependency>
 

@@ -46,11 +46,11 @@ public class DefaultSecurityCommandInterceptorTest {
     public void beforeTest() {
 
         securityCommandInterceptor = new MockDefaultSecurityCommandInterceptor(
-                        new UserNamePasswordCallerIdentity(
+                        new UserNamePasswordIdentity(
                                 "foo-user", "foo-password", "ROLE_USER"),
-                        new UserNamePasswordCallerIdentity(
+                        new UserNamePasswordIdentity(
                                 "bar-user", "bar-password"),
-                        new UserNamePasswordCallerIdentity("admin-user",
+                        new UserNamePasswordIdentity("admin-user",
                                 "admin-password", "ROLE_ADMIN"));
 
         mockCommandContext = EasyMock.createStrictMock("CommandContext", CommandContext.class);

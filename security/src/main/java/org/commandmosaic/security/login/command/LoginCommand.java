@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
+package org.commandmosaic.security.login.command;
 
-package org.commandmosaic.security.core;
+import org.commandmosaic.api.Command;
+import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.security.annotation.Access;
 
-import java.io.Serializable;
 import java.security.Principal;
-import java.util.Set;
 
-/**
- * Represents the identity of the caller.
- * <p>
- * Once an incoming command dispatch request has been authenticated,
- * the <code>CallerIdentity</code> is stored in the <code>CommandContext</code>
- */
-public interface CallerIdentity extends Principal, Serializable {
+@Access.RequiresAuthentication
+public abstract class LoginCommand<I extends Principal, T> implements Command<T> {
 
-    Set<String> getRoles();
+    @Override
+    public final T execute(CommandContext context) {
+
+        final Principal principal = context.getCallerPrincipal();
+
+        @SuppressWarnings("unchecked")
+        final I identity = (I) principal;
+        return getLoginResponse(identity, context);
+    }
+
+    protected abstract T getLoginResponse(I identity, CommandContext context);
 }

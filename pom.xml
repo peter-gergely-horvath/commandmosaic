@@ -130,12 +130,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.commandmosaic</groupId>
-                <artifactId>commandmosaic-security-jwt-spring</artifactId>
-                <version>1.2.0</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
                 <version>${spring.version}</version>
@@ -281,7 +275,6 @@
                 <module>security</module>
                 <module>security-web</module>
                 <module>security-jwt</module>
-                <module>security-jwt-spring</module>
                 <module>security-jwt-spring-boot-autoconfigure</module>
                 <module>spring</module>
                 <module>servlet-common</module>
@@ -552,7 +545,6 @@
                 <module>security</module>
                 <module>security-web</module>
                 <module>security-jwt</module>
-                <module>security-jwt-spring</module>
                 <module>security-jwt-spring-boot-autoconfigure</module>
                 <module>spring</module>
                 <module>servlet-common</module>

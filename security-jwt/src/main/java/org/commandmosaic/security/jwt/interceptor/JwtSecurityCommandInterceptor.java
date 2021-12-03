@@ -20,7 +20,7 @@ import org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor;
 import org.commandmosaic.security.jwt.core.TokenProvider;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.AuthenticationException;
-import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.Identity;
 
 import org.commandmosaic.security.authenticator.Authenticator;
 
@@ -30,8 +30,9 @@ public class JwtSecurityCommandInterceptor extends DefaultSecurityCommandInterce
 
     private static final String KEY_TOKEN = "token";
 
-    public JwtSecurityCommandInterceptor(TokenProvider tokenProvider) {
-        super(new JwtAuthenticator(tokenProvider));
+    public JwtSecurityCommandInterceptor(TokenProvider tokenProvider,
+                                         Authenticator authenticator) {
+        super(new JwtAuthenticator(tokenProvider), authenticator);
     }
 
     private static class JwtAuthenticator implements Authenticator {
@@ -43,7 +44,7 @@ public class JwtSecurityCommandInterceptor extends DefaultSecurityCommandInterce
         }
 
         @Override
-        public CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
+        public Identity authenticate(CommandContext commandContext) throws AuthenticationException {
 
             Map<String, Object> auth = commandContext.getAuth();
             if (auth != null) {

@@ -19,7 +19,7 @@ package org.commandmosaic.security.interceptor;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.authenticator.Authenticator;
-import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.Identity;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,27 +28,27 @@ import java.util.Map;
 final class MockDefaultSecurityCommandInterceptor extends DefaultSecurityCommandInterceptor {
 
     MockDefaultSecurityCommandInterceptor(
-            UserNamePasswordCallerIdentity... callerIdentities) {
+            UserNamePasswordIdentity... callerIdentities) {
 
         super(new MockAuthenticator(Arrays.asList(callerIdentities)));
     }
 
     private static class MockAuthenticator implements Authenticator {
 
-        private final Collection<UserNamePasswordCallerIdentity> users;
+        private final Collection<UserNamePasswordIdentity> users;
 
-        private MockAuthenticator(Collection<UserNamePasswordCallerIdentity> users) {
+        private MockAuthenticator(Collection<UserNamePasswordIdentity> users) {
             this.users = users;
         }
 
         @Override
-        public CallerIdentity authenticate(CommandContext commandContext) {
+        public Identity authenticate(CommandContext commandContext) {
             Map<String, Object> auth = commandContext.getAuth();
             if (auth != null) {
                 String userName = (String) auth.get("username");
                 String password = (String) auth.get("password");
 
-                UserNamePasswordCallerIdentity callerIdentity = users.stream()
+                UserNamePasswordIdentity callerIdentity = users.stream()
                         .filter(it -> it.getName().equalsIgnoreCase(userName))
                         .findFirst()
                         .orElseThrow(() -> new AuthenticationException("Failed to authenticate: user is not found"));

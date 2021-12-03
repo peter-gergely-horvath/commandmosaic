@@ -27,7 +27,7 @@ import org.commandmosaic.api.executor.ParameterSource;
 import org.commandmosaic.security.AccessDeniedException;
 import org.commandmosaic.security.annotation.Access;
 import org.commandmosaic.security.authorizer.Authorizer;
-import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.Identity;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
@@ -41,7 +41,7 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
 
         @Override
         public void checkAuthorization(Class<? extends Command<?>> commandClass,
-                                       CallerIdentity callerIdentity,
+                                       Identity identity,
                                        ParameterSource parameters,
                                        CommandContext context) {
             // no-op: public access is allowed
@@ -61,11 +61,11 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
         // CPD-OFF
         @Override
         public void checkAuthorization(Class<? extends Command<?>> commandClass,
-                                       CallerIdentity callerIdentity,
+                                       Identity identity,
                                        ParameterSource parameters,
                                        CommandContext context) {
 
-            if (callerIdentity == null) {
+            if (identity == null) {
                 throw new AccessDeniedException("Authentication is required to access: " + commandClass.getName());
             }
         }
@@ -87,15 +87,15 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
 
         @Override
         public void checkAuthorization(Class<? extends Command<?>> commandClass,
-                                       CallerIdentity callerIdentity,
+                                       Identity identity,
                                        ParameterSource parameters,
                                        CommandContext context) {
 
-            if (callerIdentity == null) {
+            if (identity == null) {
                 throw new AccessDeniedException("Authentication is required to access: " + commandClass.getName());
             }
 
-            final Set<String> presentRoles = callerIdentity.getRoles();
+            final Set<String> presentRoles = identity.getRoles();
             if (presentRoles == null
                     || presentRoles.stream().noneMatch(requiredRoles::contains)) {
 

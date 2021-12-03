@@ -16,19 +16,19 @@
 
 package org.commandmosaic.security.interceptor;
 
-import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.Identity;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-class UserNamePasswordCallerIdentity implements CallerIdentity {
+class UserNamePasswordIdentity implements Identity {
 
     private final String userName;
     private final String password;
     private final Set<String> roles;
 
-    UserNamePasswordCallerIdentity(String userName, String password, String... roles) {
+    UserNamePasswordIdentity(String userName, String password, String... roles) {
         this.userName = userName;
         this.password = password;
         this.roles = new HashSet<>(Arrays.asList(roles));

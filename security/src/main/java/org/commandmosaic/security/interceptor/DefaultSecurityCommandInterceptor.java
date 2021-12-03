@@ -28,10 +28,13 @@ import org.commandmosaic.api.interceptor.InterceptorChain;
 import org.commandmosaic.security.AccessDeniedException;
 import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.authenticator.Authenticator;
+import org.commandmosaic.security.authenticator.AuthenticatorChain;
 import org.commandmosaic.security.authorizer.Authorizer;
 import org.commandmosaic.security.authorizer.factory.AuthorizerFactory;
-import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.Identity;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -51,16 +54,34 @@ public abstract class DefaultSecurityCommandInterceptor implements SecurityComma
             });
     // CPD-OFF
 
-    protected DefaultSecurityCommandInterceptor(Authenticator authenticator) {
-        this(authenticator, AuthorizerFactory.getInstance());
+    protected DefaultSecurityCommandInterceptor(Authenticator firstAuthenticator, Authenticator... restAuthenticators) {
+        this(AuthorizerFactory.getInstance(), firstAuthenticator, restAuthenticators);
     }
 
-    protected DefaultSecurityCommandInterceptor(Authenticator authenticator, AuthorizerFactory authorizerFactory) {
-        Objects.requireNonNull(authenticator, "argument authenticator cannot be null");
-        Objects.requireNonNull(authorizerFactory, "argument authorizerFactory cannot be null");
+    protected DefaultSecurityCommandInterceptor(AuthorizerFactory authorizerFactory,
+                                                Authenticator firstAuthenticator, Authenticator... restAuthenticators) {
 
-        this.authenticator = authenticator;
-        this.authorizerFactory = authorizerFactory;
+        this.authenticator = getAuthenticator(firstAuthenticator, restAuthenticators);
+        this.authorizerFactory = Objects.requireNonNull(authorizerFactory,
+                "argument authorizerFactory cannot be null");
+    }
+
+    private Authenticator getAuthenticator(Authenticator firstAuthenticator, Authenticator... restAuthenticators) {
+        if (firstAuthenticator == null) {
+            throw new IllegalStateException("At least one authentication must be specified");
+        }
+
+        Authenticator authenticator;
+        if (restAuthenticators == null || restAuthenticators.length == 0) {
+            authenticator = firstAuthenticator;
+        } else {
+            final LinkedList<Authenticator> list = new LinkedList<>();
+            list.add(firstAuthenticator);
+            list.addAll(Arrays.asList(restAuthenticators));
+
+            authenticator = new AuthenticatorChain(list);
+        }
+        return authenticator;
     }
 
     protected Authorizer getAuthorizer(Class<? extends Command<?>> commandClass) {
@@ -76,14 +97,14 @@ public abstract class DefaultSecurityCommandInterceptor implements SecurityComma
 
             if(authorizer.isAuthenticationRequired()) {
 
-                CallerIdentity callerIdentity = this.authenticator.authenticate(context);
-                if (callerIdentity == null) {
+                Identity identity = this.authenticator.authenticate(context);
+                if (identity == null) {
                     throw new AccessDeniedException("Access Denied: authentication required");
                 }
 
-                authorizer.checkAuthorization(commandClass, callerIdentity, parameters, context);
+                authorizer.checkAuthorization(commandClass, identity, parameters, context);
 
-                context = new SecurityAwareCommandContext(context, callerIdentity);
+                context = new SecurityAwareCommandContext(context, identity);
             }
 
         } catch (AuthenticationException e) {

@@ -16,12 +16,12 @@
 
 package org.commandmosaic.security.jwt.core;
 
-import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.Identity;
 
 import java.util.Optional;
 
 public interface TokenProvider {
-    String createToken(CallerIdentity authentication, boolean rememberMe);
+    String createToken(Identity authentication, boolean rememberMe);
 
-    Optional<CallerIdentity> getCallerIdentity(String token);
+    Optional<Identity> getCallerIdentity(String token);
 }

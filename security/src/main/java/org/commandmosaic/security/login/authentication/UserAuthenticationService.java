@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.security.authorizer;
+package org.commandmosaic.security.login.authentication;
 
-import org.commandmosaic.api.Command;
-import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.api.executor.ParameterSource;
-import org.commandmosaic.security.AccessDeniedException;
+import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.core.Identity;
 
-public interface Authorizer {
-
-    void checkAuthorization(Class<? extends Command<?>> commandClass,
-                            Identity identity,
-                            ParameterSource parameters,
-                            CommandContext context) throws AccessDeniedException;
-
-    boolean isAuthenticationRequired();
+public interface UserAuthenticationService {
+    Identity authenticateUser(String user, String password) throws AuthenticationException;
 }

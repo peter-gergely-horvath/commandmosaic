@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.commandmosaic</groupId>
-            <artifactId>commandmosaic-security-jwt-spring</artifactId>
+            <artifactId>commandmosaic-security-jwt</artifactId>
         </dependency>
 
         <dependency>

@@ -18,7 +18,7 @@ package org.commandmosaic.security.authenticator;
 
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.AuthenticationException;
-import org.commandmosaic.security.core.CallerIdentity;
+import org.commandmosaic.security.core.Identity;
 
 public interface Authenticator {
 
@@ -30,9 +30,9 @@ public interface Authenticator {
      * information was present, but authentication was not successful for any reason.
      *
      * @param commandContext the command context
-     * @return a <code>CallerIdentity</code>, which represents the identity of the successfully authenticated user,
+     * @return a <code>Identity</code>, which represents the identity of the successfully authenticated user,
      * or <code>null</code>, if authentication information was not present
      * @throws AuthenticationException if authentication information was present, but authentication failed
      */
-    CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException;
+    Identity authenticate(CommandContext commandContext) throws AuthenticationException;
 }

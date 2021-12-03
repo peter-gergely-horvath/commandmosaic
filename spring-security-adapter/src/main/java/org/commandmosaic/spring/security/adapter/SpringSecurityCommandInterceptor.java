@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.authenticator.Authenticator;
-import org.commandmosaic.security.core.CallerIdentity;
-import org.commandmosaic.security.core.identity.SimpleCallerIdentity;
+import org.commandmosaic.security.core.Identity;
+import org.commandmosaic.security.core.SimpleIdentity;
 import org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -55,7 +55,7 @@ public final class SpringSecurityCommandInterceptor extends DefaultSecurityComma
     private static class SpringSecurityAdapterAuthenticator implements Authenticator {
 
         @Override
-        public CallerIdentity authenticate(CommandContext commandContext) throws AuthenticationException {
+        public Identity authenticate(CommandContext commandContext) throws AuthenticationException {
 
             SecurityContext context = SecurityContextHolder.getContext();
 
@@ -72,7 +72,7 @@ public final class SpringSecurityCommandInterceptor extends DefaultSecurityComma
                     map(this::mapToString)
                     .collect(ImmutableSet.toImmutableSet());
 
-            return new SimpleCallerIdentity(name, authorities);
+            return new SimpleIdentity(name, authorities);
         }
 
         private String mapToString(GrantedAuthority grantedAuthority) {

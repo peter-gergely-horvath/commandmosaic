@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.security.core.identity;
-
-import org.commandmosaic.security.core.CallerIdentity;
+package org.commandmosaic.security.core;
 
 import java.util.Objects;
 import java.util.Set;
 
-public final class SimpleCallerIdentity implements CallerIdentity {
+public final class SimpleIdentity implements Identity {
 
     private static final long serialVersionUID = 1L;
 
     private final String name;
     private final Set<String> roles;
 
-    public SimpleCallerIdentity(String name, Set<String> roles) {
+    public SimpleIdentity(String name, Set<String> roles) {
         this.name = name;
         this.roles = roles;
     }
@@ -47,7 +45,7 @@ public final class SimpleCallerIdentity implements CallerIdentity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SimpleCallerIdentity that = (SimpleCallerIdentity) o;
+        SimpleIdentity that = (SimpleIdentity) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(roles, that.roles);
     }
@@ -59,7 +57,7 @@ public final class SimpleCallerIdentity implements CallerIdentity {
 
     @Override
     public String toString() {
-        return "SimpleCallerIdentity{" +
+        return "SimpleIdentity{" +
                 "name='" + name + '\'' +
                 ", roles=" + roles +
                 '}';

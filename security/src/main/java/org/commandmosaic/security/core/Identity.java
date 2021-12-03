@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.security.authorizer;
 
-import org.commandmosaic.api.Command;
-import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.api.executor.ParameterSource;
-import org.commandmosaic.security.AccessDeniedException;
-import org.commandmosaic.security.core.Identity;
+package org.commandmosaic.security.core;
 
-public interface Authorizer {
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.Set;
 
-    void checkAuthorization(Class<? extends Command<?>> commandClass,
-                            Identity identity,
-                            ParameterSource parameters,
-                            CommandContext context) throws AccessDeniedException;
+/**
+ * Represents an identity.
+ * <p>
+ * When an incoming command dispatch request has been authenticated,
+ * the <code>Identity</code> is stored in the <code>CommandContext</code>
+ */
+public interface Identity extends Principal, Serializable {
 
-    boolean isAuthenticationRequired();
+    Set<String> getRoles();
 }

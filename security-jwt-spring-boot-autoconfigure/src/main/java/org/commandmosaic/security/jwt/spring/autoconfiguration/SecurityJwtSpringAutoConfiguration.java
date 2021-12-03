@@ -17,10 +17,13 @@
 
 package org.commandmosaic.security.jwt.spring.autoconfiguration;
 
+import org.commandmosaic.security.authenticator.Authenticator;
 import org.commandmosaic.security.jwt.config.JwtSecurityConfiguration;
 import org.commandmosaic.security.jwt.core.DefaultTokenProvider;
 import org.commandmosaic.security.jwt.core.TokenProvider;
 import org.commandmosaic.security.jwt.interceptor.JwtSecurityCommandInterceptor;
+import org.commandmosaic.security.login.authentication.UserAuthenticationService;
+import org.commandmosaic.security.login.authentication.UserNamePasswordAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -42,7 +45,7 @@ public class SecurityJwtSpringAutoConfiguration {
     @ConditionalOnBean(JwtSecurityConfiguration.class)
     public TokenProvider tokenProvider(JwtSecurityConfiguration configuration) {
 
-        log.info("Auto-configuring TokenProvider using reasonable defaults");
+        log.info("Auto-configuring TokenProvider using configuration: {}", configuration);
 
         return new DefaultTokenProvider(
                 configuration.getJwtKey(),
@@ -52,11 +55,23 @@ public class SecurityJwtSpringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(JwtSecurityConfiguration.class)
-    public JwtSecurityCommandInterceptor jwtSecurityCommandInterceptor(TokenProvider tokenProvider) {
+    @ConditionalOnBean({JwtSecurityConfiguration.class, UserAuthenticationService.class})
+    public Authenticator authenticator(UserAuthenticationService userAuthenticationService) {
 
-        log.info("Auto-configuring JwtSecurityCommandInterceptor using tokenProvider: {}", tokenProvider);
-        return new JwtSecurityCommandInterceptor(tokenProvider);
+        log.info("Auto-configuring Authenticator using UserAuthenticationService: {}", userAuthenticationService);
+
+        return new UserNamePasswordAuthenticator(userAuthenticationService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(JwtSecurityConfiguration.class)
+    public JwtSecurityCommandInterceptor jwtSecurityCommandInterceptor(
+            TokenProvider tokenProvider, Authenticator authenticator) {
+
+        log.info("Auto-configuring JwtSecurityCommandInterceptor using tokenProvider: {}, authenticator: {}",
+                tokenProvider, authenticator);
+        return new JwtSecurityCommandInterceptor(tokenProvider, authenticator);
     }
 
 }

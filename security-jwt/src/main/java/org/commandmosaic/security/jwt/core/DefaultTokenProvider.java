@@ -22,8 +22,8 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.commandmosaic.security.core.CallerIdentity;
-import org.commandmosaic.security.core.identity.SimpleCallerIdentity;
+import org.commandmosaic.security.core.Identity;
+import org.commandmosaic.security.core.SimpleIdentity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public class DefaultTokenProvider implements TokenProvider {
 
 
     @Override
-    public String createToken(CallerIdentity authentication, boolean rememberMe) {
+    public String createToken(Identity authentication, boolean rememberMe) {
         String roles = String.join(MULTI_VALUE_SEPARATOR, authentication.getRoles());
 
         long now = new Date().getTime();
@@ -95,7 +95,7 @@ public class DefaultTokenProvider implements TokenProvider {
     }
 
     @Override
-    public Optional<CallerIdentity> getCallerIdentity(String token) {
+    public Optional<Identity> getCallerIdentity(String token) {
 
         if (token == null || token.trim().isEmpty()) {
             return Optional.empty();
@@ -120,6 +120,6 @@ public class DefaultTokenProvider implements TokenProvider {
         Set<String> rolesSet = Arrays.stream(rolesMultiValueString.split(MULTI_VALUE_SEPARATOR))
                 .collect(ImmutableSet.toImmutableSet());
 
-        return Optional.of(new SimpleCallerIdentity(claims.getSubject(), rolesSet));
+        return Optional.of(new SimpleIdentity(claims.getSubject(), rolesSet));
     }
 }

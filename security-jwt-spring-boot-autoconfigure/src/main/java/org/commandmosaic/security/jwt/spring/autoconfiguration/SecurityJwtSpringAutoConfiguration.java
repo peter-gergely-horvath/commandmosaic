@@ -58,7 +58,8 @@ public class SecurityJwtSpringAutoConfiguration {
     @ConditionalOnBean({JwtSecurityConfiguration.class, UserAuthenticationService.class})
     public Authenticator authenticator(UserAuthenticationService userAuthenticationService) {
 
-        log.info("Auto-configuring Authenticator using UserAuthenticationService: {}", userAuthenticationService);
+        log.info("Auto-configuring UserNamePasswordAuthenticator using UserAuthenticationService: {}",
+                userAuthenticationService);
 
         return new UserNamePasswordAuthenticator(userAuthenticationService);
     }

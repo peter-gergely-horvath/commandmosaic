@@ -26,13 +26,13 @@ import org.commandmosaic.security.login.command.LoginCommand;
 import java.util.Map;
 import java.util.Objects;
 
-public abstract class JwtUsernamePasswordLoginCommand extends LoginCommand<Identity, String> {
+public abstract class JwtTokenLoginCommand extends LoginCommand<Identity, String> {
 
     private static final String REMEMBER_ME_KEY = "rememberMe";
 
     private final TokenProvider tokenProvider;
 
-    protected JwtUsernamePasswordLoginCommand(TokenProvider tokenProvider) {
+    protected JwtTokenLoginCommand(TokenProvider tokenProvider) {
         this.tokenProvider = Objects.requireNonNull(tokenProvider, "argument tokenProvider cannot be null");
     }
 
@@ -42,14 +42,22 @@ public abstract class JwtUsernamePasswordLoginCommand extends LoginCommand<Ident
 
         boolean rememberMe = false;
         if (auth != null) {
-
             Object valueObject = auth.get(REMEMBER_ME_KEY);
             if (valueObject != null) {
-                if (!(valueObject instanceof String)) {
+                if (valueObject instanceof Boolean) {
+                    rememberMe = (Boolean) valueObject;
+                } else if (valueObject instanceof String) {
+                    if ("true".equalsIgnoreCase((String)valueObject)) {
+                        rememberMe = true;
+                    } else if ("false".equalsIgnoreCase((String)valueObject)) {
+                        rememberMe = false;
+                    } else {
+                        throw new AuthenticationException(
+                                "Could not map value of '" + REMEMBER_ME_KEY + "' to a boolean: " + valueObject);
+                    }
+                } else
                     throw new AuthenticationException(
                             "'" + REMEMBER_ME_KEY + "' must be a String, but was: " + valueObject.getClass());
-                }
-                rememberMe = Boolean.parseBoolean((String) valueObject);
             }
         }
 

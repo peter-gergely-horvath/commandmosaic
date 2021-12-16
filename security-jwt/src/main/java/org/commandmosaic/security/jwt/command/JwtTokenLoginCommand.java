@@ -26,7 +26,7 @@ import org.commandmosaic.security.login.command.LoginCommand;
 import java.util.Map;
 import java.util.Objects;
 
-public abstract class JwtTokenLoginCommand extends LoginCommand<Identity, String> {
+public abstract class JwtTokenLoginCommand<R> extends LoginCommand<Identity, R> {
 
     private static final String REMEMBER_ME_KEY = "rememberMe";
 
@@ -36,7 +36,7 @@ public abstract class JwtTokenLoginCommand extends LoginCommand<Identity, String
         this.tokenProvider = Objects.requireNonNull(tokenProvider, "argument tokenProvider cannot be null");
     }
 
-    protected String getLoginResponse(Identity identity, CommandContext context) {
+    protected final R getLoginResponse(Identity identity, CommandContext context) {
 
         final Map<String, Object> auth = context.getAuth();
 
@@ -61,6 +61,10 @@ public abstract class JwtTokenLoginCommand extends LoginCommand<Identity, String
             }
         }
 
-        return tokenProvider.createToken(identity, rememberMe);
+        String token = tokenProvider.createToken(identity, rememberMe);
+
+        return getLoginResponse(token, identity, context);
     }
+
+    protected abstract R getLoginResponse(String jwtToken, Identity identity, CommandContext context);
 }

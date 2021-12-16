@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package org.commandmosaic.core.server;
 
 import org.commandmosaic.api.CommandContext;
@@ -24,7 +24,6 @@ import org.commandmosaic.api.server.InvalidRequestException;
 import org.commandmosaic.core.marshaller.Marshaller;
 import org.commandmosaic.core.marshaller.MarshallerFactory;
 import org.commandmosaic.core.server.model.CommandDispatchRequest;
-import org.commandmosaic.core.server.model.CommandDispatchResponse;
 import org.commandmosaic.core.server.model.DefaultCommandContext;
 
 import java.io.IOException;
@@ -61,7 +60,7 @@ public class DefaultCommandDispatcherServer implements CommandDispatcherServer {
         String expectedProtocolVersion = ProtocolConstants.PROTOCOL_VERSION;
         if (!expectedProtocolVersion.equals(requestProtocol)) {
             throw new InvalidRequestException("Request protocol version is invalid: '"
-                    + requestProtocol +"'; expected: " + expectedProtocolVersion);
+                    + requestProtocol + "'; expected: " + expectedProtocolVersion);
         }
 
         String commandName = request.getCommand();
@@ -91,11 +90,10 @@ public class DefaultCommandDispatcherServer implements CommandDispatcherServer {
      * passed to {@link #marshalResponse(OutputStream, Object)} for marshaling back to the caller.
      *
      * @param result the result of the command execution
-     *
      * @return the object, the representation of which will be sent back to the client
      */
     protected Object buildResponseModel(Object result) {
-        return new CommandDispatchResponse(result);
+        return result;
     }
 
 

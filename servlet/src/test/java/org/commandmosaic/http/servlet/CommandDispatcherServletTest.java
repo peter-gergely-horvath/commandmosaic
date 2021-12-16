@@ -88,13 +88,7 @@ public class CommandDispatcherServletTest {
 
         Assert.assertNotNull(jsonResponse);
 
-        Type typeOfHashMap = new TypeToken<Map<String, Object>>() { }.getType();
-        Map<String, Object> responseAsMap = gson.fromJson(jsonResponse, typeOfHashMap);
-
-        Object resultObject = responseAsMap.get("result");
-        Assert.assertNotNull(resultObject);
-
-        String result = resultObject.toString();
+        String result = gson.fromJson(jsonResponse, String.class);
         Assert.assertEquals("Hello John Smith", result);
     }
 

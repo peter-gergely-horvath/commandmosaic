@@ -23,8 +23,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.api.executor.CommandExecutor;
 import org.commandmosaic.api.executor.ParameterSource;
-import org.commandmosaic.api.interceptor.InterceptorChain;
 import org.commandmosaic.security.AccessDeniedException;
 import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.authenticator.Authenticator;
@@ -90,7 +90,7 @@ public abstract class DefaultSecurityCommandInterceptor implements SecurityComma
 
     @Override
     public final <R, C extends Command<R>> R intercept(Class<C> commandClass, ParameterSource parameters,
-                                                       CommandContext context, InterceptorChain next) {
+                                                       CommandContext context, CommandExecutor next) {
 
         try {
             final Authorizer authorizer = authorizerCache.get(commandClass);

@@ -18,17 +18,15 @@
 package org.commandmosaic.core.factory;
 
 import org.commandmosaic.api.CommandDispatcher;
+import org.commandmosaic.api.configuration.CommandDispatcherConfiguration;
 import org.commandmosaic.api.configuration.conversion.TypeConversion;
 import org.commandmosaic.api.conversion.TypeConversionService;
 import org.commandmosaic.api.executor.CommandExecutor;
 import org.commandmosaic.api.factory.CommandDispatcherFactory;
 import org.commandmosaic.api.interceptor.CommandInterceptor;
-import org.commandmosaic.api.interceptor.InterceptorChain;
 import org.commandmosaic.core.DefaultCommandDispatcher;
-import org.commandmosaic.api.configuration.CommandDispatcherConfiguration;
 import org.commandmosaic.core.conversion.DefaultTypeConversionService;
-import org.commandmosaic.core.interceptor.DelegatingInterceptorChain;
-import org.commandmosaic.core.interceptor.InterceptorCommandExecutor;
+import org.commandmosaic.core.interceptor.InterceptorHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,9 +87,7 @@ public abstract class AbstractCommandDispatcherFactory implements CommandDispatc
             log.trace("Retrieving interceptor instance: {}", commandInterceptorClass);
             CommandInterceptor interceptorInstance = getCommandInterceptor(commandInterceptorClass);
 
-            InterceptorChain interceptorChain = new DelegatingInterceptorChain(currentCommandExecutor);
-
-            currentCommandExecutor = new InterceptorCommandExecutor(interceptorInstance, interceptorChain);
+            currentCommandExecutor = new InterceptorHandler(interceptorInstance, currentCommandExecutor);
         }
 
         log.trace("Interceptor chain created: {}", currentCommandExecutor);

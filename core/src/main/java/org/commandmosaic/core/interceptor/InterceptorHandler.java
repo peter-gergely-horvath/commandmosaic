@@ -14,35 +14,37 @@
  * limitations under the License.
  */
 
- 
 package org.commandmosaic.core.interceptor;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
-import org.commandmosaic.api.interceptor.InterceptorChain;
 import org.commandmosaic.api.executor.CommandExecutor;
 import org.commandmosaic.api.executor.ParameterSource;
+import org.commandmosaic.api.interceptor.CommandInterceptor;
 
-public final class DelegatingInterceptorChain implements InterceptorChain {
+public class InterceptorHandler implements CommandExecutor {
 
-    private final CommandExecutor commandExecutor;
+    private final CommandExecutor next;
+    private final CommandInterceptor commandInterceptor;
 
-    public DelegatingInterceptorChain(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
+    public InterceptorHandler(CommandInterceptor commandInterceptor, CommandExecutor next) {
+        this.next = next;
+        this.commandInterceptor = commandInterceptor;
     }
+
 
     @Override
     public <R, C extends Command<R>> R execute(
             Class<C> commandClass, ParameterSource parameters, CommandContext context) {
 
-        return commandExecutor.execute(commandClass, parameters, context);
+        return commandInterceptor.intercept(commandClass, parameters, context, next);
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("DelegatingInterceptorChain{");
-        sb.append("commandExecutor=").append(commandExecutor);
-        sb.append('}');
-        return sb.toString();
+        return "InterceptorHandler{" +
+                "next=" + next +
+                ", commandInterceptor=" + commandInterceptor +
+                '}';
     }
 }

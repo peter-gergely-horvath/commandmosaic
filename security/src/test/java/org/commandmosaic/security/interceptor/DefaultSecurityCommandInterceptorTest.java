@@ -19,8 +19,8 @@ package org.commandmosaic.security.interceptor;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.api.executor.CommandExecutor;
 import org.commandmosaic.api.executor.ParameterSource;
-import org.commandmosaic.api.interceptor.InterceptorChain;
 import org.commandmosaic.core.parameter.source.ParameterSources;
 import org.commandmosaic.security.AccessDeniedException;
 import org.easymock.EasyMock;
@@ -39,7 +39,7 @@ public class DefaultSecurityCommandInterceptorTest {
 
     private MockDefaultSecurityCommandInterceptor securityCommandInterceptor;
     private CommandContext mockCommandContext;
-    private InterceptorChain mockInterceptorChain;
+    private CommandExecutor mockInterceptorChain;
     private ParameterSource parameterSource;
 
     @Before
@@ -54,7 +54,7 @@ public class DefaultSecurityCommandInterceptorTest {
                                 "admin-password", "ROLE_ADMIN"));
 
         mockCommandContext = EasyMock.createStrictMock("CommandContext", CommandContext.class);
-        mockInterceptorChain = EasyMock.createStrictMock("InterceptorChain", InterceptorChain.class);
+        mockInterceptorChain = EasyMock.createStrictMock("InterceptorChain", CommandExecutor.class);
 
         parameterSource = ParameterSources.mapParameterSource(Collections.emptyMap());
     }

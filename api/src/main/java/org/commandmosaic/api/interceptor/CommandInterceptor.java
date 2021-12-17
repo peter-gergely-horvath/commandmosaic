@@ -19,6 +19,7 @@ package org.commandmosaic.api.interceptor;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.api.executor.CommandExecutor;
 import org.commandmosaic.api.executor.ParameterSource;
 
 /**
@@ -30,7 +31,7 @@ import org.commandmosaic.api.executor.ParameterSource;
  *
  * <p>
  * {@code CommandInterceptor}s perform intercepting in the
- * {@link CommandInterceptor#intercept(Class, ParameterSource, CommandContext, InterceptorChain)} intercept}
+ * {@link CommandInterceptor#intercept(Class, ParameterSource, CommandContext, CommandExecutor)} intercept}
  * method.
  * </p>
  *
@@ -49,7 +50,7 @@ public interface CommandInterceptor {
      * </p>
      *
      * <p>
-     * The {@code InterceptorChain} passed in to this method allows the
+     * The {@code CommandExecutor} passed in to this method allows the
      * {@code CommandInterceptor} to propagate the dispatch instruction
      * to the next entity in the chain.
      * </p>
@@ -68,7 +69,7 @@ public interface CommandInterceptor {
      *
      * <p>
      * If a {@code CommandInterceptor} does not invoke {@code execute} method
-     * on the {@code InterceptorChain} passed in to this method, the rest of
+     * on the {@code CommandExecutor} passed in to this method, the rest of
      * the invocation chain, including the specified {@code Command} class is
      * not called at all.
      * </p>
@@ -76,7 +77,7 @@ public interface CommandInterceptor {
      * @param commandClass the class of the command to dispatch (cannot be {@code null})
      * @param parameters the parameters of the command (might be {@code null})
      * @param context the context object containing additional context information (might be {@code null})
-     * @param next the next element in the chain
+     * @param next the next element in the chain (never {@code null})
      *
      * @param <R> the return type of the command
      * @param <C> the class of the command
@@ -86,5 +87,5 @@ public interface CommandInterceptor {
     <R, C extends Command<R>> R intercept(Class<C> commandClass,
                                           ParameterSource parameters,
                                           CommandContext context,
-                                          InterceptorChain next);
+                                          CommandExecutor next);
 }

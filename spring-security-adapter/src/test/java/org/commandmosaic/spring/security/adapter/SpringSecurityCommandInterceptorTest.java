@@ -18,8 +18,8 @@ package org.commandmosaic.spring.security.adapter;
 
 
 import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.api.executor.CommandExecutor;
 import org.commandmosaic.api.executor.ParameterSource;
-import org.commandmosaic.api.interceptor.InterceptorChain;
 import org.commandmosaic.core.parameter.source.ParameterSources;
 import org.commandmosaic.security.AccessDeniedException;
 import org.easymock.EasyMock;
@@ -38,13 +38,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Collections;
 import java.util.List;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
 
 public class SpringSecurityCommandInterceptorTest {
 
     private SpringSecurityCommandInterceptor springSecurityCommandInterceptor;
     private CommandContext mockCommandContext;
-    private InterceptorChain mockInterceptorChain;
+    private CommandExecutor mockInterceptorChain;
     private ParameterSource parameterSource;
 
     @Before
@@ -52,7 +53,7 @@ public class SpringSecurityCommandInterceptorTest {
         springSecurityCommandInterceptor = new SpringSecurityCommandInterceptor();
 
         mockCommandContext = EasyMock.createStrictMock(CommandContext.class);
-        mockInterceptorChain = EasyMock.createStrictMock(InterceptorChain.class);
+        mockInterceptorChain = EasyMock.createStrictMock(CommandExecutor.class);
 
         parameterSource = ParameterSources.mapParameterSource(Collections.emptyMap());
     }

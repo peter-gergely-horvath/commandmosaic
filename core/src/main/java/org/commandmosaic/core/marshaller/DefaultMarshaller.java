@@ -49,7 +49,6 @@ final class DefaultMarshaller implements Marshaller {
     @Override
     public void marshal(OutputStream responseOutputStream, Object response) throws IOException {
         Objects.requireNonNull(responseOutputStream, "responseOutputStream cannot be null");
-        Objects.requireNonNull(response, "response cannot be null");
 
         String jsonString = gson.toJson(response);
 

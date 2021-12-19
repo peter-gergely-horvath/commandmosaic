@@ -19,6 +19,6 @@ package org.commandmosaic.security.login.authentication;
 import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.core.Identity;
 
-public interface UserAuthenticationService {
+public interface UsernamePasswordAuthenticationService {
     Identity authenticateUser(String user, String password) throws AuthenticationException;
 }

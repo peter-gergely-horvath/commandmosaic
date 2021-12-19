@@ -30,10 +30,10 @@ public class UserNamePasswordAuthenticator implements Authenticator {
     private static final String USER_KEY = "user";
     private static final String PASSWORD_KEY = "password";
 
-    private final UserAuthenticationService userAuthenticationService;
+    private final UsernamePasswordAuthenticationService usernamePasswordAuthenticationService;
 
-    public UserNamePasswordAuthenticator(UserAuthenticationService userAuthenticationService) {
-        this.userAuthenticationService = Objects.requireNonNull(userAuthenticationService);
+    public UserNamePasswordAuthenticator(UsernamePasswordAuthenticationService usernamePasswordAuthenticationService) {
+        this.usernamePasswordAuthenticationService = Objects.requireNonNull(usernamePasswordAuthenticationService);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class UserNamePasswordAuthenticator implements Authenticator {
             throw new AuthenticationException("Cannot authenticate: user is missing");
         }
 
-        return userAuthenticationService.authenticateUser(user, password);
+        return usernamePasswordAuthenticationService.authenticateUser(user, password);
     }
 
     private String getValue(Map<String, Object> auth, String key) {

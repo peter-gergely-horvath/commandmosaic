@@ -22,7 +22,7 @@ import org.commandmosaic.security.jwt.config.JwtSecurityConfiguration;
 import org.commandmosaic.security.jwt.core.DefaultTokenProvider;
 import org.commandmosaic.security.jwt.core.TokenProvider;
 import org.commandmosaic.security.jwt.interceptor.JwtSecurityCommandInterceptor;
-import org.commandmosaic.security.login.authentication.UserAuthenticationService;
+import org.commandmosaic.security.login.authentication.UsernamePasswordAuthenticationService;
 import org.commandmosaic.security.login.authentication.UserNamePasswordAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,13 +55,13 @@ public class SecurityJwtSpringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean({JwtSecurityConfiguration.class, UserAuthenticationService.class})
-    public Authenticator authenticator(UserAuthenticationService userAuthenticationService) {
+    @ConditionalOnBean({JwtSecurityConfiguration.class, UsernamePasswordAuthenticationService.class})
+    public Authenticator authenticator(UsernamePasswordAuthenticationService usernamePasswordAuthenticationService) {
 
-        log.info("Auto-configuring UserNamePasswordAuthenticator using UserAuthenticationService: {}",
-                userAuthenticationService);
+        log.info("Auto-configuring UserNamePasswordAuthenticator using UsernamePasswordAuthenticationService: {}",
+                usernamePasswordAuthenticationService);
 
-        return new UserNamePasswordAuthenticator(userAuthenticationService);
+        return new UserNamePasswordAuthenticator(usernamePasswordAuthenticationService);
     }
 
     @Bean

@@ -56,7 +56,7 @@ final class DefaultMarshaller implements Marshaller {
             writer.write(jsonString);
         }
         catch (IOException e) {
-            throw new IOException("Failed to marshal " + response.getClass(), e);
+            throw new IOException("Failed to marshal " + response, e);
         }
     }
 

@@ -112,8 +112,17 @@ public abstract class DefaultSecurityCommandInterceptor implements SecurityComma
                     "Access Denied: authentication failure", e);
 
         } catch (ExecutionException | UncheckedExecutionException e) {
-            throw new IllegalStateException("Failed to fetch command security metadata for " + commandClass, e);
+            Throwable cause = e.getCause();
 
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+
+            } else if (cause instanceof Error) {
+                throw (Error) cause;
+
+            } else {
+                throw new IllegalStateException(cause.getMessage(), cause);
+            }
         }
 
         return next.execute(commandClass, parameters, context);

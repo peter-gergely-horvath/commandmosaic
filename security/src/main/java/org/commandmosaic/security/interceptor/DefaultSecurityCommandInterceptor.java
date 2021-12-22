@@ -54,30 +54,33 @@ public abstract class DefaultSecurityCommandInterceptor implements SecurityComma
             });
     // CPD-OFF
 
-    protected DefaultSecurityCommandInterceptor(Authenticator firstAuthenticator, Authenticator... restAuthenticators) {
-        this(AuthorizerFactory.getInstance(), firstAuthenticator, restAuthenticators);
+    protected DefaultSecurityCommandInterceptor(Authenticator firstAuthenticator,
+                                                Authenticator... additionalAuthenticators) {
+        this(AuthorizerFactory.getInstance(), firstAuthenticator, additionalAuthenticators);
     }
 
     protected DefaultSecurityCommandInterceptor(AuthorizerFactory authorizerFactory,
-                                                Authenticator firstAuthenticator, Authenticator... restAuthenticators) {
+                                                Authenticator firstAuthenticator,
+                                                Authenticator... additionalAuthenticators) {
 
-        this.authenticator = getAuthenticator(firstAuthenticator, restAuthenticators);
+        this.authenticator = getAuthenticator(firstAuthenticator, additionalAuthenticators);
         this.authorizerFactory = Objects.requireNonNull(authorizerFactory,
                 "argument authorizerFactory cannot be null");
     }
 
-    private Authenticator getAuthenticator(Authenticator firstAuthenticator, Authenticator... restAuthenticators) {
+    private Authenticator getAuthenticator(Authenticator firstAuthenticator,
+                                           Authenticator... additionalAuthenticators) {
         if (firstAuthenticator == null) {
             throw new IllegalStateException("At least one authentication must be specified");
         }
 
         Authenticator authenticator;
-        if (restAuthenticators == null || restAuthenticators.length == 0) {
+        if (additionalAuthenticators == null || additionalAuthenticators.length == 0) {
             authenticator = firstAuthenticator;
         } else {
             final LinkedList<Authenticator> list = new LinkedList<>();
             list.add(firstAuthenticator);
-            list.addAll(Arrays.asList(restAuthenticators));
+            list.addAll(Arrays.asList(additionalAuthenticators));
 
             authenticator = new AuthenticatorChain(list);
         }

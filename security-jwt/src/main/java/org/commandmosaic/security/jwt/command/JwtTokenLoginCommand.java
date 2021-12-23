@@ -56,8 +56,9 @@ public abstract class JwtTokenLoginCommand<R> extends LoginCommand<Identity, R> 
                                 "Could not map value of '" + REMEMBER_ME_KEY + "' to a boolean: " + valueObject);
                     }
                 } else
-                    throw new AuthenticationException(
-                            "'" + REMEMBER_ME_KEY + "' must be a String, but was: " + valueObject.getClass());
+                    throw new AuthenticationException("'" + REMEMBER_ME_KEY
+                            + "' must be a Boolean or a true/false String, but was: "
+                            + valueObject.getClass());
             }
         }
 

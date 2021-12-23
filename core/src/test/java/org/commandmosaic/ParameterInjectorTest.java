@@ -26,6 +26,7 @@ import org.commandmosaic.core.parameter.source.ParameterSources;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Date;
@@ -68,8 +69,10 @@ public class ParameterInjectorTest {
         expectedEx.expect(ParameterInjectionException.class);
         expectedEx.expectMessage("org.commandmosaic.NumberToStringCommand.value");
 
+        BigDecimal biggerThanLongMaxValue = new BigDecimal(Long.MAX_VALUE).multiply(new BigDecimal(2));
+
         HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put("value", new Timestamp(new Date().getTime()));
+        parameters.put("value", biggerThanLongMaxValue);
 
         NumberToStringCommand numberToStringCommand = new NumberToStringCommand();
 

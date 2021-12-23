@@ -16,7 +16,7 @@
 
 package org.commandmosaic.core.marshaller;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.commandmosaic.core.marshaller.model.FailureModel;
 
 import java.io.*;
@@ -27,11 +27,7 @@ import java.util.Objects;
 
 final class DefaultMarshaller implements Marshaller {
 
-    /**
-     * Thread-safe according to the the JavaDoc of GSON:
-     * "Gson instances are Thread-safe so you can reuse them freely across multiple threads."
-     */
-    private static final Gson gson = new Gson();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public <T> T unmarshal(InputStream requestInputStream, Class<T> type) throws IOException {
@@ -39,7 +35,7 @@ final class DefaultMarshaller implements Marshaller {
         Objects.requireNonNull(type, "type cannot be null");
 
         try (InputStreamReader inputStreamReader = new InputStreamReader(requestInputStream, StandardCharsets.UTF_8)) {
-            return gson.fromJson(inputStreamReader, type);
+            return objectMapper.readValue(requestInputStream, type);
         }
         catch (IOException e) {
             throw new IOException("Failed to unmarshal " + type, e);
@@ -50,7 +46,7 @@ final class DefaultMarshaller implements Marshaller {
     public void marshal(OutputStream responseOutputStream, Object response) throws IOException {
         Objects.requireNonNull(responseOutputStream, "responseOutputStream cannot be null");
 
-        String jsonString = gson.toJson(response);
+        String jsonString = objectMapper.writeValueAsString(response);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(responseOutputStream, StandardCharsets.UTF_8)) {
             writer.write(jsonString);

@@ -39,7 +39,6 @@ public interface TypeConversionService {
      * @return the value converted to the target type
      *
      * @throws TypeConversionException if conversion fails; e.g. the conversion is not feasible
-     *              or has no {@code TypeConverter} registered
      */
     <S, T> T convert(S value, Class<T> targetType) throws TypeConversionException;
 }

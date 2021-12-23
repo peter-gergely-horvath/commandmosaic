@@ -17,16 +17,12 @@
  
 package org.commandmosaic.core.conversion;
 
-import org.commandmosaic.api.configuration.conversion.TypeConversion;
 import org.commandmosaic.api.conversion.TypeConversionException;
 import org.commandmosaic.api.conversion.TypeConversionService;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
@@ -81,7 +77,7 @@ public class DefaultTypeConversionServiceTest {
 
         assertConverted(expectedValue, new Date(expectedValue), targetClass);
 
-        assertConversionFails(new Timestamp(42L), targetClass);
+        assertConverted(expectedValue, new Timestamp(expectedValue), targetClass);
     }
 
     @Test
@@ -107,7 +103,8 @@ public class DefaultTypeConversionServiceTest {
         assertConverted(new BigDecimal(42), 42, targetClass);
         assertConverted(expectedValue, 42.123d, targetClass);
 
-        assertConversionFails(new Date(42L), targetClass);
+        assertConverted(new BigDecimal(42), new Date(42), targetClass);
+        assertConverted(new BigDecimal(42), new Timestamp(42), targetClass);
     }
 
     @Test
@@ -132,21 +129,67 @@ public class DefaultTypeConversionServiceTest {
     }
 
     @Test
-    public void testCustomConversion() {
+    public void testMapConversion() {
 
-        Type hashMapType = new TypeToken<Map<String, String>>() { }.getType();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("foo", "bar");
+        map.put("bar", 42);
 
-        String jsonHashMap = "{\"foo\": \"bar\"}";
+        TreeMap<String, Object> expectedMap = new TreeMap<>();
+        expectedMap.put("foo", "bar");
+        expectedMap.put("bar", 42);
 
-        assertConversionFails(jsonHashMap, Map.class, defaultTypeConversionService);
 
-        TypeConversion<String, Map> typeConversion = new TypeConversion<>(String.class, Map.class,
-                (jsonString) -> new Gson().fromJson(jsonString, hashMapType));
+        assertConverted(expectedMap, map, TreeMap.class);
+    }
 
-        TypeConversionService customTypeConversionService =
-                new DefaultTypeConversionService(Collections.singletonList(typeConversion));
+    public static class FooBarPOJO {
+        private String foo;
+        private int bar;
 
-        assertConverted(Collections.singletonMap("foo", "bar"), jsonHashMap, Map.class, customTypeConversionService);
+        public String getFoo() {
+            return foo;
+        }
+
+        public void setFoo(String foo) {
+            this.foo = foo;
+        }
+
+        public int getBar() {
+            return bar;
+        }
+
+        public void setBar(int bar) {
+            this.bar = bar;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            FooBarPOJO that = (FooBarPOJO) o;
+            return bar == that.bar && Objects.equals(foo, that.foo);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(foo, bar);
+        }
+    }
+
+    @Test
+    public void testPOJOConversion() {
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("foo", "bar");
+        map.put("bar", 42);
+
+        FooBarPOJO fooBarPOJO = new FooBarPOJO();
+        fooBarPOJO.setFoo("bar");
+        fooBarPOJO.setBar(42);
+
+
+        assertConverted(fooBarPOJO, map, FooBarPOJO.class);
     }
 
 

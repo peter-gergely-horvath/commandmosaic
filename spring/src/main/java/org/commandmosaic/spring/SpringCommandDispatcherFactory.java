@@ -56,7 +56,7 @@ public class SpringCommandDispatcherFactory extends AbstractCommandDispatcherFac
     protected CommandInterceptor getCommandInterceptor(Class<? extends CommandInterceptor> commandInterceptorClass) {
         CommandInterceptor interceptorInstance;
         try {
-            log.debug("Trying lo get CommandInterceptor from Spring BeanFactory: {}", commandInterceptorClass);
+            log.debug("Trying to get CommandInterceptor from Spring BeanFactory: {}", commandInterceptorClass);
             interceptorInstance = beanFactory.getBean(commandInterceptorClass);
         } catch (NoSuchBeanDefinitionException ex) {
             log.debug("Falling back to default lookup, as CommandInterceptor was not found in Spring BeanFactory: {}",

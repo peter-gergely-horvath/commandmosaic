@@ -33,13 +33,14 @@ import org.commandmosaic.security.authorizer.Authorizer;
 import org.commandmosaic.security.authorizer.factory.AuthorizerFactory;
 import org.commandmosaic.security.core.Identity;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-@SuppressWarnings("unused") // API class, sub classed by user code
-public abstract class DefaultSecurityCommandInterceptor implements SecurityCommandInterceptor {
+@SuppressWarnings("unused") // API class
+public class DefaultSecurityCommandInterceptor implements SecurityCommandInterceptor {
 
     private final Authenticator authenticator;
     private final AuthorizerFactory authorizerFactory;
@@ -48,7 +49,7 @@ public abstract class DefaultSecurityCommandInterceptor implements SecurityComma
     private final LoadingCache<Class<? extends Command<?>>, Authorizer> authorizerCache = CacheBuilder.newBuilder()
             .softValues().build(new CacheLoader<Class<? extends Command<?>>, Authorizer>() {
                 @Override
-                public Authorizer load(Class<? extends Command<?>> clazz) {
+                public Authorizer load(@Nonnull Class<? extends Command<?>> clazz) {
                     return getAuthorizer(clazz);
                 }
             });
@@ -87,7 +88,7 @@ public abstract class DefaultSecurityCommandInterceptor implements SecurityComma
         return authenticator;
     }
 
-    protected Authorizer getAuthorizer(Class<? extends Command<?>> commandClass) {
+    private Authorizer getAuthorizer(Class<? extends Command<?>> commandClass) {
         return this.authorizerFactory.getAuthorizer(commandClass);
     }
 

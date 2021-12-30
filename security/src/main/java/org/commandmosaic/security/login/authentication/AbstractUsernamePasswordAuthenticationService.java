@@ -66,7 +66,7 @@ public abstract class AbstractUsernamePasswordAuthenticationService<T>
             }
 
             if (identity == null) {
-                throw new AuthenticationException("Failed to authenticate: invalid username or password");
+                throw new AuthenticationException("Invalid username or password");
             }
 
             return identity;

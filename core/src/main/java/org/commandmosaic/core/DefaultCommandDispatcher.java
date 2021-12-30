@@ -36,7 +36,7 @@ public class DefaultCommandDispatcher implements CommandDispatcher {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultCommandDispatcher.class);
 
-    protected final String packageName;
+    protected final String rootPackageName;
 
     private final CommandExecutor commandExecutor;
 
@@ -45,9 +45,9 @@ public class DefaultCommandDispatcher implements CommandDispatcher {
         Objects.requireNonNull(configuration, "configuration cannot be null");
         Objects.requireNonNull(commandExecutor, "commandExecutor cannot be null");
 
-        this.packageName = configuration.getPackageName();
-        Objects.requireNonNull(this.packageName, "CommandDispatcher package name cannot be null");
-        if (this.packageName.trim().isEmpty()) {
+        this.rootPackageName = configuration.getRootPackageName();
+        Objects.requireNonNull(this.rootPackageName, "CommandDispatcher package name cannot be null");
+        if (this.rootPackageName.trim().isEmpty()) {
             throw new IllegalArgumentException("CommandDispatcher package name cannot be empty");
         }
         this.commandExecutor = commandExecutor;
@@ -84,7 +84,7 @@ public class DefaultCommandDispatcher implements CommandDispatcher {
     private <R, C extends Command<R>> R dispatchClass(
             Class<C> commandClass, ParameterSource parameters, CommandContext context) {
 
-        if (!commandClass.getName().startsWith(packageName)) {
+        if (!commandClass.getName().startsWith(rootPackageName)) {
             throw new IllegalArgumentException("Command ["+ commandClass +"] is not inside the exposed package");
         }
 
@@ -95,7 +95,7 @@ public class DefaultCommandDispatcher implements CommandDispatcher {
     protected Class<? extends Command<Object>> resolveCommandClass(String commandName) {
         try {
             String commandRelativeClass = commandName.replaceAll("/", ".");
-            String className = String.format("%s.%s", packageName, commandRelativeClass);
+            String className = String.format("%s.%s", rootPackageName, commandRelativeClass);
 
             log.debug("Resolved command '{}' to class name '{}'", commandName, className);
 
@@ -119,7 +119,7 @@ public class DefaultCommandDispatcher implements CommandDispatcher {
     public String toString() {
         return new StringBuilder(getClass().getSimpleName())
                 .append("@").append(Integer.toHexString(hashCode())).append("{")
-                .append("packageName='").append(packageName).append('\'')
+                .append("rootPackageName='").append(rootPackageName).append('\'')
                 .append('}').toString();
     }
 }

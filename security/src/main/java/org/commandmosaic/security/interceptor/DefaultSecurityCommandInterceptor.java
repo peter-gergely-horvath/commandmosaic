@@ -26,7 +26,6 @@ import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.api.executor.CommandExecutor;
 import org.commandmosaic.api.executor.ParameterSource;
 import org.commandmosaic.security.AccessDeniedException;
-import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.authenticator.Authenticator;
 import org.commandmosaic.security.authenticator.AuthenticatorChain;
 import org.commandmosaic.security.authorizer.Authorizer;
@@ -110,10 +109,6 @@ public class DefaultSecurityCommandInterceptor implements SecurityCommandInterce
 
                 context = new SecurityAwareCommandContext(context, identity);
             }
-
-        } catch (AuthenticationException e) {
-            throw new AccessDeniedException(
-                    "Access Denied: authentication failure", e);
 
         } catch (ExecutionException | UncheckedExecutionException e) {
             Throwable cause = e.getCause();

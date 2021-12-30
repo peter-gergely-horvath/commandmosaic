@@ -23,6 +23,7 @@ import org.commandmosaic.api.executor.CommandExecutor;
 import org.commandmosaic.api.executor.ParameterSource;
 import org.commandmosaic.core.parameter.source.ParameterSources;
 import org.commandmosaic.security.AccessDeniedException;
+import org.commandmosaic.security.AuthenticationException;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -114,7 +115,7 @@ public class DefaultSecurityCommandInterceptorTest {
 
         EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
-        Assert.assertThrows(AccessDeniedException.class, () ->
+        Assert.assertThrows(AuthenticationException.class, () ->
                 securityCommandInterceptor.intercept(AuthenticationOnlyCommand.class,
                         parameterSource, mockCommandContext, mockInterceptorChain));
     }
@@ -178,7 +179,7 @@ public class DefaultSecurityCommandInterceptorTest {
 
         EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
-        Assert.assertThrows(AccessDeniedException.class, () ->
+        Assert.assertThrows(AuthenticationException.class, () ->
                 securityCommandInterceptor.intercept(UserCommand.class,
                         parameterSource, mockCommandContext, mockInterceptorChain));
     }
@@ -240,7 +241,7 @@ public class DefaultSecurityCommandInterceptorTest {
 
         EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
-        Assert.assertThrows(AccessDeniedException.class, () ->
+        Assert.assertThrows(AuthenticationException.class, () ->
                 securityCommandInterceptor.intercept(AdminCommand.class,
                         parameterSource, mockCommandContext, mockInterceptorChain));
     }
@@ -256,7 +257,7 @@ public class DefaultSecurityCommandInterceptorTest {
 
         EasyMock.replay(mockCommandContext, mockInterceptorChain);
 
-        Assert.assertThrows(AccessDeniedException.class, () ->
+        Assert.assertThrows(AuthenticationException.class, () ->
                 securityCommandInterceptor.intercept(AdminCommand.class,
                         parameterSource, mockCommandContext, mockInterceptorChain));
     }

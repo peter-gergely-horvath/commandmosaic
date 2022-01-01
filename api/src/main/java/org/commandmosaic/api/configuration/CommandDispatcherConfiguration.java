@@ -117,7 +117,7 @@ public class CommandDispatcherConfiguration {
          * one particular Java package name. Its name might be referenced as
          * one single parameter, or can be constructed from multiple arguments.
          * If multiple arguments are used, the string values are concatenated,
-         * with a dot separator, result in one Java package name.
+         * with a dot separator, resulting in one Java package name.
          * </p>
          *
          * <p>

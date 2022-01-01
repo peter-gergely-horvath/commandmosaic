@@ -133,7 +133,8 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
         Access.RequiresAnyOfTheAuthorities requiresAnyOfTheAuthoritiesAnnotation =
                 getAnnotationFromClassHierarchy(clazz, Access.RequiresAnyOfTheAuthorities.class);
 
-        checkAnnotations(clazz, isPublicAnnotation, requiresAuthenticationAnnotation, requiresAnyOfTheAuthoritiesAnnotation);
+        checkAnnotations(clazz, isPublicAnnotation,
+                requiresAuthenticationAnnotation, requiresAnyOfTheAuthoritiesAnnotation);
 
         Authorizer authorizer;
         if (isPublicAnnotation != null) {
@@ -162,7 +163,8 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
             final String[] authorities = requiresAnyOfTheAuthoritiesAnnotation.value();
             if (authorities == null || authorities.length == 0) {
                 throw new IllegalStateException(
-                        "@RequiresAnyOfTheAuthorities annotation does not declare any authorities on: " + clazz.getName());
+                        "@RequiresAnyOfTheAuthorities annotation does not declare any authorities on: "
+                                + clazz.getName());
             }
 
             final Set<String> authoritiesSet = ImmutableSet.copyOf(authorities);

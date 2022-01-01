@@ -18,17 +18,24 @@ package org.commandmosaic.security.login.command;
 
 import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.security.AuthenticationException;
 import org.commandmosaic.security.annotation.Access;
 
 import java.security.Principal;
 
-@Access.RequiresAuthentication
+@Access.RequiresAuthentication // causes SecurityCommandInterceptor to authenticate the call
 public abstract class LoginCommand<I extends Principal, T> implements Command<T> {
 
     @Override
     public final T execute(CommandContext context) {
 
+        // SecurityCommandInterceptor should already have authenticated the caller
         final Principal principal = context.getCallerPrincipal();
+
+        if (principal == null) {
+            throw new AuthenticationException("Could not login: CallerPrincipal is null. " +
+                    "Security is likely not enabled in CommandDispatcher configuration.");
+        }
 
         @SuppressWarnings("unchecked")
         final I identity = (I) principal;

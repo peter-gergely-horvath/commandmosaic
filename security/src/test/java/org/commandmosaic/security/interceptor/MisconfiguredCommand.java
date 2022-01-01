@@ -22,7 +22,7 @@ import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.annotation.Access;
 
 @Access.IsPublic
-@Access.RequiresAnyOfTheRoles("ROLE_ADMIN")
+@Access.RequiresAnyOfTheAuthorities("ROLE_ADMIN")
 public class MisconfiguredCommand implements Command<String> {
     @Override
     public String execute(CommandContext context) {

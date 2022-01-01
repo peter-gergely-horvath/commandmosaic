@@ -24,11 +24,11 @@ public final class SimpleIdentity implements Identity {
     private static final long serialVersionUID = 1L;
 
     private final String name;
-    private final Set<String> roles;
+    private final Set<String> authorities;
 
-    public SimpleIdentity(String name, Set<String> roles) {
+    public SimpleIdentity(String name, Set<String> authorities) {
         this.name = name;
-        this.roles = roles;
+        this.authorities = authorities;
     }
 
     @Override
@@ -37,8 +37,8 @@ public final class SimpleIdentity implements Identity {
     }
 
     @Override
-    public Set<String> getRoles() {
-        return roles;
+    public Set<String> getAuthorities() {
+        return authorities;
     }
 
     @Override
@@ -47,19 +47,19 @@ public final class SimpleIdentity implements Identity {
         if (o == null || getClass() != o.getClass()) return false;
         SimpleIdentity that = (SimpleIdentity) o;
         return Objects.equals(name, that.name) &&
-                Objects.equals(roles, that.roles);
+                Objects.equals(authorities, that.authorities);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, roles);
+        return Objects.hash(name, authorities);
     }
 
     @Override
     public String toString() {
         return "SimpleIdentity{" +
                 "name='" + name + '\'' +
-                ", roles=" + roles +
+                ", authorities=" + authorities +
                 '}';
     }
 }

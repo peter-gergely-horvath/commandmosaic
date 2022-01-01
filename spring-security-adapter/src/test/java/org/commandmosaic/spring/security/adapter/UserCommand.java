@@ -20,7 +20,7 @@ import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.annotation.Access;
 
-@Access.RequiresAnyOfTheRoles(value = {"ROLE_USER", "ROLE_ADMIN"})
+@Access.RequiresAnyOfTheAuthorities(value = {"ROLE_USER", "ROLE_ADMIN"})
 public class UserCommand implements Command<String> {
 
     @Override

@@ -206,7 +206,7 @@ Two annotations are provided to mark the access levels of each commands:
     This annotation must be applied to all command classes that should be
     available without authentication.
     
-  * `org.commandmosaic.security.annotation.Access.RequiresAnyOfTheRoles`
+  * `org.commandmosaic.security.annotation.Access.RequiresAnyOfTheAuthorities`
     This annotation must be applied to all command classes that should only
     be available to authenticated clients. Optionally, role based security
     can be implemented by specifying the roles which should have access to 

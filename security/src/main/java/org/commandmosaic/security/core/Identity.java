@@ -29,5 +29,5 @@ import java.util.Set;
  */
 public interface Identity extends Principal, Serializable {
 
-    Set<String> getRoles();
+    Set<String> getAuthorities();
 }

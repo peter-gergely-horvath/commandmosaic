@@ -121,10 +121,10 @@ public class DefaultSecurityCommandInterceptorTest {
     }
 
     @Test
-    public void testAuthenticationOnlyCommandWithValidCredentialsAndNoRolesIsAllowed() {
+    public void testAuthenticationOnlyCommandWithValidCredentialsAndNoAuthoritiesIsAllowed() {
 
         HashMap<String, Object> authMap = new HashMap<>();
-        // NOTE: 'bar-user' has no roles associated with it
+        // NOTE: 'bar-user' has no authorities associated with it
         authMap.put("username", "bar-user");
         authMap.put("password", "bar-password");
 
@@ -139,7 +139,7 @@ public class DefaultSecurityCommandInterceptorTest {
     }
 
     @Test
-    public void testAuthenticationOnlyCommandWithValidCredentialsAndRolesIsAllowed() {
+    public void testAuthenticationOnlyCommandWithValidCredentialsAndAuthoritiesIsAllowed() {
 
         HashMap<String, Object> authMap = new HashMap<>();
         authMap.put("username", "foo-user");
@@ -185,7 +185,7 @@ public class DefaultSecurityCommandInterceptorTest {
     }
 
     @Test
-    public void testUserCommandWithValidCredentialsButNoRolesIsDenied() {
+    public void testUserCommandWithValidCredentialsButNoAuthoritiesIsDenied() {
 
         HashMap<String, Object> authMap = new HashMap<>();
         authMap.put("username", "bar-user");
@@ -201,7 +201,7 @@ public class DefaultSecurityCommandInterceptorTest {
     }
 
     @Test
-    public void testUserCommandWithValidCredentialsAndRolesIsAllowed() {
+    public void testUserCommandWithValidCredentialsAndAuthoritiesIsAllowed() {
 
         HashMap<String, Object> authMap = new HashMap<>();
         authMap.put("username", "foo-user");
@@ -263,10 +263,10 @@ public class DefaultSecurityCommandInterceptorTest {
     }
 
     @Test
-    public void testAdminCommandWithValidUserCredentialsAndNoRolesIsDenied() {
+    public void testAdminCommandWithValidUserCredentialsAndNoAuthoritiesIsDenied() {
 
         HashMap<String, Object> authMap = new HashMap<>();
-        // NOTE: 'bar-user' has no roles associated with it
+        // NOTE: 'bar-user' has no authorities associated with it
         authMap.put("username", "bar-user");
         authMap.put("password", "bar-password");
 
@@ -280,7 +280,7 @@ public class DefaultSecurityCommandInterceptorTest {
     }
 
     @Test
-    public void testAdminCommandWithValidUserCredentialsAndRolesIsDenied() {
+    public void testAdminCommandWithValidUserCredentialsAndAuthoritiesIsDenied() {
 
         HashMap<String, Object> authMap = new HashMap<>();
         authMap.put("username", "foo-user");
@@ -297,7 +297,7 @@ public class DefaultSecurityCommandInterceptorTest {
     }
 
     @Test
-    public void testAdminCommandWithValidAdminCredentialsAndRolesIsAllowed() {
+    public void testAdminCommandWithValidAdminCredentialsAndAuthoritiesIsAllowed() {
 
         HashMap<String, Object> authMap = new HashMap<>();
         authMap.put("username", "admin-user");

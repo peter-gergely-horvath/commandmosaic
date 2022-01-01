@@ -26,12 +26,12 @@ class UserNamePasswordIdentity implements Identity {
 
     private final String userName;
     private final String password;
-    private final Set<String> roles;
+    private final Set<String> authorities;
 
-    UserNamePasswordIdentity(String userName, String password, String... roles) {
+    UserNamePasswordIdentity(String userName, String password, String... authorities) {
         this.userName = userName;
         this.password = password;
-        this.roles = new HashSet<>(Arrays.asList(roles));
+        this.authorities = new HashSet<>(Arrays.asList(authorities));
     }
 
     @Override
@@ -40,8 +40,8 @@ class UserNamePasswordIdentity implements Identity {
     }
 
     @Override
-    public Set<String> getRoles() {
-        return roles;
+    public Set<String> getAuthorities() {
+        return authorities;
     }
 
     public String getPassword() {

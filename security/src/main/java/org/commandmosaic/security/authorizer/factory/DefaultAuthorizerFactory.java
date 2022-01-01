@@ -77,12 +77,12 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
         }
     }
 
-    private static class RequiresAnyOfTheRolesAuthorizer implements Authorizer {
+    private static class RequiresAnyOfTheAuthoritiesAuthorizer implements Authorizer {
 
-        private final Set<String> requiredRoles;
+        private final Set<String> requiredAuthorities;
 
-        private RequiresAnyOfTheRolesAuthorizer(Set<String> requiredRoles) {
-            this.requiredRoles = requiredRoles;
+        private RequiresAnyOfTheAuthoritiesAuthorizer(Set<String> requiredAuthorities) {
+            this.requiredAuthorities = requiredAuthorities;
         }
 
         @Override
@@ -95,11 +95,11 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
                 throw new AccessDeniedException("Authentication is required to access: " + commandClass.getName());
             }
 
-            final Set<String> presentRoles = identity.getRoles();
-            if (presentRoles == null
-                    || presentRoles.stream().noneMatch(requiredRoles::contains)) {
+            final Set<String> presentAuthorities = identity.getAuthorities();
+            if (presentAuthorities == null
+                    || presentAuthorities.stream().noneMatch(requiredAuthorities::contains)) {
 
-                // None of the required roles is present for the given user
+                // None of the required authorities is present for the given user
                 throw new AccessDeniedException("Access Denied: " + commandClass.getName());
             }
         }
@@ -114,8 +114,8 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
     private final LoadingCache<Set<String>, Authorizer> authorizerCache = CacheBuilder.newBuilder()
             .softValues().build(new CacheLoader<Set<String>, Authorizer>() {
                 @Override
-                public Authorizer load(Set<String> roles) {
-                    return new RequiresAnyOfTheRolesAuthorizer(roles);
+                public Authorizer load(Set<String> authorities) {
+                    return new RequiresAnyOfTheAuthoritiesAuthorizer(authorities);
                 }
             });
     // CPD-ON
@@ -130,23 +130,23 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
                 getAnnotationFromClassHierarchy(clazz, Access.RequiresAuthentication.class);
 
 
-        Access.RequiresAnyOfTheRoles requiresAnyOfTheRolesAnnotation =
-                getAnnotationFromClassHierarchy(clazz, Access.RequiresAnyOfTheRoles.class);
+        Access.RequiresAnyOfTheAuthorities requiresAnyOfTheAuthoritiesAnnotation =
+                getAnnotationFromClassHierarchy(clazz, Access.RequiresAnyOfTheAuthorities.class);
 
-        checkAnnotations(clazz, isPublicAnnotation, requiresAuthenticationAnnotation, requiresAnyOfTheRolesAnnotation);
+        checkAnnotations(clazz, isPublicAnnotation, requiresAuthenticationAnnotation, requiresAnyOfTheAuthoritiesAnnotation);
 
         Authorizer authorizer;
         if (isPublicAnnotation != null) {
             authorizer = PublicAccessAuthorizer.INSTANCE;
         } else if (requiresAuthenticationAnnotation != null) {
             authorizer = RequiresAuthenticationAuthorizer.INSTANCE;
-        } else if (requiresAnyOfTheRolesAnnotation != null) {
+        } else if (requiresAnyOfTheAuthoritiesAnnotation != null) {
             /*
             We implement the Flyweight pattern here: if multiple commands are annotated
-            with Access.RequiresAnyOfTheRoles with the same set of roles, we return
+            with Access.RequiresAnyOfTheAuthorities with the same set of authorities, we return
             the same Authorizer instance.
             */
-            authorizer = getRequiresAnyOfTheRolesAuthorizer(clazz, requiresAnyOfTheRolesAnnotation);
+            authorizer = getRequiresAnyOfTheAuthoritiesAuthorizer(clazz, requiresAnyOfTheAuthoritiesAnnotation);
         } else {
             throw new IllegalStateException("Annotation check reached an invalid state");
         }
@@ -154,20 +154,20 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
         return authorizer;
     }
 
-    private Authorizer getRequiresAnyOfTheRolesAuthorizer(
+    private Authorizer getRequiresAnyOfTheAuthoritiesAuthorizer(
             Class<? extends Command<?>> clazz,
-            Access.RequiresAnyOfTheRoles requiresAnyOfTheRolesAnnotation) {
+            Access.RequiresAnyOfTheAuthorities requiresAnyOfTheAuthoritiesAnnotation) {
 
         try {
-            final String[] roles = requiresAnyOfTheRolesAnnotation.value();
-            if (roles == null || roles.length == 0) {
+            final String[] authorities = requiresAnyOfTheAuthoritiesAnnotation.value();
+            if (authorities == null || authorities.length == 0) {
                 throw new IllegalStateException(
-                        "@RequiresAnyOfTheRoles annotation does not declare any roles on: " + clazz.getName());
+                        "@RequiresAnyOfTheAuthorities annotation does not declare any authorities on: " + clazz.getName());
             }
 
-            final Set<String> rolesSet = ImmutableSet.copyOf(roles);
+            final Set<String> authoritiesSet = ImmutableSet.copyOf(authorities);
 
-            return authorizerCache.get(rolesSet);
+            return authorizerCache.get(authoritiesSet);
 
         } catch (ExecutionException | UncheckedExecutionException e) {
             // should not happen
@@ -178,13 +178,13 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
     private void checkAnnotations(Class<? extends Command<?>> clazz,
                                   Access.IsPublic isPublicAnnotation,
                                   Access.RequiresAuthentication requiresAuthenticationAnnotation,
-                                  Access.RequiresAnyOfTheRoles requiresAnyOfTheRolesAnnotation) {
+                                  Access.RequiresAnyOfTheAuthorities requiresAnyOfTheAuthoritiesAnnotation) {
 
         if (isPublicAnnotation == null
                 && requiresAuthenticationAnnotation == null
-                && requiresAnyOfTheRolesAnnotation == null) {
+                && requiresAnyOfTheAuthoritiesAnnotation == null) {
             throw new IllegalStateException("When security is used, a class must be either annotated with " +
-                    "@IsPublic, @RequiresAuthentication or @RequiresAnyOfTheRoles");
+                    "@IsPublic, @RequiresAuthentication or @RequiresAnyOfTheAuthorities");
         }
 
         if (isPublicAnnotation != null && requiresAuthenticationAnnotation != null) {
@@ -192,9 +192,9 @@ public class DefaultAuthorizerFactory extends AuthorizerFactory {
                     "Both @IsPublic and @RequiresAuthentication are present on " + clazz);
         }
 
-        if (isPublicAnnotation != null && requiresAnyOfTheRolesAnnotation != null) {
+        if (isPublicAnnotation != null && requiresAnyOfTheAuthoritiesAnnotation != null) {
             throw new IllegalStateException(
-                    "Both @IsPublic and @RequiresAnyOfTheRoles are present on " + clazz);
+                    "Both @IsPublic and @RequiresAnyOfTheAuthorities are present on " + clazz);
         }
     }
 

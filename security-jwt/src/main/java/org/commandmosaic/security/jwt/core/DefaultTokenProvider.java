@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * <p>
  * Based on JHipster Sample application TokenProvider:
- *
+ * <p>
  * https://github.com/jhipster/jhipster-sample-app/blob/master/src/main/java/io/github/jhipster/sample/security/jwt/TokenProvider.java
  * </p>
  */
@@ -48,23 +48,23 @@ public class DefaultTokenProvider implements TokenProvider {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultTokenProvider.class);
 
-    private static final String ROLES_KEY = "roles";
+    private static final String AUTHORITIES_KEY = "authorities";
     private static final String MULTI_VALUE_SEPARATOR = ",";
 
-    private Key key;
+    private final Key key;
 
-    private long tokenValidityInMilliseconds;
+    private final long tokenValidityInMilliseconds;
 
-    private long tokenValidityInMillisecondsForRememberMe;
+    private final long tokenValidityInMillisecondsForRememberMe;
 
 
     public DefaultTokenProvider(byte[] keyBytes,
                                 long tokenValidityInSeconds,
                                 long tokenValidityInSecondsForRememberMe) {
-        if (tokenValidityInSeconds <=0) {
+        if (tokenValidityInSeconds <= 0) {
             throw new IllegalArgumentException("tokenValidityInSeconds must be a positive number");
         }
-        if (tokenValidityInSecondsForRememberMe <=0) {
+        if (tokenValidityInSecondsForRememberMe <= 0) {
             throw new IllegalArgumentException("tokenValidityInSecondsForRememberMe must be a positive number");
         }
 
@@ -76,7 +76,7 @@ public class DefaultTokenProvider implements TokenProvider {
 
     @Override
     public String createToken(Identity authentication, boolean rememberMe) {
-        String roles = String.join(MULTI_VALUE_SEPARATOR, authentication.getRoles());
+        String authorities = String.join(MULTI_VALUE_SEPARATOR, authentication.getAuthorities());
 
         long now = new Date().getTime();
         Date validity;
@@ -87,11 +87,11 @@ public class DefaultTokenProvider implements TokenProvider {
         }
 
         return Jwts.builder()
-            .setSubject(authentication.getName())
-            .claim(ROLES_KEY, roles)
-            .signWith(key, SignatureAlgorithm.HS512)
-            .setExpiration(validity)
-            .compact();
+                .setSubject(authentication.getName())
+                .claim(AUTHORITIES_KEY, authorities)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
     }
 
     @Override
@@ -115,11 +115,11 @@ public class DefaultTokenProvider implements TokenProvider {
             return Optional.empty();
         }
 
-        String rolesMultiValueString = claims.get(ROLES_KEY).toString();
+        String authoritiesMultiValueString = claims.get(AUTHORITIES_KEY).toString();
 
-        Set<String> rolesSet = Arrays.stream(rolesMultiValueString.split(MULTI_VALUE_SEPARATOR))
+        Set<String> authoritiesSet = Arrays.stream(authoritiesMultiValueString.split(MULTI_VALUE_SEPARATOR))
                 .collect(ImmutableSet.toImmutableSet());
 
-        return Optional.of(new SimpleIdentity(claims.getSubject(), rolesSet));
+        return Optional.of(new SimpleIdentity(claims.getSubject(), authoritiesSet));
     }
 }

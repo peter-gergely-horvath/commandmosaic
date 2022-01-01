@@ -41,9 +41,9 @@ public final class Access {
      * </p>
      * <p>
      * This annotation is mutually exclusive with
-     * {@code @RequiresAnyOfTheRoles}: a command class annotated
+     * {@code @RequiresAnyOfTheAuthorities}: a command class annotated
      * with {@code @IsPublic} cannot be annotated with
-     * {@code @RequiresAnyOfTheRoles} and vice versa.
+     * {@code @RequiresAnyOfTheAuthorities} and vice versa.
      * </p>
      *
      * @see DefaultSecurityCommandInterceptor
@@ -71,9 +71,9 @@ public final class Access {
      * {@code @IsPublic} and vice versa.
      * </p>
      * <p>
-     * The annotation {@code @RequiresAnyOfTheRoles} implicitly
+     * The annotation {@code @RequiresAnyOfTheAuthorities} implicitly
      * declares the command access to {@code @RequiresAuthentication}:
-     * as for role based security to work, the caller's identity must
+     * to be able to check authorities of the caller, its identity must
      * be established via authentication.
      * </p>
      *
@@ -86,10 +86,13 @@ public final class Access {
 
     }
 
+
+
     /**
      * <p>
      * Marks commands that can be accessed only after authentication
-     * with the user having the roles specified, in the annotation.
+     * with the user having <strong>at least one</strong> of the
+     * authorities listed in the annotation.
      * </p>
      * <p>
      * NOTE: for the security to work properly, a corresponding security
@@ -98,31 +101,30 @@ public final class Access {
      * <p>
      * This annotation is mutually exclusive with
      * {@code @IsPublic}: a command class annotated
-     * with {@code @RequiresAnyOfTheRoles} cannot be annotated with
+     * with {@code @RequiresAnyOfTheAuthorities} cannot be annotated with
      * {@code @IsPublic} and vice versa.
      * </p>
      *
      * <p>
      * This annotation implicitly declares the command access to
      * {@code @RequiresAuthentication}:
-     * as for role based security to work, the caller's identity must
+     * to be able to check authorities of the caller, its identity must
      * be established via authentication.
      * </p>
-
      *
      * @see DefaultSecurityCommandInterceptor
      */
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
-    public @interface RequiresAnyOfTheRoles {
+    public @interface RequiresAnyOfTheAuthorities {
         /**
-         * Declares the roles required to execute the command.
-         * If the caller is not authenticated or does not have at
-         * least one of the roles listed in {@code value}, the command
-         * cannot be executed.
+         * Declares the authorities required to execute the command.
+         * If the caller is not authenticated or does not have
+         * <strong>at least one</strong> of the authorities listed in
+         * {@code value}, the command cannot be executed.
          *
-         * @return an array of role names required to execute the command. Must not be empty.
+         * @return an array of authority names required to execute the command. Must not be empty.
          */
         String[] value();
     }

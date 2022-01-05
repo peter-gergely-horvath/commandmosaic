@@ -20,11 +20,11 @@ import org.commandmosaic.api.Command;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.security.annotation.Access;
 
-@Access.RequiresAnyOfTheAuthorities("ROLE_USER")
-public class UserCommandOne implements Command<String> {
+@Access.RequiresAuthority(DefaultAuthorizerFactoryTest.USER_ROLE_NAME)
+public class UserCommand1 implements Command<String> {
 
     @Override
     public String execute(CommandContext context) {
-        return "UserCommandOne";
+        return "UserCommand1";
     }
 }

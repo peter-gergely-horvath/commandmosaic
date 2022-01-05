@@ -87,6 +87,46 @@ public final class Access {
     }
 
 
+    /**
+     * <p>
+     * Marks commands that can be accessed only after authentication
+     * with the user having the authority listed in the annotation.
+     * </p>
+     * <p>
+     * NOTE: for the security to work properly, a corresponding security
+     * {@code CommandInterceptor} must be configured.
+     * </p>
+     * <p>
+     * This annotation is mutually exclusive with
+     * {@code @IsPublic} and {@code @RequiresAnyOfTheAuthorities}:
+     * a command class annotated with {@code @RequiresAuthority}
+     * cannot be annotated with {@code @IsPublic} or
+     * {@code @RequiresAnyOfTheAuthorities} and vice versa.
+     * </p>
+     *
+     * <p>
+     * This annotation implicitly declares the command access to
+     * {@code @RequiresAuthentication}:
+     * to be able to check authorities of the caller, its identity must
+     * be established via authentication.
+     * </p>
+     *
+     * @see DefaultSecurityCommandInterceptor
+     */
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    public @interface RequiresAuthority {
+        /**
+         * Declares the authority required to execute the command.
+         * If the caller is not authenticated or does not have
+         * the authority specified in {@code value}, the command
+         * cannot be executed.
+         *
+         * @return an String containing the authority name required to execute the command. Must not be empty.
+         */
+        String value();
+    }
 
     /**
      * <p>

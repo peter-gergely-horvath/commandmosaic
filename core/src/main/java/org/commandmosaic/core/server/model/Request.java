@@ -19,12 +19,21 @@ package org.commandmosaic.core.server.model;
 
 import java.util.Map;
 
-public class CommandDispatchRequest {
+public class Request {
 
+    private Object id;
     private String protocol;
     private String command;
     private Map<String, Object> parameters;
     private Map<String, Object> auth;
+
+    public Object getId() {
+        return id;
+    }
+
+    public void setId(Object id) {
+        this.id = id;
+    }
 
     public String getProtocol() {
         return protocol;
@@ -59,4 +68,16 @@ public class CommandDispatchRequest {
         this.auth = auth;
     }
     // CPD-ON
+
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "id=" + id +
+                ", protocol='" + protocol + '\'' +
+                ", command='" + command + '\'' +
+                ", parameters=" + parameters +
+                ", auth=" + auth +
+                '}';
+    }
 }

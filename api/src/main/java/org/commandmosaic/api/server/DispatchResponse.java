@@ -14,14 +14,27 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.core.marshaller;
+package org.commandmosaic.api.server;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.EventListener;
 
-public interface Marshaller {
-    <T> T unmarshal(InputStream requestInputStream, Class<T> object) throws IOException;
+public interface DispatchResponse {
+    OutputStream getOutputStream();
 
-    void marshal(OutputStream responseOutputStream, Object value) throws IOException;
+    OutputStream getErrorStream();
+
+    void notifyErrorListeners(Throwable throwable);
+
+    interface ResponseListener extends EventListener {
+        // marker interface
+    }
+
+    @FunctionalInterface
+    interface FailureListener extends ResponseListener {
+        void onFailure(Throwable failure);
+    }
+
+    void addListener(FailureListener failureListener);
+
 }

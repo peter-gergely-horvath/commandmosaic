@@ -16,67 +16,77 @@
 
 package org.commandmosaic.http.servlet.common;
 
-import org.commandmosaic.api.server.CommandDispatcherServer;
-import org.commandmosaic.api.server.CommandException;
-import org.commandmosaic.api.server.InvalidRequestException;
-import org.commandmosaic.core.marshaller.Marshaller;
-import org.commandmosaic.core.marshaller.MarshallerFactory;
+import org.commandmosaic.api.server.*;
+import org.commandmosaic.core.server.DefaultDispatchRequest;
+import org.commandmosaic.core.server.DefaultDispatchResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.function.Supplier;
 
 
 public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDispatchRequestHandler {
 
+    private final Logger log = LoggerFactory.getLogger(DefaultHttpCommandDispatchRequestHandler.class);
+
     private final CommandDispatcherServer commandDispatcherServer;
-    private final Marshaller marshaller;
 
     public DefaultHttpCommandDispatchRequestHandler(CommandDispatcherServer commandDispatcherServer) {
-        this(commandDispatcherServer, MarshallerFactory.getInstance().getMarshaller());
-    }
-
-
-    public DefaultHttpCommandDispatchRequestHandler(CommandDispatcherServer commandDispatcherServer,
-                                                    Marshaller marshaller) {
         this.commandDispatcherServer = commandDispatcherServer;
-        this.marshaller = marshaller;
     }
 
     @Override
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
+    public void handleRequest(HttpServletRequest httpServletRequest,
+                              HttpServletResponse httpServletResponse) throws ServletException, IOException {
         try {
-            dispatchRequest(request, response);
-        }
-        catch (InvalidRequestException e) {
-            sendStatusCodeResponse(response, e, HttpServletResponse.SC_BAD_REQUEST);
-        }
-        catch (CommandException e) {
-            sendStatusCodeResponse(response, e, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-        catch (RuntimeException e) {
+
+            DispatchRequest request = new DefaultDispatchRequest(httpServletRequest.getInputStream());
+            DispatchResponse response = new DefaultDispatchResponse(getAsSupplier(httpServletResponse));
+
+            response.addListener(failure -> onFailure(httpServletResponse, failure));
+
+            commandDispatcherServer.serviceRequest(request, response);
+
+        } catch (CommandException e) {
+            /*
+            The server has written the expected error response body already,
+            the listener has set the response status code already in
+            onFailure(HttpServletResponse, Throwable)
+
+            Since the response payload has been written already,
+            we CANNOT change the status code here: we only log here.
+             */
+            log.debug("Request failed", e);
+
+        } catch (RuntimeException e) {
             throw new ServletException(e);
         }
     }
 
-    protected void dispatchRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        ServletInputStream inputStream = request.getInputStream();
-        ServletOutputStream outputStream = response.getOutputStream();
+    protected void onFailure(HttpServletResponse httpServletResponse, Throwable failure) {
 
-        commandDispatcherServer.serviceRequest(inputStream, outputStream);
+        if (failure instanceof InvalidRequestException) {
+            httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+        } else {
+            httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+        }
     }
 
-    protected void sendStatusCodeResponse(HttpServletResponse response, Throwable throwable, int statusCode)
-            throws IOException {
-
-        response.reset();
-        response.setStatus(statusCode);
-
-        marshaller.marshalFailure(response.getOutputStream(), throwable);
+    private Supplier<OutputStream> getAsSupplier(HttpServletResponse httpServletResponse) {
+        return () -> {
+            try {
+                return httpServletResponse.getOutputStream();
+            } catch (IOException e) {
+                throw new RuntimeException("Could not get OutputStream from HttpServletResponse", e);
+            }
+        };
     }
+
 }

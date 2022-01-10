@@ -22,7 +22,11 @@ import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import org.commandmosaic.api.CommandDispatcher;
 import org.commandmosaic.api.server.CommandDispatcherServer;
 import org.commandmosaic.api.server.CommandException;
+import org.commandmosaic.api.server.DispatchRequest;
+import org.commandmosaic.api.server.DispatchResponse;
 import org.commandmosaic.core.server.DefaultCommandDispatcherServer;
+import org.commandmosaic.core.server.DefaultDispatchRequest;
+import org.commandmosaic.core.server.DefaultDispatchResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,14 +45,18 @@ public abstract class LambdaCommandDispatcherRequestHandler implements RequestSt
     }
 
     @Override
-    public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
+    public void handleRequest(InputStream input, OutputStream output, Context context) {
         try {
-            commandDispatcherServer.serviceRequest(input, output);
+            DispatchRequest request = new DefaultDispatchRequest(input);
+            DispatchResponse response = new DefaultDispatchResponse(() -> output);
+
+            commandDispatcherServer.serviceRequest(request, response);
         }
         catch (CommandException e) {
-            throw new RuntimeException(String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage()), e);
+            throw e;
         }
         catch (IOException | RuntimeException ex) {
+            // unexpected error: we throw an exception in this case
             throw new RuntimeException("Error: Failed to dispatch command", ex);
         }
     }

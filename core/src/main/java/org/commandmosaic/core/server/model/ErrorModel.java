@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.core.marshaller.model;
+package org.commandmosaic.core.server.model;
 
 import java.util.List;
 import java.util.Objects;
 
-public class FailureModel {
+public class ErrorModel {
 
     private String errorMessage;
     private String errorType;
@@ -53,7 +53,7 @@ public class FailureModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FailureModel that = (FailureModel) o;
+        ErrorModel that = (ErrorModel) o;
         return Objects.equals(errorMessage, that.errorMessage) &&
                 Objects.equals(errorType, that.errorType) &&
                 Objects.equals(stackTrace, that.stackTrace);
@@ -66,7 +66,7 @@ public class FailureModel {
 
     @Override
     public String toString() {
-        return "FailureModel{" +
+        return "ErrorModel{" +
                 "errorMessage='" + errorMessage + '\'' +
                 ", errorType='" + errorType + '\'' +
                 ", stackTrace=" + stackTrace +

@@ -18,11 +18,14 @@
 package org.commandmosaic.http.servlet;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.ToNumberPolicy;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -72,24 +75,41 @@ public class CommandDispatcherServletTest {
     @Test
     public void testRequestHandler() throws Exception {
 
-        Gson gson = new Gson();
+        final long requestId = 42;
+
+        Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create();
         Map<String, Object> request = new HashMap<>();
+        request.put("id", requestId);
         request.put("command", "GreetCommand");
         request.put("parameters", Collections.singletonMap("name", "John Smith"));
         request.put("protocol", "CM/1.0");
 
         String requestString = gson.toJson(request);
 
-        Content content = Request.Post("http://localhost:" + port)
+        HttpResponse httpResponse = Request.Post("http://localhost:" + port)
                 .bodyString(requestString, ContentType.APPLICATION_JSON)
-                .execute().returnContent();
+                .execute().returnResponse();
 
-        String jsonResponse = content.toString();
+        final int statusCode = httpResponse.getStatusLine().getStatusCode();
 
+        final int requestOKStatusCode = 200;
+        Assert.assertEquals(requestOKStatusCode, statusCode);
+
+        String jsonResponse = getResponseBodyAsString(httpResponse);
         Assert.assertNotNull(jsonResponse);
 
-        String result = gson.fromJson(jsonResponse, String.class);
-        Assert.assertEquals("Hello John Smith", result);
+        Type typeOfHashMap = new TypeToken<Map<String, Object>>() { }.getType();
+        Map<String, Object> responseAsMap = gson.fromJson(jsonResponse, typeOfHashMap);
+
+
+        Object resultObject = responseAsMap.get("result");
+        Assert.assertNotNull(resultObject);
+
+        Object requestIdObject = responseAsMap.get("id");
+        Assert.assertNotNull(requestIdObject);
+        Assert.assertEquals(requestId, requestIdObject);
+
+        Assert.assertEquals("Hello John Smith", resultObject);
     }
 
     @Test

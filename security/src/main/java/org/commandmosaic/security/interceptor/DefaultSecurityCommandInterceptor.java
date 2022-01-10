@@ -107,6 +107,8 @@ public class DefaultSecurityCommandInterceptor implements SecurityCommandInterce
 
                 authorizer.checkAuthorization(commandClass, identity, parameters, context);
 
+
+
                 context = new SecurityAwareCommandContext(context, identity);
             }
 

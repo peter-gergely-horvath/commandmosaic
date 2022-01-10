@@ -15,7 +15,7 @@
  */
 
  
-package org.commandmosaic.core.server.model;
+package org.commandmosaic.core.server.context;
 
 import com.google.common.collect.ImmutableMap;
 import org.commandmosaic.api.CommandContext;
@@ -45,8 +45,7 @@ public final class DefaultCommandContext implements CommandContext {
     }
 
     public DefaultCommandContext(DefaultCommandContext other) {
-        // no defensive copy is required as authentication is an immutable Map already
-        this.auth = other.auth;
+        this.setAuth(other.getAuth());
 
         //noinspection IncompleteCopyConstructor: only create a defensive copy if it's not null
         this.attributes = other.attributes != null ? new HashMap<>(other.attributes) : null;

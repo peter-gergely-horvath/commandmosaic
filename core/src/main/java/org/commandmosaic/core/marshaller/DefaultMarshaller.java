@@ -16,18 +16,21 @@
 
 package org.commandmosaic.core.marshaller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.commandmosaic.core.marshaller.model.FailureModel;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 final class DefaultMarshaller implements Marshaller {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper;
+
+    static {
+        objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    }
 
     @Override
     public <T> T unmarshal(InputStream requestInputStream, Class<T> type) throws IOException {
@@ -35,7 +38,7 @@ final class DefaultMarshaller implements Marshaller {
         Objects.requireNonNull(type, "type cannot be null");
 
         try (InputStreamReader inputStreamReader = new InputStreamReader(requestInputStream, StandardCharsets.UTF_8)) {
-            return objectMapper.readValue(requestInputStream, type);
+            return objectMapper.readValue(inputStreamReader, type);
         }
         catch (IOException e) {
             throw new IOException("Failed to unmarshal " + type, e);
@@ -43,42 +46,17 @@ final class DefaultMarshaller implements Marshaller {
     }
 
     @Override
-    public void marshal(OutputStream responseOutputStream, Object response) throws IOException {
+    public void marshal(OutputStream responseOutputStream, Object value) throws IOException {
         Objects.requireNonNull(responseOutputStream, "responseOutputStream cannot be null");
+        Objects.requireNonNull(responseOutputStream, "value cannot be null");
 
-        String jsonString = objectMapper.writeValueAsString(response);
+        String jsonString = objectMapper.writeValueAsString(value);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(responseOutputStream, StandardCharsets.UTF_8)) {
             writer.write(jsonString);
         }
         catch (IOException e) {
-            throw new IOException("Failed to marshal " + response, e);
+            throw new IOException("Failed to marshal: " + value, e);
         }
-    }
-
-    @Override
-    public void marshalFailure(OutputStream responseOutputStream, Throwable throwable) throws IOException {
-        Objects.requireNonNull(responseOutputStream, "responseOutputStream cannot be null");
-        Objects.requireNonNull(throwable, "throwable cannot be null");
-
-        List<String> stackTrace = convertThrowableStackTraceToString(throwable);
-
-        FailureModel model = new FailureModel();
-
-        model.setErrorMessage(throwable.getMessage());
-        model.setErrorType(throwable.getClass().getCanonicalName());
-        model.setStackTrace(stackTrace);
-
-
-        marshal(responseOutputStream, model);
-    }
-
-    private List<String> convertThrowableStackTraceToString(Throwable throwable) {
-        StringWriter sw = new StringWriter();
-        try(PrintWriter pw = new PrintWriter(sw)) {
-            throwable.printStackTrace(pw);
-        }
-
-        return Arrays.asList(sw.toString().split("\n"));
     }
 }

@@ -21,9 +21,7 @@ import org.commandmosaic.http.servlet.common.DefaultHttpCommandDispatchRequestHa
 import org.commandmosaic.security.AccessDeniedException;
 import org.commandmosaic.security.AuthenticationException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class SecurityAwareHttpCommandDispatchRequestHandler extends DefaultHttpCommandDispatchRequestHandler {
 
@@ -31,18 +29,17 @@ public class SecurityAwareHttpCommandDispatchRequestHandler extends DefaultHttpC
         super(commandDispatcherServer);
     }
 
-    @Override
-    protected void dispatchRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            super.dispatchRequest(request, response);
+    protected void onFailure(HttpServletResponse httpServletResponse, Throwable failure) {
 
-        } catch (AuthenticationException ex) {
+        if (failure instanceof AuthenticationException) {
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-            sendStatusCodeResponse(response, ex, HttpServletResponse.SC_UNAUTHORIZED);
+        } else if (failure instanceof AccessDeniedException) {
+            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-        } catch (AccessDeniedException ex) {
+        } else {
+            super.onFailure(httpServletResponse, failure);
 
-            sendStatusCodeResponse(response, ex, HttpServletResponse.SC_FORBIDDEN);
         }
     }
 }

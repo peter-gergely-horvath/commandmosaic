@@ -52,7 +52,7 @@
     </Match>
 
     <Match>
-        <Class name="org.commandmosaic.core.server.model.CommandDispatchRequest" />
+        <Class name="org.commandmosaic.core.server.model.Request" />
         <Or>
             <Bug pattern="EI_EXPOSE_REP" />
             <Bug pattern="EI_EXPOSE_REP2" />
@@ -61,7 +61,7 @@
     </Match>
 
     <Match>
-        <Class name="org.commandmosaic.core.marshaller.model.FailureModel" />
+        <Class name="org.commandmosaic.core.server.model.ErrorModel" />
         <Or>
             <Bug pattern="EI_EXPOSE_REP" />
             <Bug pattern="EI_EXPOSE_REP2" />
@@ -70,7 +70,7 @@
     </Match>
 
     <Match>
-        <Class name="org.commandmosaic.core.server.model.DefaultCommandContext" />
+        <Class name="org.commandmosaic.core.server.context.DefaultCommandContext" />
         <Or>
             <Bug pattern="EI_EXPOSE_REP" />
             <Bug pattern="EI_EXPOSE_REP2" />

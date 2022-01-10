@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.core.marshaller;
+package org.commandmosaic.core.server;
 
-import java.io.IOException;
+import org.commandmosaic.api.server.DispatchRequest;
+
 import java.io.InputStream;
-import java.io.OutputStream;
 
-public interface Marshaller {
-    <T> T unmarshal(InputStream requestInputStream, Class<T> object) throws IOException;
+public class DefaultDispatchRequest implements DispatchRequest {
 
-    void marshal(OutputStream responseOutputStream, Object value) throws IOException;
+    private final InputStream inputStream;
+
+    public DefaultDispatchRequest(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return inputStream;
+    }
 }

@@ -115,7 +115,7 @@ public interface CommandContext {
      *          and {@code Immutable} {@code AttributeType}
      */
     void setAttribute(String key, Object value, AttributeType attributeType);
-
+    
     /**
      * <p>
      * Represents the possible types of an Attribute, whether or not

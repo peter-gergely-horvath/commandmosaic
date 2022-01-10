@@ -20,8 +20,6 @@ package org.commandmosaic.api.server;
 import org.commandmosaic.api.CommandDispatcher;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * <p>
@@ -49,25 +47,7 @@ public interface CommandDispatcherServer {
      * {@code InputStream}, the command is dispatched and the result of the
      * command execution is written to the {@code OutputStream}.
      * </p>
-     *
-     * <p>
-     * Implementors can provide their own error handling mechanism
-     * and simply write a customized error message payload to the {@code OutputStream}
-     * provided, however still should consider edge cases where this is unsuccessful
-     * (E.g. a {@code IOException} is raised due to a disconnected socket connection)
-     * and an Exception is propagated back to the container running the server.
-     * </p>
-     *
-     * @param requestInputStream the {@code InputStream} to read the request from (never {@code null})
-     * @param responseOutputStream the {@code OutputStream} to write the response to (never {@code null})
-     *
-     * @throws IOException if an I/O error occurs during unmarshalling of the request or the marshaling of the response,
-     *                      including errors caused by a communications link failure. (E.g. the client disconnects
-     *                      while request payload is being read or while the command is being executed and hence,
-     *                      later on response payload cannot be written to the {@code OutputStream})
-     *
-     * @throws InvalidRequestException if the request was invalid (e.g does not contain the command name)
      */
-    void serviceRequest(InputStream requestInputStream, OutputStream responseOutputStream)
-            throws IOException, InvalidRequestException;
+    void serviceRequest(DispatchRequest dispatchRequest, DispatchResponse dispatchResponse)
+            throws IOException, InvalidRequestException, CommandException;
 }

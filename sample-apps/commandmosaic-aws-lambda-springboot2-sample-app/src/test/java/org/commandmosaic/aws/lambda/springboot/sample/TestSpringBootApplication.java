@@ -46,12 +46,12 @@ public class TestSpringBootApplication {
 
         Map<String, Object> arguments = Collections.singletonMap("name", "John Smith");
 
-        CommandDispatchRequest request = new CommandDispatchRequest();
+        Request request = new Request();
         request.setCommandName("GreetCommand");
         request.setParameters(arguments);
 
 
-        CommandDispatchResponse response = requestHandler.handleRequest(request, null);
+        ResultResponse response = requestHandler.handleRequest(request, null);
 
         Assert.assertNotNull(response);
 

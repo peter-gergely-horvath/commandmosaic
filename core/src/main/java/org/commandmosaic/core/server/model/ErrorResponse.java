@@ -14,14 +14,37 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.core.marshaller;
+ 
+package org.commandmosaic.core.server.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+public class ErrorResponse {
 
-public interface Marshaller {
-    <T> T unmarshal(InputStream requestInputStream, Class<T> object) throws IOException;
+    private Object id;
+    private ErrorModel error;
 
-    void marshal(OutputStream responseOutputStream, Object value) throws IOException;
+    public ErrorResponse() {
+    }
+
+    public ErrorResponse(Object id, ErrorModel error) {
+        this.id = id;
+        this.error = error;
+    }
+
+    public Object getId() {
+        return id;
+    }
+
+    public void setId(Object id) {
+        this.id = id;
+    }
+
+    public ErrorModel getError() {
+        return error;
+    }
+
+    public void setError(ErrorModel error) {
+        this.error = error;
+    }
+
+
 }

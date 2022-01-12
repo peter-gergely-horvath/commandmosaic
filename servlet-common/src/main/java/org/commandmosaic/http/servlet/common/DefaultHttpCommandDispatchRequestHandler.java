@@ -17,26 +17,24 @@
 package org.commandmosaic.http.servlet.common;
 
 import org.commandmosaic.api.server.*;
+import org.commandmosaic.core.marshaller.UnmarshalException;
+import org.commandmosaic.core.server.DefaultDispatchContext;
 import org.commandmosaic.core.server.DefaultDispatchRequest;
 import org.commandmosaic.core.server.DefaultDispatchResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.function.Supplier;
+import java.util.Objects;
 
 
 public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDispatchRequestHandler {
 
-    private final Logger log = LoggerFactory.getLogger(DefaultHttpCommandDispatchRequestHandler.class);
-
     private final CommandDispatcherServer commandDispatcherServer;
 
     public DefaultHttpCommandDispatchRequestHandler(CommandDispatcherServer commandDispatcherServer) {
+        Objects.requireNonNull(commandDispatcherServer, "argument commandDispatcherServer cannot be null");
         this.commandDispatcherServer = commandDispatcherServer;
     }
 
@@ -46,22 +44,12 @@ public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDisp
         try {
 
             DispatchRequest request = new DefaultDispatchRequest(httpServletRequest.getInputStream());
-            DispatchResponse response = new DefaultDispatchResponse(getAsSupplier(httpServletResponse));
+            DispatchContext context = new DefaultDispatchContext();
+            DispatchResponse response = new DefaultDispatchResponse(httpServletResponse.getOutputStream());
 
-            response.addListener(failure -> onFailure(httpServletResponse, failure));
+            context.addListener(failure -> onFailure(httpServletResponse, failure));
 
-            commandDispatcherServer.serviceRequest(request, response);
-
-        } catch (CommandException e) {
-            /*
-            The server has written the expected error response body already,
-            the listener has set the response status code already in
-            onFailure(HttpServletResponse, Throwable)
-
-            Since the response payload has been written already,
-            we CANNOT change the status code here: we only log here.
-             */
-            log.debug("Request failed", e);
+            commandDispatcherServer.serviceRequest(request, context, response);
 
         } catch (RuntimeException e) {
             throw new ServletException(e);
@@ -70,23 +58,15 @@ public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDisp
 
     protected void onFailure(HttpServletResponse httpServletResponse, Throwable failure) {
 
-        if (failure instanceof InvalidRequestException) {
+        if (failure instanceof InvalidRequestException
+                || failure instanceof UnmarshalException) {
+
             httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
         } else {
+
             httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
         }
     }
-
-    private Supplier<OutputStream> getAsSupplier(HttpServletResponse httpServletResponse) {
-        return () -> {
-            try {
-                return httpServletResponse.getOutputStream();
-            } catch (IOException e) {
-                throw new RuntimeException("Could not get OutputStream from HttpServletResponse", e);
-            }
-        };
-    }
-
 }

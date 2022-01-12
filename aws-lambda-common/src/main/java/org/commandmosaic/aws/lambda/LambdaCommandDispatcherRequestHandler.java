@@ -20,13 +20,11 @@ package org.commandmosaic.aws.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import org.commandmosaic.api.CommandDispatcher;
-import org.commandmosaic.api.server.CommandDispatcherServer;
-import org.commandmosaic.api.server.CommandException;
-import org.commandmosaic.api.server.DispatchRequest;
-import org.commandmosaic.api.server.DispatchResponse;
+import org.commandmosaic.api.server.*;
 import org.commandmosaic.core.server.DefaultCommandDispatcherServer;
 import org.commandmosaic.core.server.DefaultDispatchRequest;
 import org.commandmosaic.core.server.DefaultDispatchResponse;
+import org.commandmosaic.core.server.EmptyDispatchContext;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,12 +46,9 @@ public abstract class LambdaCommandDispatcherRequestHandler implements RequestSt
     public void handleRequest(InputStream input, OutputStream output, Context context) {
         try {
             DispatchRequest request = new DefaultDispatchRequest(input);
-            DispatchResponse response = new DefaultDispatchResponse(() -> output);
+            DispatchResponse response = new DefaultDispatchResponse(output);
 
-            commandDispatcherServer.serviceRequest(request, response);
-        }
-        catch (CommandException e) {
-            throw e;
+            commandDispatcherServer.serviceRequest(request, EmptyDispatchContext.INSTANCE, response);
         }
         catch (IOException | RuntimeException ex) {
             // unexpected error: we throw an exception in this case

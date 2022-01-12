@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.core.marshaller;
+package org.commandmosaic.core.server;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 
-public interface Marshaller {
-    <T> T unmarshal(InputStream requestInputStream, Class<T> object) throws UnmarshalException;
+import org.commandmosaic.api.server.DispatchContext;
 
-    void marshal(OutputStream responseOutputStream, Object value) throws MarshalException;
+public final class EmptyDispatchContext implements DispatchContext {
+
+    public static final EmptyDispatchContext INSTANCE = new EmptyDispatchContext();
+
+    private EmptyDispatchContext() {
+        // no external instances allowed
+    }
+
+
+    @Override
+    public void addListener(FailureListener failureListener) {
+        // no-op
+    }
+
+    @Override
+    public void notifyErrorListeners(Throwable throwable) {
+        // no-op
+    }
 }

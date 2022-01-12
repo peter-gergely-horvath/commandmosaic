@@ -19,8 +19,6 @@ package org.commandmosaic.core.server;
 import org.commandmosaic.api.server.DispatchResponse;
 
 import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class DefaultDispatchResponse implements DispatchResponse {
@@ -28,7 +26,9 @@ public class DefaultDispatchResponse implements DispatchResponse {
     private final Supplier<OutputStream> outputStreamSupplier;
     private final Supplier<OutputStream> errorStreamSupplier;
 
-    private List<FailureListener> failureListenersList;
+    public DefaultDispatchResponse(OutputStream outputStream) {
+        this(() -> outputStream);
+    }
 
     public DefaultDispatchResponse(Supplier<OutputStream> streamSupplier) {
         this(streamSupplier, streamSupplier);
@@ -50,22 +50,5 @@ public class DefaultDispatchResponse implements DispatchResponse {
         return errorStreamSupplier.get();
     }
 
-    @Override
-    public void notifyErrorListeners(Throwable throwable) {
-        if (failureListenersList != null) {
-            for(FailureListener failureListener : failureListenersList) {
-                failureListener.onFailure(throwable);
-            }
-        }
 
-    }
-
-    @Override
-    public void addListener(FailureListener failureListener) {
-        if (failureListenersList == null) {
-            failureListenersList = new LinkedList<>();
-        }
-
-        failureListenersList.add(failureListener);
-    }
 }

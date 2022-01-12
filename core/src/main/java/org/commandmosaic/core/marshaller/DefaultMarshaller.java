@@ -33,7 +33,7 @@ final class DefaultMarshaller implements Marshaller {
     }
 
     @Override
-    public <T> T unmarshal(InputStream requestInputStream, Class<T> type) throws IOException {
+    public <T> T unmarshal(InputStream requestInputStream, Class<T> type) throws UnmarshalException {
         Objects.requireNonNull(requestInputStream, "requestInputStream cannot be null");
         Objects.requireNonNull(type, "type cannot be null");
 
@@ -41,22 +41,21 @@ final class DefaultMarshaller implements Marshaller {
             return objectMapper.readValue(inputStreamReader, type);
         }
         catch (IOException e) {
-            throw new IOException("Failed to unmarshal " + type, e);
+            throw new UnmarshalException("Failed to unmarshal " + type, e);
         }
     }
 
     @Override
-    public void marshal(OutputStream responseOutputStream, Object value) throws IOException {
+    public void marshal(OutputStream responseOutputStream, Object value) throws MarshalException {
         Objects.requireNonNull(responseOutputStream, "responseOutputStream cannot be null");
         Objects.requireNonNull(responseOutputStream, "value cannot be null");
 
-        String jsonString = objectMapper.writeValueAsString(value);
-
         try (OutputStreamWriter writer = new OutputStreamWriter(responseOutputStream, StandardCharsets.UTF_8)) {
+            String jsonString = objectMapper.writeValueAsString(value);
             writer.write(jsonString);
         }
         catch (IOException e) {
-            throw new IOException("Failed to marshal: " + value, e);
+            throw new MarshalException("Failed to marshal: " + value, e);
         }
     }
 }

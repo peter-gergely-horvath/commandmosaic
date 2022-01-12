@@ -23,9 +23,7 @@ import com.google.gson.ToNumberPolicy;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -47,6 +45,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CommandDispatcherServletTest {
+
+    private static final Type HASHMAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
+
+    private final Gson gson = new Gson();
+
 
     private static final int port = 12345;
     private static Server server;
@@ -98,8 +101,7 @@ public class CommandDispatcherServletTest {
         String jsonResponse = getResponseBodyAsString(httpResponse);
         Assert.assertNotNull(jsonResponse);
 
-        Type typeOfHashMap = new TypeToken<Map<String, Object>>() { }.getType();
-        Map<String, Object> responseAsMap = gson.fromJson(jsonResponse, typeOfHashMap);
+        Map<String, Object> responseAsMap = gson.fromJson(jsonResponse, HASHMAP_TYPE);
 
 
         Object resultObject = responseAsMap.get("result");
@@ -110,6 +112,43 @@ public class CommandDispatcherServletTest {
         Assert.assertEquals(requestId, requestIdObject);
 
         Assert.assertEquals("Hello John Smith", resultObject);
+    }
+
+    @Test
+    public void testInvalidPayloadRequest() throws Exception {
+
+        String requestString = "Hello world!";
+
+        Request httpRequest = Request.Post("http://localhost:" + port)
+                .bodyString(requestString, ContentType.APPLICATION_JSON);
+
+        HttpResponse httpResponse = httpRequest.execute().returnResponse();
+
+        final int statusCode = httpResponse.getStatusLine().getStatusCode();
+
+        final int badRequestStatus = 400;
+        Assert.assertEquals(badRequestStatus, statusCode);
+
+        String jsonResponse = getResponseBodyAsString(httpResponse);
+        Assert.assertNotNull(jsonResponse);
+
+        Map<String, Object> responseAsMap = gson.fromJson(jsonResponse, HASHMAP_TYPE);
+        Assert.assertNotNull(responseAsMap);
+
+        Object errorObject = responseAsMap.get("error");
+        Assert.assertNotNull(errorObject);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> error = (Map<String, Object>) errorObject;
+
+        Object errorMessage = error.get("errorMessage");
+        Assert.assertNotNull(errorMessage);
+        Assert.assertEquals("Failed to unmarshal class org.commandmosaic.core.server.model.Request", errorMessage);
+
+
+        Object message = error.get("errorType");
+        Assert.assertNotNull(message);
+        Assert.assertEquals("org.commandmosaic.core.marshaller.UnmarshalException", message);
     }
 
     @Test
@@ -141,7 +180,6 @@ public class CommandDispatcherServletTest {
     @Test
     public void testMissingProtocolRequest() throws Exception {
 
-        Gson gson = new Gson();
         Map<String, Object> request = new HashMap<>();
         request.put("command", "GreetCommand");
         request.put("parameters", Collections.singletonMap("name", "John Smith"));

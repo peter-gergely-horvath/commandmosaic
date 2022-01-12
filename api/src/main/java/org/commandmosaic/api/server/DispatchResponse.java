@@ -17,24 +17,9 @@
 package org.commandmosaic.api.server;
 
 import java.io.OutputStream;
-import java.util.EventListener;
 
 public interface DispatchResponse {
     OutputStream getOutputStream();
 
     OutputStream getErrorStream();
-
-    void notifyErrorListeners(Throwable throwable);
-
-    interface ResponseListener extends EventListener {
-        // marker interface
-    }
-
-    @FunctionalInterface
-    interface FailureListener extends ResponseListener {
-        void onFailure(Throwable failure);
-    }
-
-    void addListener(FailureListener failureListener);
-
 }

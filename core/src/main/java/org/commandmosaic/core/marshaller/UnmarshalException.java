@@ -16,11 +16,17 @@
 
 package org.commandmosaic.core.marshaller;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+public class UnmarshalException extends Exception {
 
-public interface Marshaller {
-    <T> T unmarshal(InputStream requestInputStream, Class<T> object) throws UnmarshalException;
+    public UnmarshalException(String message) {
+        super(message);
+    }
 
-    void marshal(OutputStream responseOutputStream, Object value) throws MarshalException;
+    public UnmarshalException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public UnmarshalException(Throwable cause) {
+        super(cause);
+    }
 }

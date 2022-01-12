@@ -20,8 +20,10 @@ package org.commandmosaic.core.server;
 import org.commandmosaic.api.CommandContext;
 import org.commandmosaic.api.CommandDispatcher;
 import org.commandmosaic.api.server.*;
+import org.commandmosaic.core.marshaller.MarshalException;
 import org.commandmosaic.core.marshaller.Marshaller;
 import org.commandmosaic.core.marshaller.MarshallerFactory;
+import org.commandmosaic.core.marshaller.UnmarshalException;
 import org.commandmosaic.core.server.context.DefaultCommandContext;
 import org.commandmosaic.core.server.model.*;
 import org.slf4j.Logger;
@@ -56,28 +58,19 @@ public class DefaultCommandDispatcherServer implements CommandDispatcherServer {
 
 
     @Override
-    public void serviceRequest(DispatchRequest dispatchRequest, DispatchResponse dispatchResponse)
-            throws IOException, CommandException {
-
-        Request request = unmarshalRequest(dispatchRequest.getInputStream());
-        logger.trace("Servicing request {}", request);
-
-        Object requestId = request.getId();
-
+    public void serviceRequest(DispatchRequest dispatchRequest,
+                               DispatchContext dispatchContext,
+                               DispatchResponse dispatchResponse) throws IOException {
+        Object requestId = null;
         try {
-            String requestProtocol = request.getProtocol();
-            String expectedProtocolVersion = ProtocolConstants.PROTOCOL_VERSION;
-            if (!expectedProtocolVersion.equals(requestProtocol)) {
-                logger.warn("Invalid protocol version: {}; dispatching rejected", request);
-                throw new InvalidRequestException("Request protocol version is invalid: '"
-                        + requestProtocol + "'; expected: " + expectedProtocolVersion);
-            }
+            Request request = unmarshalRequest(dispatchRequest.getInputStream());
+            logger.trace("Servicing request {}", request);
 
-            String commandName = request.getCommand();
-            if (commandName == null || commandName.trim().isEmpty()) {
-                logger.warn("Command is not specified in request, dispatching rejected: {}", request);
-                throw new InvalidRequestException("Command is not specified");
-            }
+            requestId = request.getId();
+
+            checkRequestProtocol(request);
+
+            String commandName = getCommandName(request);
 
             Map<String, Object> parameters = request.getParameters();
             logger.debug("Parameters: {}", parameters);
@@ -87,41 +80,59 @@ public class DefaultCommandDispatcherServer implements CommandDispatcherServer {
 
             CommandContext commandContext = new DefaultCommandContext(auth);
 
-
             Object result = commandDispatcher.dispatchCommand(commandName, parameters, commandContext);
 
             ResultResponse response = new ResultResponse(requestId, result);
 
             marshalResponse(dispatchResponse.getOutputStream(), response);
-        } catch (CommandException e) {
 
-            dispatchResponse.notifyErrorListeners(e);
+        } catch (CommandException | UnmarshalException | MarshalException e) {
+            dispatchContext.notifyErrorListeners(e);
 
             logger.warn("Command failed with exception", e);
 
-            marshalFailure(dispatchResponse.getErrorStream(), requestId, e);
+            try {
+                marshalFailure(dispatchResponse.getErrorStream(), requestId, e);
+            } catch (MarshalException me) { // should not happen
+                logger.error("Failed to marshall failure response", me);
 
-            /*
-            Transports likely want to know if this was success or failure:
-            propagate CommandException to them after we have written the
-            error response payload
-            */
-
-            throw e;
+                IOException ioException = new IOException(me);
+                ioException.addSuppressed(me);
+                throw ioException;
+            }
         }
     }
 
-    protected Request unmarshalRequest(InputStream requestInputStream) throws IOException {
+    private void checkRequestProtocol(Request request) {
+        String requestProtocol = request.getProtocol();
+        String expectedProtocolVersion = ProtocolConstants.PROTOCOL_VERSION;
+        if (!expectedProtocolVersion.equals(requestProtocol)) {
+            logger.warn("Invalid protocol version: {}; dispatching rejected", request);
+            throw new InvalidRequestException("Request protocol version is invalid: '"
+                    + requestProtocol + "'; expected: " + expectedProtocolVersion);
+        }
+    }
+
+    private String getCommandName(Request request) {
+        String commandName = request.getCommand();
+        if (commandName == null || commandName.trim().isEmpty()) {
+            logger.warn("Command is not specified in request, dispatching rejected: {}", request);
+            throw new InvalidRequestException("Command is not specified");
+        }
+        return commandName;
+    }
+
+    protected Request unmarshalRequest(InputStream requestInputStream) throws UnmarshalException {
         return marshaller.unmarshal(requestInputStream, Request.class);
     }
 
 
-    protected void marshalResponse(OutputStream responseOutputStream, Object response) throws IOException {
+    protected void marshalResponse(OutputStream responseOutputStream, Object response) throws MarshalException {
         marshaller.marshal(responseOutputStream, response);
     }
 
     protected void marshalFailure(
-            OutputStream responseOutputStream, Object id, Throwable throwable) throws IOException {
+            OutputStream responseOutputStream, Object id, Throwable throwable) throws MarshalException {
 
         Objects.requireNonNull(responseOutputStream, "responseOutputStream cannot be null");
         Objects.requireNonNull(throwable, "throwable cannot be null");

@@ -48,6 +48,7 @@ public interface CommandDispatcherServer {
      * command execution is written to the {@code OutputStream}.
      * </p>
      */
-    void serviceRequest(DispatchRequest dispatchRequest, DispatchResponse dispatchResponse)
-            throws IOException, InvalidRequestException, CommandException;
+    void serviceRequest(DispatchRequest request,
+                        DispatchContext context,
+                        DispatchResponse response) throws IOException;
 }

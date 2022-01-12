@@ -48,16 +48,20 @@ public class CommandDispatcherServletTest {
 
     private static final Type HASHMAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
 
-    private static final int PORT = 12345;
+    private static final int port = 12345;
+    private static final String localAddress = "http://localhost:" + port;
 
     private static Server server;
 
-    private final Gson gson = new Gson();
+    // Gson is used to parse responses easily
+    private final Gson gson = new GsonBuilder()
+            .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+            .create();
 
     @BeforeClass
     public static void beforeTests() throws Exception {
 
-        server = new Server(PORT);
+        server = new Server(port);
 
         ServletHandler handler = new ServletHandler();
         server.setHandler(handler);
@@ -80,7 +84,6 @@ public class CommandDispatcherServletTest {
 
         final long requestId = 42;
 
-        Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create();
         Map<String, Object> request = new HashMap<>();
         request.put("id", requestId);
         request.put("command", "GreetCommand");
@@ -89,7 +92,7 @@ public class CommandDispatcherServletTest {
 
         String requestString = gson.toJson(request);
 
-        HttpResponse httpResponse = Request.Post("http://localhost:" + PORT)
+        HttpResponse httpResponse = Request.Post(localAddress)
                 .bodyString(requestString, ContentType.APPLICATION_JSON)
                 .execute().returnResponse();
 
@@ -119,7 +122,7 @@ public class CommandDispatcherServletTest {
 
         String requestString = "Hello world!";
 
-        Request httpRequest = Request.Post("http://localhost:" + PORT)
+        Request httpRequest = Request.Post(localAddress)
                 .bodyString(requestString, ContentType.APPLICATION_JSON);
 
         HttpResponse httpResponse = httpRequest.execute().returnResponse();
@@ -134,6 +137,9 @@ public class CommandDispatcherServletTest {
 
         Map<String, Object> responseAsMap = gson.fromJson(jsonResponse, HASHMAP_TYPE);
         Assert.assertNotNull(responseAsMap);
+
+        Object resultObject = responseAsMap.get("result");
+        Assert.assertNull(resultObject); // if request failed, result must be null
 
         Object errorObject = responseAsMap.get("error");
         Assert.assertNotNull(errorObject);
@@ -162,7 +168,7 @@ public class CommandDispatcherServletTest {
 
         String requestString = gson.toJson(request);
 
-        Request httpRequest = Request.Post("http://localhost:" + PORT)
+        Request httpRequest = Request.Post(localAddress)
                 .bodyString(requestString, ContentType.APPLICATION_JSON);
 
         HttpResponse httpResponse = httpRequest.execute().returnResponse();
@@ -186,7 +192,7 @@ public class CommandDispatcherServletTest {
 
         String requestString = gson.toJson(request);
 
-        Request httpRequest = Request.Post("http://localhost:" + PORT)
+        Request httpRequest = Request.Post(localAddress)
                 .bodyString(requestString, ContentType.APPLICATION_JSON);
 
         HttpResponse httpResponse = httpRequest.execute().returnResponse();

@@ -17,15 +17,15 @@
 package org.commandmosaic.security.web;
 
 import org.commandmosaic.api.server.CommandDispatcherServer;
-import org.commandmosaic.http.servlet.common.DefaultHttpCommandDispatchRequestHandler;
+import org.commandmosaic.http.servlet.common.DefaultHttpServletTransport;
 import org.commandmosaic.security.AccessDeniedException;
 import org.commandmosaic.security.AuthenticationException;
 
 import javax.servlet.http.HttpServletResponse;
 
-public class SecurityAwareHttpCommandDispatchRequestHandler extends DefaultHttpCommandDispatchRequestHandler {
+public class SecurityAwareHttpServletTransport extends DefaultHttpServletTransport {
 
-    public SecurityAwareHttpCommandDispatchRequestHandler(CommandDispatcherServer commandDispatcherServer) {
+    public SecurityAwareHttpServletTransport(CommandDispatcherServer commandDispatcherServer) {
         super(commandDispatcherServer);
     }
 

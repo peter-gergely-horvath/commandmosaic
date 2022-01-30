@@ -29,11 +29,11 @@ import java.io.IOException;
 import java.util.Objects;
 
 
-public class DefaultHttpCommandDispatchRequestHandler implements HttpCommandDispatchRequestHandler {
+public class DefaultHttpServletTransport implements HttpServletTransport {
 
     private final CommandDispatcherServer commandDispatcherServer;
 
-    public DefaultHttpCommandDispatchRequestHandler(CommandDispatcherServer commandDispatcherServer) {
+    public DefaultHttpServletTransport(CommandDispatcherServer commandDispatcherServer) {
         Objects.requireNonNull(commandDispatcherServer, "argument commandDispatcherServer cannot be null");
         this.commandDispatcherServer = commandDispatcherServer;
     }

@@ -17,39 +17,39 @@
 package org.commandmosaic.http.servlet.common.factory;
 
 import org.commandmosaic.api.server.CommandDispatcherServer;
-import org.commandmosaic.http.servlet.common.HttpCommandDispatchRequestHandler;
+import org.commandmosaic.http.servlet.common.HttpServletTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-public abstract class HttpCommandDispatchRequestHandlerFactory {
+public abstract class HttpServletTransportFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpCommandDispatchRequestHandlerFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpServletTransportFactory.class);
 
-    public static HttpCommandDispatchRequestHandlerFactory getInstance() {
-        log.debug("Constructing new instance of HttpCommandDispatchRequestHandlerFactory");
+    public static HttpServletTransportFactory getInstance() {
+        log.debug("Constructing new instance of HttpServletTransportFactory");
 
-        log.trace("Performing ServiceLoader load for: {}", HttpCommandDispatchRequestHandlerFactory.class);
-        ServiceLoader<HttpCommandDispatchRequestHandlerFactory> serviceLoader = ServiceLoader
-                .load(HttpCommandDispatchRequestHandlerFactory.class);
+        log.trace("Performing ServiceLoader load for: {}", HttpServletTransportFactory.class);
+        ServiceLoader<HttpServletTransportFactory> serviceLoader = ServiceLoader
+                .load(HttpServletTransportFactory.class);
 
-        log.trace("Discovering available HttpCommandDispatchRequestHandlerFactory types");
-        Iterator<HttpCommandDispatchRequestHandlerFactory> iterator = serviceLoader.iterator();
+        log.trace("Discovering available HttpServletTransportFactory types");
+        Iterator<HttpServletTransportFactory> iterator = serviceLoader.iterator();
 
-        HttpCommandDispatchRequestHandlerFactory factory;
+        HttpServletTransportFactory factory;
         if (!iterator.hasNext()) {
             log.debug("No custom factory is discovered by ServiceLoader, falling back to default");
-            factory = new DefaultHttpCommandDispatchRequestHandlerFactory();
+            factory = new DefaultHttpServletTransportFactory();
         } else {
-            HttpCommandDispatchRequestHandlerFactory singleExpectedFactory = iterator.next();
+            HttpServletTransportFactory singleExpectedFactory = iterator.next();
             if (log.isTraceEnabled()) {
                 log.trace("Factory discovered: {}", singleExpectedFactory);
             }
 
             if (iterator.hasNext()) {
-                HttpCommandDispatchRequestHandlerFactory unexpectedAnotherFactoryFound = iterator.next();
+                HttpServletTransportFactory unexpectedAnotherFactoryFound = iterator.next();
                 log.warn("Unexpected additional factory discovered: {}", unexpectedAnotherFactoryFound);
 
                 throw new IllegalStateException(
@@ -68,6 +68,6 @@ public abstract class HttpCommandDispatchRequestHandlerFactory {
         return factory;
     }
 
-    public abstract HttpCommandDispatchRequestHandler getHttpCommandDispatchRequestHandler(
+    public abstract HttpServletTransport getHttpServletTransport(
             CommandDispatcherServer commandDispatcherServer);
 }

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package org.commandmosaic.http.servlet.common.factory;
+package org.commandmosaic.security.web.factory;
 
 import org.commandmosaic.api.server.CommandDispatcherServer;
-import org.commandmosaic.http.servlet.common.DefaultHttpCommandDispatchRequestHandler;
-import org.commandmosaic.http.servlet.common.HttpCommandDispatchRequestHandler;
+import org.commandmosaic.http.servlet.common.HttpServletTransport;
+import org.commandmosaic.http.servlet.common.factory.HttpServletTransportFactory;
+import org.commandmosaic.security.web.SecurityAwareHttpServletTransport;
 
-final class DefaultHttpCommandDispatchRequestHandlerFactory extends HttpCommandDispatchRequestHandlerFactory {
+public class SecurityAwareHttpServletTransportFactory extends HttpServletTransportFactory {
 
     @Override
-    public HttpCommandDispatchRequestHandler getHttpCommandDispatchRequestHandler(
+    public HttpServletTransport getHttpServletTransport(
             CommandDispatcherServer commandDispatcherServer) {
 
-        return new DefaultHttpCommandDispatchRequestHandler(commandDispatcherServer);
+        return new SecurityAwareHttpServletTransport(commandDispatcherServer);
     }
 }

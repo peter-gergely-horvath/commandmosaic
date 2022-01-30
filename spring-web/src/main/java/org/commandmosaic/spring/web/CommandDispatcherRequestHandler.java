@@ -18,8 +18,8 @@
 package org.commandmosaic.spring.web;
 
 import org.commandmosaic.api.server.CommandDispatcherServer;
-import org.commandmosaic.http.servlet.common.HttpCommandDispatchRequestHandler;
-import org.commandmosaic.http.servlet.common.factory.HttpCommandDispatchRequestHandlerFactory;
+import org.commandmosaic.http.servlet.common.HttpServletTransport;
+import org.commandmosaic.http.servlet.common.factory.HttpServletTransportFactory;
 import org.springframework.web.HttpRequestHandler;
 
 import javax.servlet.ServletException;
@@ -29,18 +29,18 @@ import java.io.IOException;
 
 public class CommandDispatcherRequestHandler implements HttpRequestHandler {
 
-    private final HttpCommandDispatchRequestHandler httpServletRequestHandler;
+    private final HttpServletTransport httpServletTransport;
 
     public CommandDispatcherRequestHandler(CommandDispatcherServer commandDispatcherServer) {
-        HttpCommandDispatchRequestHandlerFactory factory = HttpCommandDispatchRequestHandlerFactory.getInstance();
+        HttpServletTransportFactory factory = HttpServletTransportFactory.getInstance();
 
-        this.httpServletRequestHandler = factory.getHttpCommandDispatchRequestHandler(commandDispatcherServer);
+        this.httpServletTransport = factory.getHttpServletTransport(commandDispatcherServer);
     }
 
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        httpServletRequestHandler.handleRequest(request, response);
+        httpServletTransport.handleRequest(request, response);
     }
 }

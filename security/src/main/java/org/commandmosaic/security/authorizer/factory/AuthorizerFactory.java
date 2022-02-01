@@ -17,55 +17,16 @@
 package org.commandmosaic.security.authorizer.factory;
 
 import org.commandmosaic.api.Command;
+import org.commandmosaic.core.factory.support.ServiceLoaderSupport;
 import org.commandmosaic.security.authorizer.Authorizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 public abstract class AuthorizerFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthorizerFactory.class);
+    private static final ServiceLoaderSupport<AuthorizerFactory> serviceLoaderSupport =
+            new ServiceLoaderSupport<>(AuthorizerFactory.class);
 
     public static AuthorizerFactory getInstance() {
-        log.debug("Constructing new instance of AuthorizerFactory");
-
-        log.trace("Performing ServiceLoader load for: {}", AuthorizerFactory.class);
-        ServiceLoader<AuthorizerFactory> serviceLoader = ServiceLoader
-                .load(AuthorizerFactory.class);
-
-        log.trace("Discovering available AuthorizerFactory types");
-        Iterator<AuthorizerFactory> iterator = serviceLoader.iterator();
-
-        AuthorizerFactory factory;
-        if (!iterator.hasNext()) {
-            log.debug("No custom factory is discovered by ServiceLoader, falling back to default");
-            factory = new DefaultAuthorizerFactory();
-        } else {
-            AuthorizerFactory singleExpectedFactory = iterator.next();
-            if (log.isTraceEnabled()) {
-                log.trace("Factory discovered: {}", singleExpectedFactory);
-            }
-
-            if (iterator.hasNext()) {
-                AuthorizerFactory unexpectedAnotherFactoryFound = iterator.next();
-                log.warn("Unexpected additional factory discovered: {}", unexpectedAnotherFactoryFound);
-
-                throw new IllegalStateException(
-                        "Multiple implementations found (this is caused by misconfigured dependencies): "
-                                + singleExpectedFactory.getClass() + ", " + unexpectedAnotherFactoryFound.getClass());
-            }
-
-            factory = singleExpectedFactory;
-        }
-
-
-        if(log.isDebugEnabled()) {
-            log.debug("Factory used: {}", factory.getClass());
-        }
-
-        return factory;
+        return serviceLoaderSupport.loadSingleServiceOrGetDefault(DefaultAuthorizerFactory::new);
     }
 
     public abstract Authorizer getAuthorizer(Class<? extends Command<?>> commandClass);

@@ -16,54 +16,15 @@
 
 package org.commandmosaic.core.marshaller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
-import java.util.ServiceLoader;
+import org.commandmosaic.core.factory.support.ServiceLoaderSupport;
 
 public abstract class MarshallerFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(MarshallerFactory.class);
+    private static final ServiceLoaderSupport<MarshallerFactory> serviceLoaderSupport =
+            new ServiceLoaderSupport<>(MarshallerFactory.class);
 
     public static MarshallerFactory getInstance() {
-        log.debug("Constructing new instance of MarshallerFactory");
-
-        log.trace("Performing ServiceLoader load for: {}", MarshallerFactory.class);
-        ServiceLoader<MarshallerFactory> serviceLoader = ServiceLoader
-                .load(MarshallerFactory.class);
-
-        log.trace("Discovering available MarshallerFactory types");
-        Iterator<MarshallerFactory> iterator = serviceLoader.iterator();
-
-        MarshallerFactory factory;
-        if (!iterator.hasNext()) {
-            log.debug("No custom factory is discovered by ServiceLoader, falling back to default");
-            factory = new DefaultMarshallerFactory();
-        } else {
-            MarshallerFactory singleExpectedFactory = iterator.next();
-            if (log.isTraceEnabled()) {
-                log.trace("Factory discovered: {}", singleExpectedFactory);
-            }
-
-            if (iterator.hasNext()) {
-                MarshallerFactory unexpectedAnotherFactoryFound = iterator.next();
-                log.warn("Unexpected additional factory discovered: {}", unexpectedAnotherFactoryFound);
-
-                throw new IllegalStateException(
-                        "Multiple implementations found (this is caused by misconfigured dependencies): "
-                                + singleExpectedFactory.getClass() + ", " + unexpectedAnotherFactoryFound.getClass());
-            }
-
-            factory = singleExpectedFactory;
-        }
-
-
-        if(log.isDebugEnabled()) {
-            log.debug("Factory used: {}", factory.getClass());
-        }
-
-        return factory;
+        return serviceLoaderSupport.loadSingleServiceOrGetDefault(DefaultMarshallerFactory::new);
     }
 
     public abstract Marshaller getMarshaller();

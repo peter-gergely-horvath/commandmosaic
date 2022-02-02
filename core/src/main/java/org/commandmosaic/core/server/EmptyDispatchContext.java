@@ -34,7 +34,7 @@ public final class EmptyDispatchContext implements DispatchContext {
     }
 
     @Override
-    public void notifyErrorListeners(Throwable throwable) {
+    public void notifyFailureListeners(Throwable throwable) {
         // no-op
     }
 }

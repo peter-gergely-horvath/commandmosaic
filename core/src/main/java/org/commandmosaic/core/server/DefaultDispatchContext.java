@@ -23,12 +23,12 @@ import java.util.List;
 
 public class DefaultDispatchContext implements DispatchContext {
 
-    private List<DispatchContext.FailureListener> failureListenersList;
+    private List<DispatchContext.FailureListener> failureListenerList;
 
     @Override
-    public void notifyErrorListeners(Throwable throwable) {
-        if (failureListenersList != null) {
-            for(DispatchContext.FailureListener failureListener : failureListenersList) {
+    public void notifyFailureListeners(Throwable throwable) {
+        if (failureListenerList != null) {
+            for(DispatchContext.FailureListener failureListener : failureListenerList) {
                 failureListener.onFailure(throwable);
             }
         }
@@ -37,10 +37,10 @@ public class DefaultDispatchContext implements DispatchContext {
 
     @Override
     public void addListener(DispatchContext.FailureListener failureListener) {
-        if (failureListenersList == null) {
-            failureListenersList = new LinkedList<>();
+        if (failureListenerList == null) {
+            failureListenerList = new LinkedList<>();
         }
 
-        failureListenersList.add(failureListener);
+        failureListenerList.add(failureListener);
     }
 }

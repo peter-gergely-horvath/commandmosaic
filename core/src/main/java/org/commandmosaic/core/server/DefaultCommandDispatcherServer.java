@@ -87,7 +87,7 @@ public class DefaultCommandDispatcherServer implements CommandDispatcherServer {
             marshalResponse(dispatchResponse.getOutputStream(), response);
 
         } catch (CommandException | UnmarshalException | MarshalException e) {
-            dispatchContext.notifyErrorListeners(e);
+            dispatchContext.notifyFailureListeners(e);
 
             logger.warn("Command failed with exception", e);
 

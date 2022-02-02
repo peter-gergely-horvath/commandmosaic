@@ -49,28 +49,28 @@ public final class ServiceLoaderSupport<T> {
         log.trace("Discovering available {} types", className);
         Iterator<T> iterator = serviceLoader.iterator();
 
-        T factory;
+        T service;
         if (!iterator.hasNext()) {
-            log.debug("No custom factory is discovered by ServiceLoader, falling back to default");
-            factory = defaultSupplier.get();
+            log.debug("No custom {} is discovered by ServiceLoader, falling back to default", className);
+            service = defaultSupplier.get();
         } else {
-            T singleExpectedFactory = iterator.next();
-            log.trace("Factory discovered: {}", singleExpectedFactory);
+            T singleExpectedService = iterator.next();
+            log.trace("Discovered: {}", singleExpectedService);
 
             if (iterator.hasNext()) {
-                T unexpectedAnotherFactoryFound = iterator.next();
-                log.warn("Unexpected additional factory discovered: {}", unexpectedAnotherFactoryFound);
+                T unexpectedAnotherServiceFound = iterator.next();
+                log.error("Unexpected additional class discovered: {}", unexpectedAnotherServiceFound);
 
                 throw new IllegalStateException(
                         "Multiple implementations found (this is caused by misconfigured dependencies): "
-                                + singleExpectedFactory.getClass() + ", " + unexpectedAnotherFactoryFound.getClass());
+                                + singleExpectedService.getClass() + ", " + unexpectedAnotherServiceFound.getClass());
             }
 
-            factory = singleExpectedFactory;
+            service = singleExpectedService;
         }
 
-        log.debug("Factory used: {}", factory.getClass());
+        log.debug("Service loaded: {}", service.getClass());
 
-        return factory;
+        return service;
     }
 }

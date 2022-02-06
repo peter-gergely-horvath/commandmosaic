@@ -21,21 +21,14 @@ import org.commandmosaic.security.core.Identity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 public abstract class AbstractUsernamePasswordAuthenticationService<T>
         implements UsernamePasswordAuthenticationService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final String dummyEncodedPassword;
-
-    protected AbstractUsernamePasswordAuthenticationService(Function<String, String> passwordEncodeFunction) {
-        Objects.requireNonNull(passwordEncodeFunction, "argument passwordEncodeFunction cannot be null");
-        this.dummyEncodedPassword = passwordEncodeFunction.apply("userNotFoundPassword");
-    }
+    private volatile String dummyEncodedPassword;
 
     @Override
     public final Identity authenticateUser(String userName, String password) throws AuthenticationException {
@@ -58,10 +51,12 @@ public abstract class AbstractUsernamePasswordAuthenticationService<T>
                 }
             } else {
                 logger.debug("User '{}' is not found", userName);
-                // to avoid timing attacks, even if the user is not found,
-                // we still compare the password to this dummy value
+                // Artificial password encoding delay in case the user is not found.
+                // Used to avoid timing attacks, where an attacker can detect if a user name is valid or not
+                // by measuring a longer response time in case the user is found due to password encoding
+                // happening. If the user is not found, we still compare the password to a dummy value.
                 if (password != null) {
-                    checkPasswordMatches(password, dummyEncodedPassword);
+                    checkPasswordMatches(password, getDummyPassword());
                 }
             }
 
@@ -80,7 +75,18 @@ public abstract class AbstractUsernamePasswordAuthenticationService<T>
         }
     }
 
+    private String getDummyPassword() {
+        // NOTE: dummyEncodedPassword is volatile
+        if (dummyEncodedPassword == null) {
+            dummyEncodedPassword = encodePassword("userNotFoundPassword");
+        }
+
+        return dummyEncodedPassword;
+    }
+
     protected abstract Optional<T> loadUserByUsername(String userName) throws AuthenticationException;
+
+    protected abstract String encodePassword(String clearTextPassword);
 
     protected abstract String getEncodedPassword(T user) throws AuthenticationException;
 

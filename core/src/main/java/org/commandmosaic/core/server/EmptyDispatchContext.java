@@ -29,7 +29,7 @@ public final class EmptyDispatchContext implements DispatchContext {
 
 
     @Override
-    public void addListener(FailureListener failureListener) {
+    public void addFailureListener(FailureListener failureListener) {
         // no-op
     }
 

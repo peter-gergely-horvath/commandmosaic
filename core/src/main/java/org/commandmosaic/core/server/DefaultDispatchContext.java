@@ -36,7 +36,7 @@ public class DefaultDispatchContext implements DispatchContext {
     }
 
     @Override
-    public void addListener(DispatchContext.FailureListener failureListener) {
+    public void addFailureListener(DispatchContext.FailureListener failureListener) {
         if (failureListenerList == null) {
             failureListenerList = new LinkedList<>();
         }

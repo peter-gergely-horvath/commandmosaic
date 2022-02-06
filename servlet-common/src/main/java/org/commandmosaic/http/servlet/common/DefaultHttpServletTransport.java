@@ -47,7 +47,7 @@ public class DefaultHttpServletTransport implements HttpServletTransport {
             DispatchContext context = new DefaultDispatchContext();
             DispatchResponse response = new DefaultDispatchResponse(httpServletResponse.getOutputStream());
 
-            context.addListener(failure -> onFailure(httpServletResponse, failure));
+            context.addFailureListener(failure -> onFailure(httpServletResponse, failure));
 
             commandDispatcherServer.serviceRequest(request, context, response);
 

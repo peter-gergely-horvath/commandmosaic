@@ -25,7 +25,7 @@ public interface DispatchContext {
         void onFailure(Throwable failure);
     }
 
-    void addListener(FailureListener failureListener);
+    void addFailureListener(FailureListener failureListener);
 
     void notifyFailureListeners(Throwable throwable);
 

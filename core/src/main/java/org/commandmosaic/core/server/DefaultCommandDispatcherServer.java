@@ -59,8 +59,8 @@ public class DefaultCommandDispatcherServer implements CommandDispatcherServer {
 
     @Override
     public void serviceRequest(DispatchRequest dispatchRequest,
-                               DispatchContext dispatchContext,
-                               DispatchResponse dispatchResponse) throws IOException {
+                               DispatchResponse dispatchResponse,
+                               DispatchContext dispatchContext) throws IOException {
         Object requestId = null;
         try {
             Request request = unmarshalRequest(dispatchRequest.getInputStream());

@@ -20,35 +20,35 @@ package org.commandmosaic.aws.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import org.commandmosaic.api.CommandDispatcher;
-import org.commandmosaic.api.server.*;
+import org.commandmosaic.api.server.CommandDispatcherServer;
+import org.commandmosaic.aws.lambda.transport.LambdaTransport;
 import org.commandmosaic.core.server.DefaultCommandDispatcherServer;
-import org.commandmosaic.core.server.DefaultDispatchRequest;
-import org.commandmosaic.core.server.DefaultDispatchResponse;
-import org.commandmosaic.core.server.EmptyDispatchContext;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 public abstract class LambdaCommandDispatcherRequestHandler implements RequestStreamHandler {
 
-    protected final CommandDispatcherServer commandDispatcherServer;
+    protected final LambdaTransport lambdaTransport;
 
     protected LambdaCommandDispatcherRequestHandler(CommandDispatcher commandDispatcher) {
         this(new DefaultCommandDispatcherServer(commandDispatcher));
     }
 
     protected LambdaCommandDispatcherRequestHandler(CommandDispatcherServer commandDispatcherServer) {
-        this.commandDispatcherServer = commandDispatcherServer;
+        this(new LambdaTransport(commandDispatcherServer));
+    }
+
+    protected LambdaCommandDispatcherRequestHandler(LambdaTransport lambdaTransport) {
+        this.lambdaTransport = Objects.requireNonNull(lambdaTransport, "argument lambdaTransport cannot be null");
     }
 
     @Override
     public void handleRequest(InputStream input, OutputStream output, Context context) {
         try {
-            DispatchRequest request = new DefaultDispatchRequest(input);
-            DispatchResponse response = new DefaultDispatchResponse(output);
-
-            commandDispatcherServer.serviceRequest(request, EmptyDispatchContext.INSTANCE, response);
+            lambdaTransport.handleRequest(input, output);
         }
         catch (IOException | RuntimeException ex) {
             // unexpected error: we throw an exception in this case

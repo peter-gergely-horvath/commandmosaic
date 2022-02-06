@@ -49,7 +49,7 @@ public class DefaultHttpServletTransport implements HttpServletTransport {
 
             context.addFailureListener(failure -> onFailure(httpServletResponse, failure));
 
-            commandDispatcherServer.serviceRequest(request, context, response);
+            commandDispatcherServer.serviceRequest(request, response, context);
 
         } catch (RuntimeException e) {
             throw new ServletException(e);

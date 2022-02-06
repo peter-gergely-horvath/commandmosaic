@@ -43,12 +43,22 @@ public interface CommandDispatcherServer {
     /**
      * <p>
      * Called to service an incoming message that contains a request for
-     * dispatching a command. The dispatch request is read from the
-     * {@code InputStream}, the command is dispatched and the result of the
-     * command execution is written to the {@code OutputStream}.
-     * </p>
+     * dispatching a command.</p>
+     *
+     * <p>
+     * The dispatch request is read from the {@code InputStream} passed in
+     * the {@code DispatchRequest}; it is then dispatched and the result
+     * is written back to the {@code OutputStream} passed in the
+     * {@code DispatchResponse}. </p>
+     *
+     * @param request the request object
+     * @param response the response object
+     * @param context provides context information and operations
+     *
+     * @throws IOException if IOException is raised while reading the request or writing the response
+     *                      (e.g. the container closes the streams due to a network connection abort)
      */
     void serviceRequest(DispatchRequest request,
-                        DispatchContext context,
-                        DispatchResponse response) throws IOException;
+                        DispatchResponse response,
+                        DispatchContext context) throws IOException;
 }

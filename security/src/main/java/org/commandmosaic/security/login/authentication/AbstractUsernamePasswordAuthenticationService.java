@@ -92,6 +92,6 @@ public abstract class AbstractUsernamePasswordAuthenticationService<T>
 
     protected abstract Identity mapToIdentity(T user);
 
-    protected abstract boolean checkPasswordMatches(String password, String passwordHash);
+    protected abstract boolean checkPasswordMatches(String password, String encodedPassword);
 
 }

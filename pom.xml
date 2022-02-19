@@ -38,7 +38,6 @@
         <developer>
             <id>peter-gergely-horvath</id>
             <name>Peter G. Horvath</name>
-            <email>peter.gergely.horvath@gmail.com</email>
             <roles>
                 <role>developer</role>
             </roles>
@@ -649,6 +648,10 @@
                     <id>ossrh</id>
                     <url>https://oss.sonatype.org/content/repositories/snapshots</url>
                 </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
             </distributionManagement>
         </profile>
     </profiles>

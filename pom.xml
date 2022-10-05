@@ -55,7 +55,7 @@
         <spring.version>5.2.6.RELEASE</spring.version>
         <springboot.version>2.3.1.RELEASE</springboot.version>
 
-        <jackson.version>2.13.1</jackson.version>
+        <jackson.version>2.13.2.1</jackson.version>
 
 
         <spotbug.version>4.0.4</spotbug.version>

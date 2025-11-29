@@ -1,228 +1,387 @@
-# CommandMosaic: a Java command pattern framework 
+# CommandMosaic
 
-  * [Introduction](#introduction)
-  * [Overview](#overview)
-  * [The API](#the-api)
-  * [Spring support](#spring-support)
-  * [Exposing Commands as a service](#exposing-commands-as-a-service)
-    * [Command names](#command-names)
-    * [Security](#security)
-    * [Built-in integrations for exposing commands as a service](#built-in-integrations-for-exposing-commands-as-a-service)
-    * [Using the CommandDispatcherServer server classes](#using-the-commanddispatcherserver-server-classes)
-  * [Implementing the Command Pattern](#implementing-the-command-pattern)
-    * [Command Pattern within a Plain Java application](#command-pattern-within-a-plain-java-application)
-    * [Command Pattern within a Spring Boot application](#command-pattern-within-a-spring-boot-application)
-  * [Exposing Commands from a Java application](#exposing-commands-from-a-java-application)
-    * [Exposing Commands through a Servlet (without Spring)](#exposing-commands-through-a-servlet-without-spring)
-    * [Exposing Commands from a Spring Boot application](#exposing-commands-from-a-spring-boot-application)
-  * [Servlerless Cloud with Amazon Lambda](#servlerless-cloud-with-amazon-lambda)
-    * [Plain Java AWS Lambda function (without Spring)](#plain-java-aws-lambda-function-without-spring)
-    * [Using Spring Boot 2.x+](#using-spring-boot-2x)
-    * [Are we building a monolithic Lambda application?](#are-we-building-a-monolithic-lambda-application)
-  * [Which dependency do you need](#which-dependency-do-you-need)
-  * [Spring Boot version required](#spring-boot-version-required)
-  * [Samples](#samples)
+**A Java framework for building services using the Command pattern**
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# Introduction
+## Why CommandMosaic?
 
-CommandMosaic is a project with the following high-level goals:
+While REST APIs work well for resource-oriented operations, modeling every business operation as CRUD (Create, Read, Update, Delete) can become challenging with complex domain logic:
 
-  * Promote the implementation of business logic via the Command design pattern.
-  
-  * Support a uniform programming model across a variety of Java application types,
-    regardless of their runtime environment, including serverless cloud providers.
+- **Domain mismatch**: Not all operations map to CRUD. A booking system needs `CancelBooking`, not `DELETE /booking` – the booking must remain for audit purposes with a compensating entry.
+- **Boilerplate overhead**: Each new feature requires creating controllers, defining routes, writing delegation logic, and updating API documentation.
+- **Testing complexity**: Integration testing serverless functions requires vendor-specific tooling and complex setup.
+
+CommandMosaic takes a different approach: **one dispatch endpoint, many commands**.
+
+## What You Get
+
+- **Single entry point**: One API endpoint handles all operations. Add features by implementing commands – no routing, no controllers, no configuration changes.
+- **Write once, run anywhere**: Same code runs in plain Java, servlets, Spring Boot, or AWS Lambda. Test Lambda functions with plain JUnit.
+- **Built-in security**: Declarative, annotation-based access control. Secure commands individually without touching infrastructure.
+- **Spring-native**: Commands are Spring beans with full support for `@Autowired`, transactions, and the entire Spring ecosystem.
+- **Minimal boilerplate**: Focus on business logic, not plumbing.
+
+## Quick Example
+
+### Define a command
+
+```java
+package com.example.commands;
+
+import org.commandmosaic.api.Command;
+import org.commandmosaic.api.CommandContext;
+import org.commandmosaic.api.Parameter;
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class ProcessPayment implements Command<PaymentResult> {
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Parameter
+    private String orderId;
     
-  * Decouple the development lifecycle of business logic from any specific 
-    target runtime environment so that the same code can run both as encapsulation
-    of logic in any generic Java application or exposed as service for remote clients.
+    @Parameter
+    private BigDecimal amount;
 
-  * Provide trivial-to-use, pure Java-based testing capabilities for business logic 
-    developed for serverless cloud platforms without using any vendor-specific tooling. 
-   
-  * Provide first class support for Spring Framework and Spring Boot features 
-    (auto-configuration, dependency injection, etc) without mandating their usage.
+    @Override
+    public PaymentResult execute(CommandContext context) {
+        return paymentService.processPayment(orderId, amount);
+    }
+}
+```
+
+### Invoke it
+
+**From Java code:**
+```java
+commandDispatcher.dispatchCommand(new ProcessPayment(orderId, amount), context);
+```
+
+**From a REST client:**
+```bash
+curl -X POST https://api.example.com/dispatch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "command": "ProcessPayment",
+    "parameters": {
+      "orderId": "ORD-123",
+      "amount": 99.99
+    },
+    "protocol": "CM/1.0"
+  }'
+```
+
+That's it. No routes to define, no controllers to write, no API Gateway configuration to update.
+
+## Architecture
+
+CommandMosaic separates **what** to execute from **how** it's invoked:
+
+```
+Client Request → CommandDispatcher → Command.execute() → Response
+```
+
+Commands are:
+- **Self-contained**: Encapsulate logic and parameters
+- **Testable**: Pure Java objects that run in JUnit
+- **Portable**: Same code across servlet, Spring Boot, AWS Lambda
+- **Discoverable**: Named by convention (package structure)
+
+## When to Use CommandMosaic
+
+**Good fit:**
+- Complex business domains that don't map cleanly to CRUD
+- Applications with many small operations (50+ endpoints)
+- Serverless architectures where you want to minimize API Gateway configuration
+- Teams that want rapid feature development without infrastructure changes
+- Applications requiring uniform security policies across operations
+
+**Maybe not:**
+- Pure CRUD applications with simple resource management
+- Public APIs that must conform to REST conventions
+- When you need fine-grained HTTP method semantics (GET caching, PUT idempotency, etc.)
+
+## Getting Started
+
+### Installation
+
+Add the dependency matching your runtime environment:
+
+```xml
+<!-- Plain Java -->
+<dependency>
+    <groupId>org.commandmosaic</groupId>
+    <artifactId>commandmosaic-plain-java</artifactId>
+    <version>2.0.0</version>
+</dependency>
+
+<!-- Spring Boot -->
+<dependency>
+    <groupId>org.commandmosaic</groupId>
+    <artifactId>commandmosaic-spring-boot-autoconfigure</artifactId>
+    <version>2.0.0</version>
+</dependency>
+
+<!-- AWS Lambda (Spring Boot) -->
+<dependency>
+    <groupId>org.commandmosaic</groupId>
+    <artifactId>commandmosaic-aws-lambda-springboot</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
+
+See [Which Dependency](#which-dependency-do-you-need) for the complete matrix.
+
+### Plain Java Setup
+
+```java
+CommandDispatcherConfiguration config = CommandDispatcherConfiguration.builder()
+    .rootPackage("com.example.commands")
+    .build();
+
+CommandDispatcherFactory factory = PlainCommandDispatcherFactory.getInstance();
+CommandDispatcher dispatcher = factory.getCommandDispatcher(config);
+
+// Execute commands
+String result = dispatcher.dispatchCommand(new GreetingCommand("Alice"), null);
+```
+
+### Spring Boot Setup
+
+Configure the dispatcher in your Spring configuration:
+
+```java
+@Configuration
+public class AppConfig {
     
-# Overview    
+    @Bean
+    public CommandDispatcherConfiguration commandDispatcherConfig() {
+        return CommandDispatcherConfiguration.builder()
+            .rootPackage("com.example.commands")
+            .build();
+    }
+}
+```
 
-The [Command design pattern](https://en.wikipedia.org/wiki/Command_pattern) is a 
-well-known pattern described in the ["Gang of Four"](http://wiki.c2.com/?GangOfFour)
-[Design Patterns: Elements of Reusable Object-Oriented Software](https://en.wikipedia.org/wiki/Design_Patterns)
-book.
+Inject and use:
 
-This Java library contains an implementation of the command pattern, 
-a simple programming interface for passing parameters to commands,
-and a minimalistic container for easily exposing commands as a 
-simple service with minimal amount of boilerplate code. 
+```java
+@Service
+public class BusinessService {
+    
+    @Autowired
+    private CommandDispatcher commandDispatcher;
+    
+    public void doSomething() {
+        Result result = commandDispatcher.dispatchCommand(
+            new SomeCommand(params), context
+        );
+    }
+}
+```
 
-In addition to this, out-of-the-box support is provided for the 
-industry standard Spring Framework allowing the library consumers
-to develop their commands as pure Spring Beans, with the rich
-set of functionality offered by Spring, like transaction support, 
-automatic dependency injection through Spring's `@Autowired` 
-annotation etc.
+### Expose as HTTP Endpoint (Spring Boot)
 
-The framework is runtime-agnostic, which means it can be used in practically 
-all environments, ranging from a small command line application through 
-Java Servlet based systems, any Spring or Spring Boot application, including 
-any serverless cloud platform, where  Java is available.
+Create a controller that delegates to the dispatcher:
 
-# The API 
+```java
+@RestController
+@RequestMapping("/api")
+public class CommandResource {
 
-Commands are simple Java classes that implement the business logic in
-the `execute` method defined in the `Command` interface. Their 
-parameters are passed via fields annotated with `@Parameter` annotation, 
-which are automatically injected by the framework.
+    private final CommandDispatcherServer dispatcherServer;
 
-    package sample;
-
-    import org.commandmosaic.api.Command;
-    import org.commandmosaic.api.Parameter;
-    import org.commandmosaic.api.CommandContext;
-
-    public class GreetingCommand implements Command<String> {
-
-        @Parameter
-        String name;
-
-        @Override
-        public String execute(CommandContext context) {
-            return "Hello " + name;
-        }
+    public CommandResource(CommandDispatcherServer dispatcherServer) {
+        this.dispatcherServer = dispatcherServer;
     }
 
-# Spring support 
-
-Spring is supported out-of-the box: a Command class can also be 
-a Spring bean, allowing it to be used according to powerful and 
-well-known Spring concepts, including automatic dependency 
-injection through Spring's `@Autowired` annotation.    
-
-    package sample;
-
-    import org.commandmosaic.api.Command;
-    import org.commandmosaic.api.Parameter;
-    import org.commandmosaic.api.CommandContext;
-    import org.springframework.beans.factory.annotation.Autowired;
-
-    public class GreetCommand implements Command<String> {
-
-        @Autowired
-        private GreetingService greetingService;
-
-        @Parameter
-        private String name;
-
-        @Override
-        public String execute(CommandContext context) {
-
-            return greetingService.getMessage(name);
-        }
+    @PostMapping("/dispatch")
+    public void dispatch(InputStream is, OutputStream os) throws IOException {
+        dispatcherServer.serviceRequest(is, os);
     }
+}
+```
 
-# Exposing Commands as a service 
+Request format:
 
-Today, the typical implementation pattern for building interactive web
+```json
+{
+  "command": "ProcessPayment",
+  "parameters": {
+    "orderId": "ORD-123",
+    "amount": 99.99
+  },
+  "protocol": "CM/1.0"
+}
+```
+
+## Security
+
+Commands are secured with annotations:
+
+```java
+// Public access
+@Access.IsPublic
+public class GetProductCatalog implements Command<List<Product>> {
+    // ...
+}
+
+// Requires authentication
+@Access.RequiresAnyOfTheAuthorities
+public class UpdateProfile implements Command<Void> {
+    // ...
+}
+
+// Role-based access
+@Access.RequiresAnyOfTheAuthorities({"ADMIN", "MANAGER"})
+public class DeleteUser implements Command<Void> {
+    // ...
+}
+```
+
+Implement authentication by extending `DefaultSecurityCommandInterceptor`:
+
+```java
+public class JwtSecurityInterceptor extends DefaultSecurityCommandInterceptor {
+    
+    @Override
+    protected Set<String> attemptLogin(CommandContext context) 
+            throws AuthenticationException {
+        Map<String, Object> auth = context.getAuth();
+        String token = (String) auth.get("token");
+        
+        // Validate token, extract roles
+        Claims claims = jwtService.validateToken(token);
+        return new HashSet<>(claims.get("roles", List.class));
+    }
+}
+```
+
+Register the interceptor:
+
+```java
+CommandDispatcherConfiguration config = CommandDispatcherConfiguration.builder()
+    .rootPackage("com.example.commands")
+    .interceptor(JwtSecurityInterceptor.class)
+    .build();
+```
+
+Clients pass authentication data in the `auth` field:
+
+```json
+{
+  "command": "DeleteUser",
+  "parameters": { "userId": 123 },
+  "auth": { "token": "eyJhbGc..." },
+  "protocol": "CM/1.0"
+}
+```
+
+## AWS Lambda Deployment
+
+CommandMosaic minimizes Lambda complexity: **one handler, one API Gateway endpoint, infinite operations**.
 applications is using RESTful web services: that is, mapping HTTP URL patterns
-and certain HTTP operations (GET, POST, PUT and DELETE) to the respective handler code.
+### Benefits
 
-While this is a nice and clear approach, there might be some drawbacks, esecially
-with more complex applications. As the application grows, the exposed interface
-becomes larger and larger. While Frameworks like Spring REST offer massive help
-with the implementation, some challenges still remain:
+- **Single API endpoint**: Add features without updating API Gateway configuration
+- **Test without AWS tooling**: Commands run in plain JUnit tests
+- **Unified codebase**: Same commands work in Lambda, servlets, and Spring Boot
+- **Cold start optimization**: One function to warm up, not dozens
 
-  * The service interfaces still have to be individually declared
-    * If you work with Spring, you will use @RestController, @RequestMapping etc annotations 
-		on the controller class. These make the declaration easy, but still: you have to write it.
+### Spring Boot Lambda Setup
+
+1. Add dependency:
 	
-  * Dispatching logic still has to be written for each request 
-    * If you work with Spring, you write the invocation of your @Service classes within 
-		your @RestController. While Spring offers a great deal of support here, this part of a 
-		RESTful service does not give to much value and can be considered as boilerplate code. 
-	
-  * Permission management is commonly based on HTTP URL patterns and HTTP operations.
-	  While you can surely bake your own solution, it takes time and effort to implement it properly.
-	  	  
-Based on this we can see the limitations of a implementing a service through via RESTful interfaces: 
+```xml
+<dependency>
+    <groupId>org.commandmosaic</groupId>
+    <artifactId>commandmosaic-aws-lambda-springboot</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
 
-  * Quite a lot of boilerplate coding is required
-  * The assumption that all business logic operations can be squeezed into a 
+2. Create request handler:
+
+```java
+package com.example;
     Create/Read/Update/Delete a resource pattern
-  * The exposed interface becomes large as the application grows. This makes
+import org.commandmosaic.aws.lambda.springboot.SpringBootLambdaCommandDispatcherRequestHandler;
     working with the interface more complex (e.g. consider AWS API Gateway and Lambda)
+public class AppRequestHandler extends SpringBootLambdaCommandDispatcherRequestHandler {
     
-   
-Unlike the traditional RESTful API pattern, CommandMosaic offers a slightly different approach:
-building the application out of small blocks -- commands -- and exposing one service, that
+    public AppRequestHandler() {
+        super(Application.class); // Your Spring Boot application class
 allows the remote clients to request the execution of a command. Security is managed at 
-the level of commands: each command simply declares who can execute it (role based security),
-but has to know nothing how it is actually invoked.
+}
+```
 
-With CommandMosaic, the only API operation exposed is dispatching of a command: this allows 
+3. Configure Lambda function with handler: `com.example.AppRequestHandler`
 keeping the interface minimal and focusing on the business logic instead of writing boilerplate 
-code for exposing operations for remote consumption. One simply does not have to write *any code* 
-to expose a new feature implemented as a command in the application. 
-This concept makes a great deal of difference with larger and more complex application. 
+4. Deploy. Your commands are now accessible via API Gateway.
 
-By default, a CommandMosaic command dispatch request is simply a JSON document sent 
+### Plain Java Lambda Setup
+
+For non-Spring deployments:
 to the dispatch handler via HTTP POST with similar structure:
-
-    {
-        "command": "Foobar",
-        "parameters" : {
-            "foo": "Hello there",
-            "bar": 42
-        },
+```xml
+<dependency>
+    <groupId>org.commandmosaic</groupId>
+    <artifactId>commandmosaic-aws-lambda-plain-java</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
         "protocol": "CM/1.0"    
-    }
-
-## Command names
-
-Exposing the full package structure of the application in remote scenarios would be
-especially undesirable. To prevent unwanted coupling and to reduce overall message size,
-CommandMosaic uses abbreviated command names, where command names do not contain the 
-common root package name prefix configured during the creation of the CommandDispatcher
-and use forward slash ("/") instead of the dot (".") package separator.
-  
-For example, assuming the `CommandDispatcher` used was configured with `org.acme` as the 
-root package, the following request would cause the command `org.acme.foo.bar.Foobar` 
-to be executed:
-
-    {
-        "command": "foo/bar/Foobar",
-        "protocol": "CM/1.0"    
-    }
-
-## Security 
-
-In remote service cases, having proper security is essential so that commands
-can only be executed by authorized clients only.  
-The module [commandmosaic-security](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/security) 
-contains support features for this requirement.
-
-Two annotations are provided to mark the access levels of each commands:
-
-  * `org.commandmosaic.security.annotation.Access.IsPublic`:
-    This annotation must be applied to all command classes that should be
-    available without authentication.
+```java
+public class AppRequestHandler extends PlainLambdaCommandDispatcherRequestHandler {
     
-  * `org.commandmosaic.security.annotation.Access.RequiresAnyOfTheAuthorities`
-    This annotation must be applied to all command classes that should only
-    be available to authenticated clients. Optionally, role based security
-    can be implemented by specifying the roles which should have access to 
-    the specific command.
-     
-Access control is implemented via `CommandInterceptor`s: application developers
-are required to develop a custom interceptor by extending the framework-provided
-class `org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor`
-and configure it for the `CommandDispatcher`. 
+    public AppRequestHandler() {
+        super(CommandDispatcherConfiguration.builder()
+            .rootPackage("com.example.commands")
+            .build());
+    }
+}
+```
+For example, assuming the `CommandDispatcher` used was configured with `org.acme` as the 
+### Testing Lambda Functions Locally
+to be executed:
+No AWS tooling required:
 
+```java
+@Test
+public void testPaymentProcessing() {
+    CommandDispatcher dispatcher = // ... create dispatcher
+## Security 
+    ProcessPayment command = new ProcessPayment();
+    command.setOrderId("ORD-123");
+    command.setAmount(new BigDecimal("99.99"));
+The module [commandmosaic-security](https://github.com/peter-gergely-horvath/commandmosaic/tree/master/security) 
+    PaymentResult result = dispatcher.dispatchCommand(command, null);
+
+    assertNotNull(result.getTransactionId());
+}
+```
+
+Or test the full HTTP flow with `CommandDispatcherServer` in a servlet container.
+
+### Module Declaration (Java 9+)
+
+For Spring Boot Lambda:
+
+```java
+module com.example.app {
+    requires org.commandmosaic.aws.lambda.springboot;
+    requires spring.boot.autoconfigure;
+    requires spring.boot;
+    requires spring.context;
+    requires spring.beans;
 `org.commandmosaic.security.interceptor.DefaultSecurityCommandInterceptor`
-provides a base implementation for security `CommandInterceptor`s: its 
-`attemptLogin(CommandContext)` method must be implemented by the end-user.
-Such implementations will want to extract the user-defined 
-authentication/authorization information from the request via the 
-`CommandContext.getAuth()` method.
+    opens com.example to
+        spring.core, spring.context, spring.beans,
+        org.commandmosaic.core;
+}
+```
 
 The user-provided security `CommandInterceptor` must be configured within
 `CommandDispatcherConfiguration`, otherwise security will not be enabled. 

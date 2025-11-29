@@ -37,10 +37,8 @@ public class CommandDispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String CONFIG_KEY_PREFIX = CommandDispatcherConfiguration.class.getName();
-
-    public static final String COMMAND_DISPATCHER_ROOT_PACKAGE = CONFIG_KEY_PREFIX + ".rootPackage";
-    public static final String COMMAND_DISPATCHER_INTERCEPTORS = CONFIG_KEY_PREFIX + ".interceptors";
+    public static final String COMMAND_DISPATCHER_ROOT_PACKAGE = "rootPackage";
+    public static final String COMMAND_DISPATCHER_INTERCEPTORS = "interceptors";
 
     /*
      * We follow the same pattern as javax.servlet.GenericServlet#config,

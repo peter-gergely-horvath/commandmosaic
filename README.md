@@ -429,13 +429,13 @@ Add the CommandMosaic servlet to your `web.xml`:
         
         <!-- Required: Root package for commands -->
         <init-param>
-            <param-name>commandDispatcherRootPackage</param-name>
+            <param-name>rootPackage</param-name>
             <param-value>com.example.commands</param-value>
         </init-param>
         
         <!-- Optional: Command interceptors for security, logging, etc. -->
         <init-param>
-            <param-name>commandDispatcherInterceptors</param-name>
+            <param-name>interceptors</param-name>
             <param-value>com.example.security.AuthInterceptor,com.example.logging.LoggingInterceptor</param-value>
         </init-param>
         
@@ -917,12 +917,12 @@ public class SecurityConfig {
     <servlet-class>org.commandmosaic.http.servlet.CommandDispatcherServlet</servlet-class>
     
     <init-param>
-        <param-name>commandDispatcherRootPackage</param-name>
+        <param-name>rootPackage</param-name>
         <param-value>com.example.commands</param-value>
     </init-param>
     
     <init-param>
-        <param-name>commandDispatcherInterceptors</param-name>
+        <param-name>interceptors</param-name>
         <param-value>com.example.security.JwtSecurityInterceptor</param-value>
     </init-param>
 </servlet>

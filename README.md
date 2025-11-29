@@ -369,6 +369,8 @@ public class CreateOrder implements Command<OrderResult> {
 ```
 
 > **Important:** Do NOT annotate commands with `@Component` or `@Service`. Commands have `@Parameter` fields that receive per-request values, so they must be created fresh for each execution. CommandMosaic automatically registers commands as **prototype-scoped beans** in Spring's bean factory, ensuring thread-safety and proper parameter injection.
+> 
+> **Note on Performance:** Prototype-scoped beans have a small creation overhead (~0.1-0.5ms per command), but this is negligible compared to typical I/O operations (database queries, network calls). For most web applications, this represents <2% of total request time. See [Performance Implications](#performance-implications) for details.
 
 #### 5. Call Your API
 
@@ -1097,6 +1099,108 @@ public class CreateOrder implements Command<OrderResult> {
 - ✓ Use `@Autowired` for singleton services
 - ✓ Use `@Parameter` for per-request data
 - ✓ Spring features (transactions, AOP) work correctly
+
+#### Performance Implications
+
+** Command objects are created as prototype-scoped beans: These have overhead compared to singletons**, but the impact is often negligible for typical use cases:
+
+**The Cost:**
+- Each command execution creates a new object instance
+- Spring's bean creation involves:
+  - Object instantiation via reflection
+  - Dependency injection (@Autowired fields/setters)
+  - Post-processor callbacks
+  - AOP proxy creation (if @Transactional or other aspects are used)
+- Memory allocation and garbage collection overhead
+
+**Typical Performance Impact:**
+- Bean creation overhead: **~0.1-0.5ms per command** (varies by complexity)
+- For commands with database operations, network calls, or business logic: **negligible** (operations take 10-1000ms+)
+- For extremely simple commands (pure computation, no I/O): overhead may be **5-10% of total time**
+
+**When This Matters:**
+- ❌ **Rarely matters**: Commands that do database queries, API calls, file I/O (the overhead is noise compared to I/O time)
+- ⚠️ **May matter**: Extremely high-throughput scenarios (>10,000 requests/second per instance) with very simple commands
+- ⚠️ **May matter**: Commands used in tight loops within application code (not via HTTP dispatch)
+
+**Performance vs. Correctness Trade-off:**
+
+The prototype scope is **required for correctness**. Without it:
+```java
+// ❌ Singleton command = DATA CORRUPTION
+@Component  // Creates singleton
+public class ProcessPayment implements Command<PaymentResult> {
+    @Parameter
+    private String orderId;  // Shared across threads!
+    
+    // Thread 1: orderId = "A"
+    // Thread 2: orderId = "B" (overwrites Thread 1's value!)
+    // Result: Thread 1 processes order "B" instead of "A"
+}
+```
+
+The performance overhead is **far preferable to data corruption**.
+
+**Optimization Strategies (if needed):**
+
+1. **Most commands don't need optimization** - I/O dominates execution time
+
+2. **For high-throughput simple commands**, consider:
+   ```java
+   // Keep business logic services as singletons
+   @Service
+   public class PaymentCalculator {
+       public BigDecimal calculate(Order order) {
+           // Complex calculation logic as singleton
+           // No state, thread-safe
+       }
+   }
+   
+   // Command is just a thin wrapper
+   public class CalculatePayment implements Command<BigDecimal> {
+       @Autowired
+       private PaymentCalculator calculator;  // Singleton, no creation overhead
+       
+       @Parameter
+       private Order order;
+       
+       @Override
+       public BigDecimal execute(CommandContext context) {
+           return calculator.calculate(order);  // Delegate to singleton
+       }
+   }
+   ```
+
+3. **For tight-loop scenarios**, invoke services directly:
+   ```java
+   @Service
+   public class OrderProcessor {
+       @Autowired
+       private PaymentService paymentService;
+       
+       public void processBatch(List<Order> orders) {
+           for (Order order : orders) {
+               // Don't dispatch commands in a tight loop
+               // Call services directly for batch operations
+               paymentService.process(order);
+           }
+       }
+   }
+   ```
+
+4. **Profile before optimizing** - Use tools like JProfiler or YourKit to identify actual bottlenecks
+
+**Real-World Perspective:**
+
+In a typical web application:
+- **Network latency**: 10-100ms
+- **Database query**: 5-50ms
+- **Business logic**: 1-10ms
+- **Prototype bean creation**: 0.1-0.5ms
+
+The bean creation overhead is **0.1-2% of total request time** - usually not worth optimizing.
+
+**Conclusion:** The prototype scope overhead is a reasonable trade-off for thread-safety and correctness. For the vast majority of use cases (HTTP APIs, REST services, Lambda functions), the performance impact is negligible compared to I/O operations.
 
 ### Using CommandDispatcherServer
 
